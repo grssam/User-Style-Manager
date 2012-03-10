@@ -1,0 +1,27 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+@-moz-document url(chrome://mozapps/content/extensions/extensions.xul), url(about:addons) {
+#view-port-container {margin-bottom: -10px !important;}
+#list-view .global-warning-container, #list-view .addon > .warning {display: none !important;}
+#list-view .addon .content-inner-container {-moz-box-orient: horizontal !important;}
+#list-view .addon :-moz-any(.name-container, .name) {font-size: 20px !important;}
+#list-view .addon.addon-view {padding: 5px 4px 5px 0 !important;}
+#list-view .addon.addon-view[active="true"]:not([selected]) .description {opacity: 0.5 !important;}
+#list-view .addon.addon-view .description-outer-container {overflow: hidden !important;}
+
+#list-view .addon.addon-view * {
+  -moz-box-align: center !important;
+  vertical-align: middle !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-right: 0 !important;
+  white-space: nowrap !important;
+}
+
+#list-view .addon .icon-container,
+#list-view .addon .icon {
+  width: 20px !important;
+  height: 20px !important;
+  padding: 0 !important;
+}
+}

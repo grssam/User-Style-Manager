@@ -1,0 +1,341 @@
+<?xml version="1.0"?>
+<!-- ***** BEGIN LICENSE BLOCK *****
+ - Version: MIT/X11 License
+ - 
+ - Copyright (c) 2011 Girish Sharma
+ - 
+ - Permission is hereby granted, free of charge, to any person obtaining copy
+ - of this software and associated documentation files (the "Software"), to deal
+ - in the Software without restriction, including without limitation the rights
+ - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ - copies of the Software, and to permit persons to whom the Software is
+ - furnished to do so, subject to the following conditions:
+ - 
+ - The above copyright notice and this permission notice shall be included in
+ - all copies or substantial portions of the Software.
+ - 
+ - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ - THE SOFTWARE.
+ -
+ - The original code is the Scratchpad.xul
+ -
+ - Creator:
+ -   Girish Sharma <scrapmachines@gmail.com>
+ -
+ - ***** END LICENSE BLOCK ***** -->
+<!DOCTYPE window SYSTEM "chrome://userstylemanager/locale/styleeditor.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="editor.css" type="text/css"?>
+<?xul-overlay href="chrome://global/content/editMenuOverlay.xul"?>
+<?xul-overlay href="chrome://browser/content/source-editor-overlay.xul"?>
+<window id="USMEditor" width="800" height="600"
+  style="min-height:600px;min-width:800px"
+  persist="screenX screenY width height sizemode"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/javascript" src="chrome://global/content/globalOverlay.js"/>
+  <script type="application/x-javascript" src="editor.js"/>
+  <commandset id="editMenuCommands"/>
+  <commandset id="sourceEditorCommands"/>
+  <commandset>
+    <command id="se-cmd-find" oncommand="styleEditor.doFind();"/>
+    <command id="se-cmd-findPrevious" oncommand="styleEditor.doFindPrevious();"/>
+    <command id="se-cmd-replace" oncommand="styleEditor.doReplace();"/>
+    <command id="se-cmd-undo" oncommand="styleEditor.undo();" disabled="true"/>
+    <command id="se-cmd-redo" oncommand="styleEditor.redo();" disabled="true"/>
+    <command id="se-cmd-preview" oncommand="styleEditor.previewButtonClick();"/>
+    <command id="se-cmd-save" oncommand="styleEditor.saveButtonClick();"/>
+    <command id="se-cmd-exit" oncommand="styleEditor.exitButtonClick();"/>
+    <command id="se-cmd-addNamespace" oncommand="styleEditor.addNamespace();"/>
+    <command id="se-cmd-addWebNamespace" oncommand="styleEditor.addWebNamespace();"/>
+    <command id="se-cmd-addMozURL" oncommand="styleEditor.addMozURL();"/>
+    <command id="se-cmd-addMozPreURL" oncommand="styleEditor.addMozPreURL();"/>
+    <command id="se-cmd-addMozDomain" oncommand="styleEditor.addMozDomain();"/>
+  </commandset>
+  <keyset>
+    <key id="se-key-save"
+         key="&saveCmd.key;"
+         command="se-cmd-save"
+         modifiers="accel"/>
+    <key id="se-key-preview"
+         key="&previewCmd.key;"
+         command="se-cmd-preview"
+         modifiers="accel"/>
+    <key id="se-key-exit"
+         key="&exitCmd.key;"
+         command="se-cmd-exit"
+         modifiers="accel"/>
+
+
+    <key id="key_cut"
+         key="&cutCmd.key;"
+         modifiers="accel"/>
+    <key id="key_copy"
+         key="&copyCmd.key;"
+         modifiers="accel"/>
+    <key id="key_paste"
+         key="&pasteCmd.key;"
+         modifiers="accel"/>
+    <key id="key_selectAll" key="&selectAllCmd.key;" modifiers="accel"/>
+    <key id="key_undo" key="&undoCmd.key;" modifiers="accel"
+         oncommand="styleEditor.undo();"/>
+    <key id="key_redo" key="&undoCmd.key;" modifiers="accel,shift"
+         oncommand="styleEditor.redo();"/>
+#ifdef XP_MACOSX
+    <key id="key_find"
+         key="&findCmd.key;"
+         command="se-cmd-find"
+         modifiers="accel"/>
+    <key id="key_findPrevious"
+         key="&findPreviousCmd.key;"
+         command="se-cmd-findPrevious"
+         modifiers="accel,shift"/>
+#else
+    <key id="key_find"
+         keycode="VK_F3"
+         command="se-cmd-find"/>
+    <key id="key_findPrevious"
+         keycode="VK_F3"
+         command="se-cmd-findPrevious"
+         modifiers="shift"/>
+#endif
+
+    <key id="key_replace"
+         key="&replaceCmd.key;"
+         command="se-cmd-replace"
+         modifiers="accel"/>
+
+    <key id="key_gotoLine"
+         key="&gotoLineCmd.key;"
+         command="cmd_gotoLine"
+         modifiers="accel"/>
+
+    <key id="key_addNamespace"
+         key="&addNameSpace.key;"
+         command="se-cmd-addNamespace"
+         modifiers="accel"/>
+    <key id="key_addWebNamespace"
+         key="&addWebNameSpace.key;"
+         command="se-cmd-addWebNamespace"
+         modifiers="accel, shift"/>
+    <key id="key_addMozURL"
+         key="&addMozURL.key;"
+         command="se-cmd-addMozURL"
+         modifiers="accel"/>
+    <key id="key_addMozPreURL"
+         key="&addMozPreURL.key;"
+         command="se-cmd-addMozPreURL"
+         modifiers="accel, shift"/>
+    <key id="key_addMozDomain"
+         key="&addMozDomain.key;"
+         command="se-cmd-addMozDomain"
+         modifiers="accel"/>
+  </keyset>
+
+  <vbox id="se-search-panel-container">
+    <hbox id="se-top-panel">
+      <menubar id="se-menubar" style="margin:2px 0px;" height="24">
+        <menu id="se-file-menu" label="&fileMenu.label;"
+              accesskey="&fileMenu.accesskey;">
+          <menupopup id="se-menu-filepopup">
+            <menuitem id="se-menu-save"
+                      label="&saveCmd.label;"
+                      accesskey="&saveCmd.accesskey;"
+                      key="se-key-save"
+                      command="se-cmd-save"/>
+            <menuitem id="se-menu-preview"
+                      label="&previewCmd.label;"
+                      accesskey="&previewCmd.accesskey;"
+                      key="se-key-preview"
+                      command="se-cmd-preview"/>
+            <menuseparator/>
+            <menuitem id="se-menu-exit"
+                      label="&exitCmd.label;"
+                      key="se-key-exit"
+                      accesskey="&exitCmd.accesskey;"
+                      command="se-cmd-exit"/>
+          </menupopup>
+        </menu>
+
+        <menu id="se-edit-menu" label="&editMenu.label;"
+              accesskey="&editMenu.accesskey;">
+          <menupopup id="se-menu_editpopup"
+                     onpopupshowing="styleEditor.onContextMenuShowing()">
+            <menuitem id="se-menu-undo"
+                      label="&undoCmd.label;"
+                      key="key_undo"
+                      accesskey="&undoCmd.accesskey;"
+                      command="se-cmd-undo"/>
+            <menuitem id="se-menu-redo"
+                      label="&redoCmd.label;"
+                      key="key_redo"
+                      accesskey="&redoCmd.accesskey;"
+                      command="se-cmd-redo"/>
+            <menuseparator/>
+            <menuitem id="se-menu-cut"
+                      label="&cutCmd.label;"
+                      key="key_cut"
+                      accesskey="&cutCmd.accesskey;"
+                      command="cmd_cut"/>
+            <menuitem id="se-menu-copy"
+                      label="&copyCmd.label;"
+                      key="key_copy"
+                      accesskey="&copyCmd.accesskey;"
+                      command="cmd_copy"/>
+            <menuitem id="se-menu-paste"
+                      label="&pasteCmd.label;"
+                      key="key_paste"
+                      accesskey="&pasteCmd.accesskey;"
+                      command="cmd_paste"/>
+            <menuseparator/>
+            <menuitem id="se-menu-selectAll"
+                      label="&selectAllCmd.label;"
+                      key="key_selectAll"
+                      accesskey="&selectAllCmd.accesskey;"
+                      command="cmd_selectAll"/>
+            <menuseparator/>
+            <menuitem id="se-menu-gotoLine"
+                      label="&gotoLineCmd.label;"
+                      accesskey="&gotoLineCmd.accesskey;"
+                      key="key_gotoLine"
+                      command="cmd_gotoLine"/>
+          </menupopup>
+        </menu>
+        <menu id="se-tools-menu" label="&toolsMenu.label;"
+              accesskey="&toolsMenu.accesskey;">
+          <menupopup id="se-menu_toolspopup"
+                     onpopupshowing="styleEditor.onToolsMenuShowing()"
+                     onpopuphiding="styleEditor.onToolsMenuHiding();">
+            <menuitem id="se-menu-addNamespace"
+                      label="&addNameSpace.label;"
+                      key="key_addNamespace"
+                      accesskey="&addNameSpace.accesskey;"
+                      command="se-cmd-addNamespace"/>
+            <menuitem id="se-menu-addWebNamespace"
+                      label="&addWebNameSpace.label;"
+                      key="key_addWebNamespace"
+                      accesskey="&addWebNameSpace.accesskey;"
+                      command="se-cmd-addWebNamespace"/>
+            <menuitem id="se-menu-addMozURL"
+                      label="&addMozURL.label;"
+                      key="key_addMozURL"
+                      accesskey="&addMozURL.accesskey;"
+                      command="se-cmd-addMozURL"/>
+            <menuitem id="se-menu-addMozPreURL"
+                      label="&addMozPreURL.label;"
+                      key="key_addMozPreURL"
+                      accesskey="&addMozPreURL.accesskey;"
+                      command="se-cmd-addMozPreURL"/>
+            <menuitem id="se-menu-addMozDomain"
+                      label="&addMozDomain.label;"
+                      key="key_addMozDomain"
+                      accesskey="&addMozDomain.accesskey;"
+                      command="se-cmd-addMozDomain"/>
+          </menupopup>
+        </menu>
+      </menubar>
+      <spacer flex="1" />
+      <hbox id="se-search-panel" minheight="28">
+        <textbox type="search" id="se-search-box" placeholder="&search.placeholder;" flex="1" minwidth="200"
+          onfocus="styleEditor.onSearchFocus();" onblur="styleEditor.onSearchBlur();" command="se-cmd-find"/>
+        <hbox id="se-search-toolbar" minheight="24">
+          <label value=" 0" id="se-search-index"/>
+          <label value="/" id="se-search-splitter" />
+          <label value=" 0" id="se-search-count"/>
+          <label id="se-search-prev" class="search-buttons search-prev"
+            tooltiptext="&search.prev.tooltip;" onclick="styleEditor.doFindPrevious();">&lt;</label>
+          <label id="se-search-next" class="search-buttons search-next"
+            tooltiptext="&search.next.tooltip;" onclick="styleEditor.doFind();">&gt;</label>
+          <toolbarbutton id="se-search-options" tooltiptext="&search.options.tooltip;" type="menu"
+            image="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACN0lEQVR42mNgwAXq65mmnHwi3L//vAADOWDGofv+s488Oj3n8IMjPftvihDUUF+/im3GkXulUw7fCZx25L7FrEP3t8w88uA0CM84eK9lwu67cjMP3vMDyWE1YOr+W61AhadnHLiLF08/ePfolL23jTANOHC3EIhPT4HhvXd2TNl/q3fK/juzp+6/dwImDlIzad9NfQwDJu64HTZ5z+3TIDxpz+1ih/r9LDC5zg031CfvvbUNJDdh7+0joatWMcM1Juzfz9G3+3pU387ru/p33zjdv+P6fJB427bbot07ruf0bbvsBuJ37LxuBZYH4t6dV0vL5t7ghZi+44pj9/Zrp7u2XQXjzq2XY8Eatl6ZDRIH4aZN502BQoxd264dgKnr2XF9EdiApi0Xbdu3Xj7dBsUdmy/HgV2w5eoSkDgIN2+8ZAcyoG3LpUMwda2bLi6He6Npwxnz5k0XNrdsvHC6ecOFeeBoXXFSrWndxdbmTReTQfzadZcsQfJgvOF8f/O6s5oogViz6nRy/dpzp0G4bu05lEAsW3xaHSi2DSy3+uwuoPFMGLFQseLE1PIVp06XL4fgsuUnd5SvONFbtuLk7IqVJ0/AxIFqjqfN3M2PYUDuosMTCxYdOZ23AD/OX3T0aNbi/SoYBnjmTmJPm7ErMX3SPv3kSTvMUmfuP5I+68BpCN5bkjJ7n3HG7H3FydP3WROVmeKm7CxNnLb7dPzUXRsYHOpZSM6NWqH1bHFT9gi7dS/ixqcOAIKNhvsWmZLDAAAAAElFTkSuQmCC"
+            class="search-options">
+              <menupopup id="se-search-options-panel" noautohide="true" position="after_end"
+                onpopuphidden="styleEditor.searchPanelHidden();" flex="1">
+                <grid>
+                  <columns>
+                    <column flex="1" />
+                    <column flex="1" />
+                    <column flex="1" />
+                  </columns>
+                  <rows>
+                    <row>
+                      <checkbox label="&search.wrap;" accesskey="&search.wrap.accesskey;"
+                        id="se-search-wrap" tooltiptext="&search.wrap.tooltip;" checked="true"/>
+                      <checkbox label="&search.ignoreCase;" accesskey="&search.ignoreCase.accesskey;"
+                        id="se-search-case" tooltiptext="&search.ignoreCase.tooltip;" checked="true"/>
+                      <checkbox label="&search.highlightAll;" accesskey="&search.highlightAll.accesskey;"
+                        id="se-search-highlight" tooltiptext="&search.highlightAll.tooltip;"/>
+                    </row>
+                    <row>
+                      <checkbox label="&search.regexp;" accesskey="&search.regexp.accesskey;"
+                        id="se-search-regexp" tooltiptext="&search.regexp.tooltip;"/>
+                      <checkbox label="&search.backwards;" accesskey="&search.backwards.accesskey;"
+                        id="se-search-backwards" tooltiptext="&search.backwards.tooltip;"/>
+                      <menuitem label="&replace;" accesskey="&replace.accesskey;"
+                        id="se-replace" tooltiptext="&replace.tooltip;" onclick="styleEditor.doReplace();" />
+                    </row>
+                  </rows>
+                </grid>
+              </menupopup>
+          </toolbarbutton>
+        </hbox>
+      </hbox>
+    </hbox>
+    <hbox id="se-replace-container" minheight="28">
+      <label class="close-button" onclick="styleEditor.closeReplace();"/>
+      <spacer flex="1"/>
+      <hbox>
+        <textbox id="se-replace-box" placeholder="&replace.placeholder;" minwidth="200" flex="1"
+          onfocus="styleEditor.onReplaceFocus();" onblur="styleEditor.onReplaceBlur();"/>
+        <hbox id="se-replace-toolbar" minheight="24">
+          <label id="se-replace-this" tooltiptext="&replace.this.tooltip;" onclick="styleEditor.doReplace();"
+            class="replace-buttons">&#x2714;</label>
+          <label id="se-replace-all" tooltiptext="&replace.all.tooltip;" onclick="styleEditor.doReplace(true);"
+            class="replace-buttons">&replace.all.tooltip;</label>
+        </hbox>
+      </hbox>
+    </hbox>
+  </vbox>
+  <vbox id="USMTextEditorContainer" flex="1">
+    <vbox id="USMTextEditor" flex="1"/>
+  </vbox>
+  <vbox id="USMButtonContainerV">
+    <hbox id="USMButtonContainer" style="margin:10px">
+      <label value="&fileName.label;" id="USMFileNameLabel" control="USMFileNameBox"
+        style="padding:4px;" accesskey="&fileName.accesskey;" tooltiptext="&fileName.tooltip;"/>
+      <label value="&fileNameEditing.label;" id="USMFileNameEditingLabel" collapsed="true"
+        style="padding:4px;" accesskey="&fileName.accesskey;" control="USMFileNameBox" tooltiptext="&fileName.tooltip;"/>
+      <textbox id="USMFileNameBox" width="150" tooltiptext="&fileName.tooltip;"/>
+      <spacer flex="1"/>
+      <button id="USMButtonPreview" label="&previewCmd.label;" style="margin:0px 5px;" accesskey="&previewCmd.accesskey;"/>
+      <button id="USMButtonSave" label="&saveCmd.label;" style="margin:0px 5px;" accesskey="&saveCmd.accesskey;"/>
+      <button id="USMButtonExit" label="&exitCmd.label;" style="margin:0px 5px;" accesskey="&exitCmd.accesskey;"/>
+    </hbox>
+  </vbox>
+  <popupset id="USMStyleEditorPopups">
+    <menupopup id="USMStyleEditorContextMenu"
+      onpopupshowing="styleEditor.onContextMenuShowing()">
+        <menuitem id="menu_cut"/>
+        <menuitem id="menu_copy"/>
+        <menuitem id="menu_paste"/>
+        <menuitem id="menu_delete"/>
+        <menuseparator/>
+        <menuitem id="menu_selectAll"/>
+        <menuseparator/>
+        <menuitem id="se-menu_undo"
+                  label="&undoCmd.label;"
+                  key="key_undo"
+                  accesskey="&undoCmd.accesskey;"
+                  command="se-cmd-undo"/>
+        <menuitem id="se-menu_redo"
+                  label="&redoCmd.label;"
+                  key="key_redo"
+                  accesskey="&redoCmd.accesskey;"
+                  command="se-cmd-redo"/>
+    </menupopup>
+  </popupset>
+</window>

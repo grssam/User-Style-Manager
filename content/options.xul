@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<!-- ***** BEGIN LICENSE BLOCK *****
+ - Version: MIT/X11 License
+ - 
+ - Copyright (c) 2011 Girish Sharma
+ - 
+ - Permission is hereby granted, free of charge, to any person obtaining copy
+ - of this software and associated documentation files (the "Software"), to deal
+ - in the Software without restriction, including without limitation the rights
+ - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ - copies of the Software, and to permit persons to whom the Software is
+ - furnished to do so, subject to the following conditions:
+ - 
+ - The above copyright notice and this permission notice shall be included in
+ - all copies or substantial portions of the Software.
+ - 
+ - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ - THE SOFTWARE.
+ -
+ - Creator:
+ -   Girish Sharma <scrapmachines@gmail.com>
+ -
+ - ***** END LICENSE BLOCK ***** -->
+<!DOCTYPE window SYSTEM "chrome://userstylemanager/locale/optionwindow.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="options.css" type="text/css"?>
+<prefwindow id="USMOptionsWindow" title="&window.title;"
+  minwidth="800" minheight="600" flex="1"
+  buttons="accept,cancel" ondialogaccept="optionsWindow.saveChanges();"
+  persist="sizemode width height"
+  onload="optionsWindow.onLoad()" onunload="optionsWindow.onUnload()"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript" src="options.js"/>
+  <notificationbox id="changeNotificationBox" flex="1"/>
+  <prefpane id="USMOptionsPane">
+    <preferences>
+      <preference id="maintainBackup" name="extensions.UserStyleManager.maintainBackup" type="bool"/>
+      <preference id="fallBack" name="extensions.UserStyleManager.fallBack" type="bool"/>
+      <preference id="hideWindow" name="extensions.UserStyleManager.hideOptionsWhileEditing" type="bool"/>
+      <preference id="createAppMenu" name="extensions.UserStyleManager.createAppMenuButton" type="bool"/>
+      <preference id="createToolbarButton" name="extensions.UserStyleManager.createToolbarButton" type="bool"/>
+      <preference id="createToolsMenu" name="extensions.UserStyleManager.createToolsMenuButton" type="bool"/>
+      <preference id="createHotKey" name="extensions.UserStyleManager.createHotKey" type="bool"/>
+      <preference id="createContextMenu" name="extensions.UserStyleManager.createContextMenuEntry" type="bool"/>
+    </preferences>
+    <vbox flex="1">
+      <groupbox id="syleSheetListContainer" flex="1">
+        <caption label="&styleSheet.list.caption;" style="font-size:14px;"/>
+        <tree id="styleSheetTree" flex="1" hidecolumnpicker="false"
+          class="tree" rows="10" editable="true">
+
+          <treecols>
+            <treecol id="styleSheetStateCol" primary="true" flex="0" label=""
+              ordinal="1" type="checkbox" editable="true" minwidth="50" maxwidth="50"/>
+            <splitter class="tree-splitter" ordinal="2"/>
+            <treecol id="styleSheetNameCol" flex="1" label="&styleHeader.name;"
+              persist="width" ordinal="3" editable="true"/>
+            <splitter class="tree-splitter" ordinal="4"/>
+            <treecol id="styleSheetAppliesOnCol" flex="1" label="&styleHeader.affects;"
+              persist="width" ordinal="5" editable="false" crop="center"/>
+            <splitter class="tree-splitter" ordinal="6"/>
+            <treecol id="styleSheetDateAdded" flex="1" label="&styleHeader.dateAdded;"
+              persist="width" ordinal="7" editable="false"/>
+            <splitter class="tree-splitter" ordinal="8"/>
+            <treecol id="styleSheetDateModified" flex="1" label="&styleHeader.dateModified;"
+              persist="width" ordinal="9" editable="false"/>
+          </treecols>
+          <treechildren id="styleSheetList" flex="1"/>
+        </tree>
+        <hbox style="margin:5px;">
+          <button id="updateStyleSheet" label="&updateBtn.label;" disabled="true"
+            accesskey="&updateBtn.accesskey;" tooltiptext="&updateBtn.tooltip;"/>
+          <button id="updateAllStyleSheet" label="&updateAllBtn.label;" disabled="true"
+            accesskey="&updateAllBtn.accesskey;" tooltiptext="&updateAllBtn.tooltip;"/>
+          <spacer flex="1"/>
+          <button id="moreInfo" label="&infoBtn.label;" onclick="optionsWindow.showMoreInfo();"
+            tooltiptext="&infoBtn.tooltip;" accesskey="&infoBtn.accesskey;"/>
+          <button id="editStyleSheet" label="&editBtn.label;" onclick="optionsWindow.editStyleSheet();"
+            tooltiptext="&editBtn.tooltip;" accesskey="&editBtn.accesskey;"/>
+          <button id="deleteStyleSheet" label="&deleteBtn.label;" onclick="optionsWindow.deleteStyleSheet();"
+            tooltiptext="&deleteBtn.tooltip;" accesskey="&deleteBtn.accesskey;"/>
+        </hbox>
+      </groupbox>
+      <hbox>
+        <groupbox>
+          <caption label="&settings.caption;" />
+          <grid>
+            <rows>
+              <row>
+                <checkbox id="maintainBackupCheckBox" preference="maintainBackup" onclick="optionsWindow.notifyChange()"
+                  tooltiptext="&backup.tooltip;" label="&backup.label;" accesskey="&backup.accesskey;" />
+              </row>
+              <row>
+                <checkbox id="fallBackCheckBox" preference="fallBack" tooltiptext="&fallback.tooltip;"
+                  onclick="optionsWindow.notifyChange()" accesskey="&fallback.accesskey;" label="&fallback.label;" />
+              </row>
+              <row>
+                <checkbox id="hideWindowCheckBox" preference="hideWindow" onclick="optionsWindow.notifyChange()"
+                  tooltiptext="&hideWindow.tooltip;" accesskey="&hideWindow.accesskey;" label="&hideWindow.label;" />
+              </row>
+            </rows>
+          </grid>
+        </groupbox>
+        <groupbox>
+          <caption label="&menuEntry.caption;" />
+          <grid>
+            <rows>
+              <row>
+                <checkbox id="createAppMenuCheckBox" preference="createAppMenu" onclick="optionsWindow.notifyChange()"
+                  tooltiptext="&appMenu.tooltip;" accesskey="&appMenu.accesskey;" label="&appMenu.label;" />
+                <checkbox id="createToolbarButtonCheckBox" preference="createToolbarButton" onclick="optionsWindow.notifyChange()"
+                  tooltiptext="&button.tooltip;" accesskey="&button.accesskey;" label="&button.label;" />
+              </row>
+              <row>
+                <checkbox id="createToolsMenuCheckBox" preference="createToolsMenu" tooltiptext="&toolsMenu.tooltip;"
+                  onclick="optionsWindow.notifyChange()" accesskey="&toolsMenu.accesskey;" label="&toolsMenu.label;" />
+                <checkbox id="createContextMenuCheckBox" preference="createContextMenu" tooltiptext="&contextMenu.tooltip;"
+                  onclick="optionsWindow.notifyChange()" accesskey="&contextMenu.accesskey;" label="&contextMenu.label;" />
+              </row>
+            </rows>
+          </grid>
+        </groupbox>
+        <spacer flex="1" />
+        <vbox>
+          <hbox>
+            <spacer flex="1"/>
+            <checkbox id="createHotKeyCheckBox" preference="createHotKey" onclick="optionsWindow.notifyChange()"
+              tooltiptext="&hotkey.tooltip;" accesskey="&hotkey.accesskey;" label="&hotkey.label;" />
+          </hbox>
+          <hbox>
+            <label id="shortcutLabel" value="&combination.label;"
+              accesskey="&combination.accesskey;" control="shortcutTextBox" style="padding: 5px 0px;"/>
+            <textbox flex="1" id="shortcutTextBox" value="" width="120px" style="margin-right:5px;"
+              onkeyup="optionsWindow.notifyChange(this.value);" tooltiptext="&combination.tooltip;"/>
+          </hbox>
+          <spacer flex="1"/>
+          <hbox>
+            <spacer flex="1"/>
+            <label accesskey="&addBtn.accesskey;" control="addStyleSheetButton" style="padding:5px 0px;"
+              tooltiptext="&addBtn.label.tooltip;">&addBtn.label.label;</label>
+            <button id="addStyleSheetButton" label="&addBtn.label;" onclick="optionsWindow.openFile();"
+              tooltiptext="&addBtn.tooltip;"/>
+            <button id="createStyleSheet" label="&createBtn.label;" onclick="optionsWindow.createStyleSheet();"
+              tooltiptext="&createBtn.tooltip;" accesskey="&createBtn.accesskey;" style="margin-right:5px;"/>
+          </hbox>
+        </vbox>
+      </hbox>
+    </vbox>
+  </prefpane>
+</prefwindow>

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<dialog
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+  id="moreInfoDialog" title=""
+  buttons="accept" ondialogaccept="window.close();"
+  buttonpack="center"
+  onload="onLoad();" width="400" height="250"
+  windowtype="styleSheetInfoDialogBox">
+  <script type="text/javascript">
+    function toDateString(dateString) {
+      let date = new Date(JSON.parse(dateString));
+      return date.toLocaleString().split(", ").filter(function(part) part.indexOf("day") > 0? false: true).join(", ");
+    }
+    function onLoad() {
+      if(window.arguments[0][3].length == 0)
+        document.getElementById("homeLink").style.display="none";
+      else
+        document.getElementById("homeLink").href=window.arguments[0][3];
+      document.title = "Information for " + unescape(window.arguments[0][1]) + " - User Style Manager";
+      document.getElementById("name").value=unescape(window.arguments[0][1]);
+      if (window.arguments[0][4].length > 0)
+        document.getElementById("affects").value=window.arguments[0][4];
+      else
+        document.getElementById("affects").value="No Information";
+      document.getElementById("added").value=toDateString(window.arguments[0][5]);
+      if (window.arguments[0][6].length == 0)
+        document.getElementById("modified").value="Never modified yet."
+      else
+        document.getElementById("modified").value=toDateString(window.arguments[0][6]);
+    }
+  </script>
+  <grid flex="1">
+    <columns><column flex="1"/><column flex="1"/></columns>
+    <rows>
+      <row align="center"><label style="text-align:right;" value="User Style Name :"/><label id="name" value="" flex="1" crop="center"/></row>
+      <row align="center"><label style="text-align:right;" value="Style Added on :"/><label id="added" value="" flex="1" crop="center"/></row>
+      <row align="center"><label style="text-align:right;" value="Last Modified on :"/><label id="modified" value="" flex="1" crop="center"/></row>
+      <row align="center"><label style="text-align:right;" value="Style Sheet Affects :"/><label id="affects" value="" flex="1" crop="center"/></row>
+    </rows>
+  </grid>
+  <hbox flex="1" pack="center">
+    <label style="text-align:center;font-size:16px;" value="Home Page" id="homeLink" href="" class="text-link" flex="1"/>
+  </hbox>
+</dialog>

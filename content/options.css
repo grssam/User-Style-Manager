@@ -1,0 +1,33 @@
+treechildren::-moz-tree-checkbox { list-style-image: url("");}
+treechildren::-moz-tree-checkbox(checked) {
+  list-style-image: url("chrome://global/skin/checkbox/cbox-check.gif");
+}
+treechildren::-moz-tree-checkbox(disabled) {
+  list-style-image: url("chrome://global/skin/checkbox/cbox-check-dis.gif")
+}
+treechildren::-moz-tree-row {
+  height: 28px;
+  border-bottom: 1px solid rgba(190,190,190, 0.5);
+}
+treechildren::-moz-tree-row(selected) {
+  outline: 1px solid rgba(256,256,256,.43);
+  border: 1px solid #84acdd;
+  background-image: -moz-linear-gradient(#ecf5ff 0%, #d0e5ff 100%);
+  -moz-border-bottom-colors: none;
+  -moz-border-top-colors: none;
+  border-radius:3px;
+  -moz-outline-radius:2px;
+}
+treechildren::-moz-tree-cell-text(selected) {
+  color: #000000; text-shadow: rgba(255, 255, 255, .37) 0 0 3px, rgba(255, 255, 255, .7) 0 1px 0;
+}
+treechildren::-moz-tree-row(hover) {
+  outline: 1px solid rgba(256,256,256,.43);
+  border: 1px solid #84acdd;
+  background: #ecf5ff;
+  -moz-border-bottom-colors: none;
+  -moz-border-top-colors: none;
+  border-radius:3px;
+  -moz-outline-radius:2px;
+}
+treechildren:-moz-tree-column { border-right:1px solid rgb(175,180,185);}
