@@ -1,0 +1,11 @@
+*.xpi
+*.zip
+*.png
+*.txt
+*.css
+*.xul
+FirstStart/
+
+images/
+
+stylish stuff/

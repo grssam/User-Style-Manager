@@ -1,0 +1,76 @@
+<!ENTITY window.title                 "Manage Your Styles">
+<!ENTITY styleSheet.list.caption      "Style Sheet List">
+<!ENTITY styleHeader.enabled          "Enabled">
+<!ENTITY styleHeader.name             "Name">
+<!ENTITY styleHeader.affects          "Applies On">
+<!ENTITY styleHeader.dateAdded        "Date Added">
+<!ENTITY styleHeader.dateModified     "Date Modified">
+
+<!ENTITY updateBtn.label              "Check for Update">
+<!ENTITY updateBtn.accesskey          "U">
+<!ENTITY updateBtn.tooltip            "Checks and updates the Selected Style Sheet">
+
+<!ENTITY updateAllBtn.label           "Update All">
+<!ENTITY updateAllBtn.accesskey       "L">
+<!ENTITY updateAllBtn.tooltip         "Checks and Updates for a newer version of Style Sheet">
+
+<!ENTITY infoBtn.label                "More Info.">
+<!ENTITY infoBtn.accesskey            "I">
+<!ENTITY infoBtn.tooltip              "More Information about the selected Style">
+
+<!ENTITY editBtn.label                "Edit Style Sheet">
+<!ENTITY editBtn.accesskey            "E">
+<!ENTITY editBtn.tooltip              "Modify the content of the Selected Style Sheet">
+
+<!ENTITY deleteBtn.label              "Delete Style Sheet">
+<!ENTITY deleteBtn.accesskey          "D">
+<!ENTITY deleteBtn.tooltip            "Deleting here will not remove the file from Hard Disk">
+
+<!ENTITY settings.caption             "Style Sheet Settings">
+<!ENTITY menuEntry.caption            "Create Menu Entry in">
+
+<!ENTITY backup.label                 "Maintain Backup">
+<!ENTITY backup.accesskey             "M">
+<!ENTITY backup.tooltip               "Maintain a Periodic Backup of the Style Sheets">
+
+<!ENTITY fallback.label               "Fall Back on Backed up Style Sheet">
+<!ENTITY fallback.accesskey           "F">
+<!ENTITY fallback.tooltip             "Load the Style Sheet from Backup if not present at original place">
+
+<!ENTITY hideWindow.label             "Hide Options Window while Editing Style Sheets">
+<!ENTITY hideWindow.accesskey         "H">
+<!ENTITY hideWindow.tooltip           "Hides the Options window while editing Style Sheets. This enables changing of Tabs and Windows.">
+
+<!ENTITY appMenu.label                "Apps Menu">
+<!ENTITY appMenu.accesskey            "P">
+<!ENTITY appMenu.tooltip              "Creates an entry in Apps Menu to easily access the Options window and to quickly enable/disable a style">
+
+<!ENTITY toolsMenu.label              "Tools Menu">
+<!ENTITY toolsMenu.accesskey          "T">
+<!ENTITY toolsMenu.tooltip            "Creates an entry in Tools menu to easily access the Options window and to quickly enable/disable a style">
+
+<!ENTITY button.label                 "Toolbar Button">
+<!ENTITY button.accesskey             "B">
+<!ENTITY button.tooltip               "Creates a toolbar button that can be placed anywhere to easily access the Options Window or the Style Sheets">
+
+<!ENTITY hotkey.tooltip               "Creates a customizable Shortcut Key to open this Options Window">
+<!ENTITY hotkey.label                 "Create a Keyboard Shortcut">
+<!ENTITY hotkey.accesskey             "S">
+
+<!ENTITY contextMenu.tooltip          "Adds an option in the context menu to quickly convert selected text into a User Style.">
+<!ENTITY contextMenu.label            "Context Menu">
+<!ENTITY contextMenu.accesskey        "C">
+
+<!ENTITY combination.label            "Shortcut Key Combination:">
+<!ENTITY combination.accesskey        "K">
+<!ENTITY combination.tooltip          "Click in the text box and press the desired combination">
+
+<!ENTITY addBtn.label                 "Browse…">
+<!ENTITY addBtn.label.label           "Add a new Style Sheet:">
+<!ENTITY addBtn.label.tooltip         "Click on the button to add a new Style Sheet">
+<!ENTITY addBtn.accesskey             "A">
+<!ENTITY addBtn.tooltip               "Browse the Style Sheet from your Hard Disk">
+
+<!ENTITY createBtn.label              "Create New">
+<!ENTITY createBtn.accesskey          "N">
+<!ENTITY createBtn.tooltip            "Create A new Style Sheet">

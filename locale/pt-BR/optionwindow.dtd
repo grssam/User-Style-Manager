@@ -1,0 +1,59 @@
+<!ENTITY window.title  "Gerencie seus Estilos">
+<!ENTITY styleSheet.list.caption  "Lista de Folhas de Estilo">
+<!ENTITY styleHeader.enabled  "Ativado">
+<!ENTITY styleHeader.name  "Nome">
+<!ENTITY styleHeader.affects  "Aplica-se em">
+<!ENTITY styleHeader.dateAdded  "Data adicionada">
+<!ENTITY styleHeader.dateModified  "Data de modificação">
+<!ENTITY updateBtn.label  "Verificar Atualizações">
+<!ENTITY updateBtn.accesskey  "V">
+<!ENTITY updateBtn.tooltip  "Cheques e atualiza a Folha de estilo selecionado">
+<!ENTITY updateAllBtn.label  "Atualizar Tudo">
+<!ENTITY updateAllBtn.accesskey  "L">
+<!ENTITY updateAllBtn.tooltip  "Verificações e Atualizações de uma nova versão do Style Sheet">
+<!ENTITY infoBtn.label  "Mais informações.">
+<!ENTITY infoBtn.accesskey  "I">
+<!ENTITY infoBtn.tooltip  "Mais informações sobre o estilo selecionado">
+<!ENTITY editBtn.label  "Editar Folha de Estilo">
+<!ENTITY editBtn.accesskey  "E">
+<!ENTITY editBtn.tooltip  "Modificar o conteúdo da Folha de estilo selecionado">
+<!ENTITY deleteBtn.label  "Remover Style Sheet">
+<!ENTITY deleteBtn.accesskey  "R">
+<!ENTITY deleteBtn.tooltip  "Removendo a partir daqui não irá remover o arquivo do disco rígido">
+<!ENTITY settings.caption  "Folha de configurações de estilo">
+<!ENTITY menuEntry.caption  "Criar entrada no Menu de">
+<!ENTITY backup.label  "Manter cópia de segurança">
+<!ENTITY backup.accesskey  "M">
+<!ENTITY backup.tooltip  "Manter um backup periódico das Folhas de Estilo">
+<!ENTITY fallback.label  "Cair para trás em Style Sheet Apoiado">
+<!ENTITY fallback.accesskey  "C">
+<!ENTITY fallback.tooltip  "Coloque a folha de estilo a partir de backup, se não presente no local original">
+<!ENTITY hideWindow.label  "Esconder Janela Opções durante a edição de Folhas de Estilo">
+<!ENTITY hideWindow.accesskey  "O">
+<!ENTITY hideWindow.tooltip  "Oculta a janela Opções durante a edição de Folhas de Estilo. Isso permite mudar de abas e janelas.">
+<!ENTITY appMenu.label  "Apps Menu">
+<!ENTITY appMenu.accesskey  "P">
+<!ENTITY appMenu.tooltip  "Cria uma entrada no menu Firefox para acessar facilmente a janela Opções e rapidamente ativar / desativar um estilo">
+<!ENTITY toolsMenu.label  "Ferramentas Menu">
+<!ENTITY toolsMenu.accesskey  "F">
+<!ENTITY toolsMenu.tooltip  "Cria uma entrada no menu Ferramentas para facilmente acessar a janela Opções e rapidamente ativar / desativar um estilo">
+<!ENTITY button.label  "Barra de ferramentas">
+<!ENTITY button.accesskey  "B">
+<!ENTITY button.tooltip  "Cria um botão que pode ser colocado em qualquer lugar para facilmente acessar a janela Opções ou as Folhas de Estilo">
+<!ENTITY hotkey.label  "Criar um atalho de teclado">
+<!ENTITY hotkey.accesskey  "T">
+<!ENTITY hotkey.tooltip  "Cria uma tecla de atalho personalizáveis ​​para abrir esta janela Opções">
+<!ENTITY contextMenu.label  "Menu de Contexto">
+<!ENTITY contextMenu.accesskey  "D">
+<!ENTITY contextMenu.tooltip  "Adiciona uma opção no menu de contexto para converter rapidamente o texto selecionado em um estilo de Usuário.">
+<!ENTITY combination.label  "Combinação de teclas de atalho:">
+<!ENTITY combination.accesskey  "K">
+<!ENTITY combination.tooltip  "Clique na caixa de texto e pressione a combinação desejada">
+<!ENTITY addBtn.label  "Navegue…">
+<!ENTITY addBtn.label.label  "Adicionar uma nova folha de estilo:">
+<!ENTITY addBtn.label.tooltip  "Clique no botão para adicionar uma nova folha de estilo">
+<!ENTITY addBtn.accesskey  "A">
+<!ENTITY addBtn.tooltip  "Navegar na Folha de estilo em seu disco rígido">
+<!ENTITY createBtn.label  "Criar Novo">
+<!ENTITY createBtn.accesskey  "N">
+<!ENTITY createBtn.tooltip  "Criar uma nova folha de estilo">

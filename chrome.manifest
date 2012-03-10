@@ -1,0 +1,13 @@
+content userstylemanager content/
+content userstylemanager-scripts scripts/
+content userstylemanager-styles  styles/
+locale  userstylemanager en-US locale/en-US/
+locale  userstylemanager en-GB locale/en-US/
+locale  userstylemanager en    locale/en-US/
+locale  userstylemanager ja    locale/ja/
+locale  userstylemanager es-ES locale/es-ES/
+locale  userstylemanager es-AR locale/es-ES/
+locale  userstylemanager es-CL locale/es-ES/
+locale  userstylemanager es-MX locale/es-ES/
+locale  userstylemanager pt-BR locale/pt-BR/
+locale  userstylemanager ru    locale/ru/

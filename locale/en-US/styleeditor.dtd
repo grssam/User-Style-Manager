@@ -1,0 +1,110 @@
+<!ENTITY fileMenu.label               "File">
+<!ENTITY fileMenu.accesskey           "F">
+
+<!ENTITY saveCmd.label                "Save">
+<!ENTITY saveCmd.key                  "S">
+<!ENTITY saveCmd.accesskey            "S">
+
+<!ENTITY previewCmd.label             "Preview">
+<!ENTITY previewCmd.key               "P">
+<!ENTITY previewCmd.accesskey         "P">
+
+<!ENTITY exitCmd.label                "Exit">
+<!ENTITY exitCmd.key                  "W">
+<!ENTITY exitCmd.accesskey            "X">
+
+<!ENTITY editMenu.label               "Edit">
+<!ENTITY editMenu.accesskey           "E">
+
+<!ENTITY undoCmd.label                "Undo">
+<!ENTITY undoCmd.key                  "Z">
+<!ENTITY undoCmd.accesskey            "U">
+
+<!ENTITY redoCmd.label                "Redo">
+<!ENTITY redoCmd.key                  "Y">
+<!ENTITY redoCmd.accesskey            "R">
+
+<!ENTITY cutCmd.label                 "Cut">
+<!ENTITY cutCmd.key                   "X">
+<!ENTITY cutCmd.accesskey             "t">
+
+<!ENTITY copyCmd.label                "Copy">
+<!ENTITY copyCmd.key                  "C">
+<!ENTITY copyCmd.accesskey            "C">
+
+<!ENTITY pasteCmd.label               "Paste">
+<!ENTITY pasteCmd.key                 "V">
+<!ENTITY pasteCmd.accesskey           "P">
+
+<!ENTITY selectAllCmd.label           "Select All">
+<!ENTITY selectAllCmd.key             "A">
+<!ENTITY selectAllCmd.accesskey       "A">
+
+<!ENTITY gotoLineCmd.label            "Jump to line…">
+<!ENTITY gotoLineCmd.key              "J">
+<!ENTITY gotoLineCmd.accesskey        "J">
+
+<!ENTITY toolsMenu.label              "Tools">
+<!ENTITY toolsMenu.accesskey          "T">
+
+<!ENTITY addNameSpace.label           "Add Namespace">
+<!ENTITY addNameSpace.key             "N">
+<!ENTITY addNameSpace.accesskey       "N">
+
+<!ENTITY addWebNameSpace.label        "Add Web Namespace">
+<!ENTITY addWebNameSpace.key          "N">
+<!ENTITY addWebNameSpace.accesskey    "W">
+
+<!ENTITY addMozURL.label              "Add @-moz-url Container">
+<!ENTITY addMozURL.key                "U">
+<!ENTITY addMozURL.accesskey          "U">
+
+<!ENTITY addMozPreURL.label           "Add @-moz-document url-prefix() Container">
+<!ENTITY addMozPreURL.key             "P">
+<!ENTITY addMozPreURL.accesskey       "P">
+
+<!ENTITY addMozDomain.label           "Add @-moz-document domain() Container">
+<!ENTITY addMozDomain.key             "D">
+<!ENTITY addMozDomain.accesskey       "D">
+
+<!ENTITY fileName.label               "Enter the name of the Stylesheet file: ">
+<!ENTITY fileNameEditing.label        "Change the Name of the Stylesheet file: ">
+<!ENTITY fileName.accesskey           "N">
+<!ENTITY fileName.tooltip             "This will rename the file on your Hard Disk as well">
+
+<!ENTITY findCmd.key                  "F">
+<!ENTITY findPreviousCmd.key          "F">
+<!ENTITY replaceCmd.key               "H">
+
+<!ENTITY search.placeholder           "Search">
+<!ENTITY search.prev.tooltip          "Find Previous">
+<!ENTITY search.next.tooltip          "Find Next">
+<!ENTITY search.options.tooltip       "Show Options">
+
+<!ENTITY replace.placeholder          "Replace">
+<!ENTITY replace.this.tooltip         "Replace This">
+<!ENTITY replace.all.tooltip          "Replace All">
+
+<!ENTITY search.wrap                  "Wrap Text">
+<!ENTITY search.wrap.accesskey        "W">
+<!ENTITY search.wrap.tooltip          "Wrap the end to the starting of text.">
+
+<!ENTITY search.ignoreCase            "Ignore Case">
+<!ENTITY search.ignoreCase.accesskey  "C">
+<!ENTITY search.ignoreCase.tooltip    "Treat Lower Case and Upper Case as same while searching">
+
+<!ENTITY search.highlightAll            "Highlight All">
+<!ENTITY search.highlightAll.accesskey  "A">
+<!ENTITY search.highlightAll.tooltip    "Highlight all the matching text">
+
+<!ENTITY search.regexp                "Allow Regexp">
+<!ENTITY search.regexp.accesskey      "e">
+<!ENTITY search.regexp.tooltip        "Allows searching based on regular expressions.">
+
+<!ENTITY search.backwards             "Search Backwards">
+<!ENTITY search.backwards.accesskey   "B">
+<!ENTITY search.backwards.tooltip     "Reverses the default searching direction.">
+
+<!ENTITY replace                      "Replace">
+<!ENTITY replace.accesskey            "R">
+<!ENTITY replace.tooltip              "Displays the replace dialog box.">

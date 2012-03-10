@@ -1,0 +1,83 @@
+<!ENTITY fileMenu.label  "Ficheiro">
+<!ENTITY fileMenu.accesskey  "F">
+<!ENTITY saveCmd.label  "Salvar">
+<!ENTITY saveCmd.key  "S">
+<!ENTITY saveCmd.accesskey  "S">
+<!ENTITY previewCmd.label  "Visualização">
+<!ENTITY previewCmd.key  "I">
+<!ENTITY previewCmd.accesskey  "I">
+<!ENTITY exitCmd.label  "Sair">
+<!ENTITY exitCmd.key  "W">
+<!ENTITY exitCmd.accesskey  "W">
+<!ENTITY editMenu.label  "Editar">
+<!ENTITY editMenu.accesskey  "E">
+<!ENTITY undoCmd.label  "Desfaz">
+<!ENTITY undoCmd.key  "Z">
+<!ENTITY undoCmd.accesskey  "D">
+<!ENTITY redoCmd.label  "Refaz">
+<!ENTITY redoCmd.key  "Y">
+<!ENTITY redoCmd.accesskey  "R">
+<!ENTITY cutCmd.label  "Cortar">
+<!ENTITY cutCmd.key  "X">
+<!ENTITY cutCmd.accesskey  "t">
+<!ENTITY copyCmd.label  "Copiar">
+<!ENTITY copyCmd.key  "C">
+<!ENTITY copyCmd.accesskey  "C">
+<!ENTITY pasteCmd.label  "Colar">
+<!ENTITY pasteCmd.key  "V">
+<!ENTITY pasteCmd.accesskey  "L">
+<!ENTITY selectAllCmd.label  "Selecionar tudo">
+<!ENTITY selectAllCmd.key  "A">
+<!ENTITY selectAllCmd.accesskey  "A">
+<!ENTITY gotoLineCmd.label  "Pule para a linha…">
+<!ENTITY gotoLineCmd.key  "J">
+<!ENTITY gotoLineCmd.accesskey  "P">
+<!ENTITY toolsMenu.label  "Ferramentas">
+<!ENTITY toolsMenu.accesskey  "T">
+<!ENTITY addNameSpace.label  "Adicionar Namespace">
+<!ENTITY addNameSpace.key  "N">
+<!ENTITY addNameSpace.accesskey  "N">
+<!ENTITY addWebNameSpace.label  "Adicionar Web Namespace">
+<!ENTITY addWebNameSpace.key  "N">
+<!ENTITY addWebNameSpace.accesskey  "W">
+<!ENTITY addMozURL.label  "Adicionar @-moz-url Contêiner">
+<!ENTITY addMozURL.key  "U">
+<!ENTITY addMozURL.accesskey  "U">
+<!ENTITY addMozPreURL.label  "Adicionar @-moz-document url-prefix() Contêiner">
+<!ENTITY addMozPreURL.key  "P">
+<!ENTITY addMozPreURL.accesskey  "P">
+<!ENTITY addMozDomain.label  "Adicionar @-moz-document domain() Contêiner">
+<!ENTITY addMozDomain.key  "D">
+<!ENTITY addMozDomain.accesskey  "D">
+<!ENTITY fileName.label  "Digite o nome do arquivo de estilo: ">
+<!ENTITY fileNameEditing.label  "Mude o nome do arquivo de estilo: ">
+<!ENTITY fileName.accesskey  "n">
+<!ENTITY fileName.tooltip  "Isto irá renomear o arquivo no disco rígido também">
+<!ENTITY findCmd.key  "F">
+<!ENTITY findPreviousCmd.key  "G">
+<!ENTITY replaceCmd.key  "H">
+<!ENTITY search.placeholder  "Pesquisar">
+<!ENTITY search.prev.tooltip  "Localizar anterior">
+<!ENTITY search.next.tooltip  "Localizar seguinte">
+<!ENTITY search.options.tooltip  "Mostrar Opções">
+<!ENTITY replace.placeholder  "Substituir">
+<!ENTITY replace.this.tooltip  "Substituir Este">
+<!ENTITY replace.all.tooltip  "Substituir tudo">
+<!ENTITY search.wrap  "Ajustar texto">
+<!ENTITY search.wrap.accesskey  "t">
+<!ENTITY search.wrap.tooltip  "Enrole a ponta para a partida do texto.">
+<!ENTITY search.ignoreCase  "Ignorar Caso">
+<!ENTITY search.ignoreCase.accesskey  "C">
+<!ENTITY search.ignoreCase.tooltip  "Maiúsculas e minúsculas como mesmo enquanto procura">
+<!ENTITY search.highlightAll  "Destaque All">
+<!ENTITY search.highlightAll.accesskey  "A">
+<!ENTITY search.highlightAll.tooltip  "Destaque todo o texto correspondente">
+<!ENTITY search.regexp  "Permitir Regexp">
+<!ENTITY search.regexp.accesskey  "P">
+<!ENTITY search.regexp.tooltip  "Permite busca baseados em expressões regulares.">
+<!ENTITY search.backwards  "Procurar para trás">
+<!ENTITY search.backwards.accesskey  "t">
+<!ENTITY search.backwards.tooltip  "Inverte a direção padrão procura.">
+<!ENTITY replace  "Substituir">
+<!ENTITY replace.accesskey  "S">
+<!ENTITY replace.tooltip  "Exibe a caixa de diálogo Substituir.">

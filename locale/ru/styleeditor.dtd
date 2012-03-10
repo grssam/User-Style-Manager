@@ -1,0 +1,83 @@
+<!ENTITY fileMenu.label  "Файл">
+<!ENTITY fileMenu.accesskey  "Ф">
+<!ENTITY saveCmd.label  "Сохранить">
+<!ENTITY saveCmd.key  "С">
+<!ENTITY saveCmd.accesskey  "S">
+<!ENTITY previewCmd.label  "предварительный просмотр">
+<!ENTITY previewCmd.key  "P">
+<!ENTITY previewCmd.accesskey  "п">
+<!ENTITY exitCmd.label  "Закрыть">
+<!ENTITY exitCmd.key  "W">
+<!ENTITY exitCmd.accesskey  "а">
+<!ENTITY editMenu.label  "Правка">
+<!ENTITY editMenu.accesskey  "р">
+<!ENTITY undoCmd.label  "Отменить">
+<!ENTITY undoCmd.key  "Z">
+<!ENTITY undoCmd.accesskey  "О">
+<!ENTITY redoCmd.label  "Повторить">
+<!ENTITY redoCmd.key  "Y">
+<!ENTITY redoCmd.accesskey  "П">
+<!ENTITY cutCmd.label  "Вырезать">
+<!ENTITY cutCmd.key  "X">
+<!ENTITY cutCmd.accesskey  "ы">
+<!ENTITY copyCmd.label  "Копировать">
+<!ENTITY copyCmd.key  "C">
+<!ENTITY copyCmd.accesskey  "и">
+<!ENTITY pasteCmd.label  "Вставить">
+<!ENTITY pasteCmd.key  "V">
+<!ENTITY pasteCmd.accesskey  "т">
+<!ENTITY selectAllCmd.label  "Выделить всё">
+<!ENTITY selectAllCmd.key  "A">
+<!ENTITY selectAllCmd.accesskey  "д">
+<!ENTITY gotoLineCmd.label  "Перейти к строке…">
+<!ENTITY gotoLineCmd.key  "J">
+<!ENTITY gotoLineCmd.accesskey  "е">
+<!ENTITY toolsMenu.label  "инструменты">
+<!ENTITY toolsMenu.accesskey  "н">
+<!ENTITY addNameSpace.label  "добавлять Пространство имен">
+<!ENTITY addNameSpace.key  "N">
+<!ENTITY addNameSpace.accesskey  "П">
+<!ENTITY addWebNameSpace.label  "Добавить веб-имен">
+<!ENTITY addWebNameSpace.key  "N">
+<!ENTITY addWebNameSpace.accesskey  "в">
+<!ENTITY addMozURL.label  "добавлять @-moz-url контейнер">
+<!ENTITY addMozURL.key  "U">
+<!ENTITY addMozURL.accesskey  "U">
+<!ENTITY addMozPreURL.label  "добавлять @-moz-document url-prefix() контейнер">
+<!ENTITY addMozPreURL.key  "P">
+<!ENTITY addMozPreURL.accesskey  "P">
+<!ENTITY addMozDomain.label  "добавлять @-moz-document domain() контейнер">
+<!ENTITY addMozDomain.key  "D">
+<!ENTITY addMozDomain.accesskey  "D">
+<!ENTITY fileName.label  "Введите имя файла стилей: ">
+<!ENTITY fileNameEditing.label  "Изменение имени файла стилей: ">
+<!ENTITY fileName.accesskey  "и">
+<!ENTITY fileName.tooltip  "Это будет переименовать файл на жестком диске также">
+<!ENTITY findCmd.key  "F">
+<!ENTITY findPreviousCmd.key  "G">
+<!ENTITY replaceCmd.key  "H">
+<!ENTITY search.placeholder  "Поиск">
+<!ENTITY search.prev.tooltip  "Найти предыдущий">
+<!ENTITY search.next.tooltip  "Найти далее">
+<!ENTITY search.options.tooltip  "Показать параметры">
+<!ENTITY replace.placeholder  "заменять">
+<!ENTITY replace.this.tooltip  "заменять это">
+<!ENTITY replace.all.tooltip  "заменять все">
+<!ENTITY search.wrap  "Переносить текст">
+<!ENTITY search.wrap.accesskey  "П">
+<!ENTITY search.wrap.tooltip  "Оберните конец исходный текст.">
+<!ENTITY search.ignoreCase  "Игнорировать регистр">
+<!ENTITY search.ignoreCase.accesskey  "р">
+<!ENTITY search.ignoreCase.tooltip  "Лечить верхнего и нижнего регистра, как же при поиске">
+<!ENTITY search.highlightAll  "Выделите все">
+<!ENTITY search.highlightAll.accesskey  "в">
+<!ENTITY search.highlightAll.tooltip  "Выделите все подходящие текст">
+<!ENTITY search.regexp  "Позвольте Regex">
+<!ENTITY search.regexp.accesskey  "з">
+<!ENTITY search.regexp.tooltip  "Позволяет осуществлять поиск на основе регулярных выражений.">
+<!ENTITY search.backwards  "Поиск Обратная">
+<!ENTITY search.backwards.accesskey  "О">
+<!ENTITY search.backwards.tooltip  "Меняет по умолчанию поиск направлении..">
+<!ENTITY replace  "заменять">
+<!ENTITY replace.accesskey  "т">
+<!ENTITY replace.tooltip  "Отображает окно замены диалог.">
