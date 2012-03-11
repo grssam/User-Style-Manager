@@ -10,7 +10,7 @@ treechildren::-moz-tree-row {
   border-bottom: 1px solid rgba(190,190,190, 0.5);
 }
 treechildren::-moz-tree-row(selected) {
-  outline: 1px solid rgba(256,256,256,.43);
+  outline: 1px solid rgba(255,255,255,.43);
   border: 1px solid #84acdd;
   background-image: -moz-linear-gradient(#ecf5ff 0%, #d0e5ff 100%);
   -moz-border-bottom-colors: none;
@@ -25,7 +25,7 @@ treechildren::-moz-tree-cell-text(disabledText) {
   color: #888888; text-shadow: rgba(255, 255, 255, .37) 0 0 3px, rgba(255, 255, 255, .5) 0 1px 0;
 }
 treechildren::-moz-tree-row(hover) {
-  outline: 1px solid rgba(256,256,256,.43);
+  outline: 1px solid rgba(255,255,255,.43);
   border: 1px solid #84acdd;
   background: #ecf5ff;
   -moz-border-bottom-colors: none;
@@ -36,5 +36,23 @@ treechildren::-moz-tree-row(hover) {
 treechildren::-moz-tree-row(disabled) {
   border: 1px solid rgba(205,202,200,.5);
   background: rgba(205,202,200,.5);
+}
+treechildren::-moz-tree-row(disabled hover) {
+  outline: 1px solid rgba(255,255,255,.43);
+  border: 1px solid rgba(152,172,221,.5);
+  background: rgba(236,245,255,.5);
+  -moz-border-bottom-colors: none;
+  -moz-border-top-colors: none;
+  border-radius:3px;
+  -moz-outline-radius:2px;
+}
+treechildren::-moz-tree-row(disabled selected) {
+  outline: 1px solid rgba(255,255,255,.2);
+  border: 1px solid rgba(152,172,221,.5);
+  background-image: -moz-linear-gradient(rgba(236,245,255,0.5) 0%, rgba(208,229,255,0.5) 100%);
+  -moz-border-bottom-colors: none;
+  -moz-border-top-colors: none;
+  border-radius:3px;
+  -moz-outline-radius:2px;
 }
 treechildren:-moz-tree-column { border-right:1px solid rgb(175,180,185);}

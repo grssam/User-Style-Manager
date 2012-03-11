@@ -241,10 +241,13 @@ let optionsWindow = {
   },
 
   onLoad: function OW_onLoad() {
+    function $(id) document.getElementById(id);
     this.tree = document.getElementById("styleSheetTree");
     this.initialized = true;
     readJSONPref(function() {
       optionsWindow.populateStyles();
+      $("moreInfo").disabled = $("editStyleSheet").disabled = $("deleteStyleSheet").disabled
+        = optionsWindow.tree.view.selection.getRangeCount() == 0;
     });
     listen(window, window, "focus", function() {
       if (!pref("hideOptionsWhileEditing") && optionsWindow.editorOpened) {
@@ -380,6 +383,12 @@ let optionsWindow = {
         optionsWindow.editStyleSheet();
         break;
     }
+  },
+
+  onTreeClick: function OW_onTreeClick() {
+    function $(id) document.getElementById(id);
+    $("moreInfo").disabled = $("editStyleSheet").disabled = $("deleteStyleSheet").disabled
+      = optionsWindow.tree.view.selection.getRangeCount() == 0;
   },
 
   showMoreInfo: function OW_showMoreInfo() {
