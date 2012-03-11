@@ -358,6 +358,18 @@ let optionsWindow = {
     }
   },
 
+  onTreeKeypress: function OW_onTreeKeypress(event) {
+    switch(event.keyCode) {
+      case event.DOM_VK_DELETE:
+        optionsWindow.deleteStyleSheet();
+        break;
+      case event.DOM_VK_RETURN:
+      case event.DOM_VK_ENTER:
+        optionsWindow.editStyleSheet();
+        break;
+    }
+  },
+
   showMoreInfo: function OW_showMoreInfo() {
     let numRanges = this.tree.view.selection.getRangeCount();
     if (numRanges < 1)
