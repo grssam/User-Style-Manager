@@ -201,8 +201,20 @@ let optionsWindow = {
       },
       getLevel: function(row) {return 0;},
       getImageSrc: function(row,col) {return null;},
-      getRowProperties: function(row,props) {},
-      getCellProperties: function(row,col,props) {},
+      getRowProperties: function(row, properties) {
+        let atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+        if (this.list[row][0] == 'disabled') {
+          let atom = atomService.getAtom("disabled");
+          properties.AppendElement(atom);
+        }
+      },
+      getCellProperties: function(row,col,props) {
+        let atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+        if (this.list[row][0] == 'disabled' && col.id != "styleSheetStateCol") {
+          let atom = atomService.getAtom("disabledText");
+          props.AppendElement(atom);
+        }
+      },
       getColumnProperties: function(colid,col,props) {}
     };
     optionsWindow.tree.view = optionsWindow.treeView;

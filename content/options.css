@@ -21,6 +21,9 @@ treechildren::-moz-tree-row(selected) {
 treechildren::-moz-tree-cell-text(selected) {
   color: #000000; text-shadow: rgba(255, 255, 255, .37) 0 0 3px, rgba(255, 255, 255, .7) 0 1px 0;
 }
+treechildren::-moz-tree-cell-text(disabledText) {
+  color: #888888; text-shadow: rgba(255, 255, 255, .37) 0 0 3px, rgba(255, 255, 255, .5) 0 1px 0;
+}
 treechildren::-moz-tree-row(hover) {
   outline: 1px solid rgba(256,256,256,.43);
   border: 1px solid #84acdd;
@@ -29,5 +32,9 @@ treechildren::-moz-tree-row(hover) {
   -moz-border-top-colors: none;
   border-radius:3px;
   -moz-outline-radius:2px;
+}
+treechildren::-moz-tree-row(disabled) {
+  border: 1px solid rgba(205,202,200,.5);
+  background: rgba(205,202,200,.5);
 }
 treechildren:-moz-tree-column { border-right:1px solid rgb(175,180,185);}
