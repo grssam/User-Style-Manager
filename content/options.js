@@ -202,6 +202,7 @@ let optionsWindow = {
       getLevel: function(row) {return 0;},
       getImageSrc: function(row,col) {return null;},
       getRowProperties: function(row, properties) {
+        optionsWindow.onTreeClick();
         let atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
         if (this.list[row][0] == 'disabled') {
           let atom = atomService.getAtom("disabled");
@@ -382,6 +383,8 @@ let optionsWindow = {
       case event.DOM_VK_ENTER:
         optionsWindow.editStyleSheet();
         break;
+      default:
+        optionsWindow.onTreeClick();
     }
   },
 
