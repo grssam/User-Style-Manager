@@ -12,16 +12,19 @@
 <!ENTITY updateAllBtn.accesskey  "в">
 <!ENTITY updateAllBtn.tooltip  "Проверки и обновления для новой версии таблиц стилей">
 <!ENTITY infoBtn.label  "Больше информации.">
-<!ENTITY infoBtn.accesskey  "и">
+<!ENTITY infoBtn.accesskey  "Б">
 <!ENTITY infoBtn.tooltip  "Дополнительная информация о выбранном стиле">
 <!ENTITY editBtn.label  "Редактировать таблицы стилей">
 <!ENTITY editBtn.accesskey  "т">
 <!ENTITY editBtn.tooltip  "Изменение содержания отдельных таблиц стилей">
 <!ENTITY deleteBtn.label  "Удаление стилей">
-<!ENTITY deleteBtn.accesskey  "У">
+<!ENTITY deleteBtn.accesskey  "л">
 <!ENTITY deleteBtn.tooltip  "Удаление здесь не будет удалить файл с жесткого диска">
 <!ENTITY settings.caption  "Настройки стилей">
-<!ENTITY menuEntry.caption  "Создать пункт меню в">
+<!ENTITY backupMenu.label  "Резервное копирование">
+<!ENTITY backupMenu.accesskey  "к">
+<!ENTITY entryMenu.label  "Пункт меню">
+<!ENTITY entryMenu.accesskey  "у">
 <!ENTITY backup.label  "Поддерживать резервного">
 <!ENTITY backup.accesskey  "р">
 <!ENTITY backup.tooltip  "Поддерживать периодического резервного копирования стилей">
@@ -38,11 +41,11 @@
 <!ENTITY toolsMenu.accesskey  "е">
 <!ENTITY toolsMenu.tooltip  "Создает запись в меню Сервис легко получать доступ к Окно и быстро включить / выключить стиль">
 <!ENTITY button.label  "кнопки панели инструментов">
-<!ENTITY button.accesskey  "к">
+<!ENTITY button.accesskey  "и">
 <!ENTITY button.tooltip  "Создает кнопку на панели инструментов, которые можно разместить в любом месте легко получить доступ к окно настроек и стилей">
 <!ENTITY hotkey.tooltip  "Создает настраиваемые ключевые ярлык, чтобы открыть это окно настроек">
 <!ENTITY hotkey.label  "Создание сочетания клавиш">
-<!ENTITY hotkey.accesskey  "л">
+<!ENTITY hotkey.accesskey  "з">
 <!ENTITY contextMenu.tooltip  "Добавляет опцию в контекстном меню, чтобы быстро преобразовать выделенный текст в стиле пользователя.">
 <!ENTITY contextMenu.label  "Контекстное меню">
 <!ENTITY contextMenu.accesskey  "ю">

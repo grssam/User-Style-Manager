@@ -21,9 +21,12 @@
 <!ENTITY deleteBtn.accesskey  "R">
 <!ENTITY deleteBtn.tooltip  "Removendo a partir daqui não irá remover o arquivo do disco rígido">
 <!ENTITY settings.caption  "Folha de configurações de estilo">
-<!ENTITY menuEntry.caption  "Criar entrada no Menu de">
+<!ENTITY backupMenu.label  "Cópia de segurança">
+<!ENTITY backupMenu.accesskey  "G">
+<!ENTITY entryMenu.label  "Entrada de Menu">
+<!ENTITY entryMenu.accesskey  "M">
 <!ENTITY backup.label  "Manter cópia de segurança">
-<!ENTITY backup.accesskey  "M">
+<!ENTITY backup.accesskey  "S">
 <!ENTITY backup.tooltip  "Manter um backup periódico das Folhas de Estilo">
 <!ENTITY fallback.label  "Cair para trás em Style Sheet Apoiado">
 <!ENTITY fallback.accesskey  "C">

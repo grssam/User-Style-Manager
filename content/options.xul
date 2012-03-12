@@ -39,16 +39,32 @@
   <notificationbox id="changeNotificationBox" flex="1"/>
   <prefpane id="USMOptionsPane">
     <preferences>
-      <preference id="maintainBackup" name="extensions.UserStyleManager.maintainBackup" type="bool"/>
-      <preference id="fallBack" name="extensions.UserStyleManager.fallBack" type="bool"/>
       <preference id="hideWindow" name="extensions.UserStyleManager.hideOptionsWhileEditing" type="bool"/>
-      <preference id="createAppMenu" name="extensions.UserStyleManager.createAppMenuButton" type="bool"/>
-      <preference id="createToolbarButton" name="extensions.UserStyleManager.createToolbarButton" type="bool"/>
-      <preference id="createToolsMenu" name="extensions.UserStyleManager.createToolsMenuButton" type="bool"/>
       <preference id="createHotKey" name="extensions.UserStyleManager.createHotKey" type="bool"/>
-      <preference id="createContextMenu" name="extensions.UserStyleManager.createContextMenuEntry" type="bool"/>
     </preferences>
     <vbox flex="1">
+      <menubar id="optionsMenubar" style="margin: 0px; border: solid black; border-width:0px 0px 1px 0px; !important" flex="1">
+        <menu id="backupMenu" label="&backupMenu.label;" accesskey="&backupMenu.accesskey;">
+          <menupopup id="backupMenuPopup" onpopupshowing="optionsWindow.backupMenuPopupShowing();">
+            <menuitem type="checkbox" id="maintainBackupMenuitem" tooltiptext="&backup.tooltip;"
+              label="&backup.label;" accesskey="&backup.accesskey;" oncommand="optionsWindow.togglePref('maintainBackup');"/>
+            <menuitem type="checkbox" id="fallBackMenuitem" tooltiptext="&fallback.tooltip;"
+              accesskey="&fallback.accesskey;" label="&fallback.label;" oncommand="optionsWindow.togglePref('fallBack');"/>
+          </menupopup>
+        </menu>
+        <menu id="entryMenu" label="&entryMenu.label;" accesskey="&entryMenu.accesskey;">
+          <menupopup id="entryMenuPopup" onpopupshowing="optionsWindow.entryMenuPopupShowing();">
+            <menuitem type="checkbox" id="createAppMenuMenuitem" tooltiptext="&appMenu.tooltip;"
+              accesskey="&appMenu.accesskey;" label="&appMenu.label;" oncommand="optionsWindow.togglePref('createAppMenuButton');"/>
+            <menuitem type="checkbox" id="createToolbarButtonMenuitem" tooltiptext="&button.tooltip;"
+              accesskey="&button.accesskey;" label="&button.label;" oncommand="optionsWindow.togglePref('createToolbarButton');"/>
+            <menuitem type="checkbox" id="createToolsMenuMenuitem" tooltiptext="&toolsMenu.tooltip;"
+              accesskey="&toolsMenu.accesskey;" label="&toolsMenu.label;" oncommand="optionsWindow.togglePref('createToolsMenuButton');"/>
+            <menuitem type="checkbox" id="createContextMenuMenuitem" tooltiptext="&contextMenu.tooltip;"
+              accesskey="&contextMenu.accesskey;" label="&contextMenu.label;" oncommand="optionsWindow.togglePref('createContextMenuEntry');"/>
+          </menupopup>
+        </menu>
+      </menubar>
       <groupbox id="syleSheetListContainer" flex="1">
         <caption label="&styleSheet.list.caption;" style="font-size:14px;"/>
         <tree id="styleSheetTree" flex="1" hidecolumnpicker="false" onclick="optionsWindow.onTreeClick();"
@@ -92,35 +108,8 @@
           <grid>
             <rows>
               <row>
-                <checkbox id="maintainBackupCheckBox" preference="maintainBackup" onclick="optionsWindow.notifyChange()"
-                  tooltiptext="&backup.tooltip;" label="&backup.label;" accesskey="&backup.accesskey;" />
-              </row>
-              <row>
-                <checkbox id="fallBackCheckBox" preference="fallBack" tooltiptext="&fallback.tooltip;"
-                  onclick="optionsWindow.notifyChange()" accesskey="&fallback.accesskey;" label="&fallback.label;" />
-              </row>
-              <row>
                 <checkbox id="hideWindowCheckBox" preference="hideWindow" onclick="optionsWindow.notifyChange()"
                   tooltiptext="&hideWindow.tooltip;" accesskey="&hideWindow.accesskey;" label="&hideWindow.label;" />
-              </row>
-            </rows>
-          </grid>
-        </groupbox>
-        <groupbox>
-          <caption label="&menuEntry.caption;" />
-          <grid>
-            <rows>
-              <row>
-                <checkbox id="createAppMenuCheckBox" preference="createAppMenu" onclick="optionsWindow.notifyChange()"
-                  tooltiptext="&appMenu.tooltip;" accesskey="&appMenu.accesskey;" label="&appMenu.label;" />
-                <checkbox id="createToolbarButtonCheckBox" preference="createToolbarButton" onclick="optionsWindow.notifyChange()"
-                  tooltiptext="&button.tooltip;" accesskey="&button.accesskey;" label="&button.label;" />
-              </row>
-              <row>
-                <checkbox id="createToolsMenuCheckBox" preference="createToolsMenu" tooltiptext="&toolsMenu.tooltip;"
-                  onclick="optionsWindow.notifyChange()" accesskey="&toolsMenu.accesskey;" label="&toolsMenu.label;" />
-                <checkbox id="createContextMenuCheckBox" preference="createContextMenu" tooltiptext="&contextMenu.tooltip;"
-                  onclick="optionsWindow.notifyChange()" accesskey="&contextMenu.accesskey;" label="&contextMenu.label;" />
               </row>
             </rows>
           </grid>

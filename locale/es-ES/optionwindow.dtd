@@ -21,9 +21,12 @@
 <!ENTITY deleteBtn.accesskey  "H">
 <!ENTITY deleteBtn.tooltip  "Eliminación de aquí no va a eliminar el archivo de disco duro">
 <!ENTITY settings.caption  "Configuración de hoja de estilos">
-<!ENTITY menuEntry.caption  "Crear entrada de menú en">
+<!ENTITY backupMenu.label  "Copia de seguridad">
+<!ENTITY backupMenu.accesskey  "S">
+<!ENTITY entryMenu.label  "Menú de entrada">
+<!ENTITY entryMenu.accesskey  "M">
 <!ENTITY backup.label  "Mantenga copias de seguridad">
-<!ENTITY backup.accesskey  "M">
+<!ENTITY backup.accesskey  "G">
 <!ENTITY backup.tooltip  "Mantenga una copia de seguridad periódica de las hojas de estilo">
 <!ENTITY fallback.label  "Recurrir a la hoja de estilos Copia de seguridad">
 <!ENTITY fallback.accesskey  "R">

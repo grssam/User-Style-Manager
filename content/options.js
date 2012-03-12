@@ -408,6 +408,30 @@ let optionsWindow = {
     }
   },
 
+  backupMenuPopupShowing: function OW_backupMenuPopupShowing() {
+    function $(id) document.getElementById(id);
+    if (pref("maintainBackup"))
+      $("maintainBackupMenuitem").setAttribute("checked", true);
+    if (pref("fallBack"))
+      $("fallBackMenuitem").setAttribute("checked", true);
+  },
+
+   entryMenuPopupShowing: function OW_entryMenuPopupShowing() {
+    function $(id) document.getElementById(id);
+    if (pref("createToolsMenuButton"))
+      $("createToolsMenuMenuitem").setAttribute("checked", true);
+    if (pref("createAppMenuButton"))
+      $("createAppMenuMenuitem").setAttribute("checked", true);
+    if (pref("createToolbarButton"))
+      $("createToolbarButtonMenuitem").setAttribute("checked", true);
+    if (pref("createContextMenuEntry"))
+      $("createContextMenuMenuitem").setAttribute("checked", true);
+  },
+
+  togglePref: function OW_togglePref(prefName) {
+    pref(prefName, !pref(prefName));
+  },
+
   notifyChange: function OW_notifyChange(val) {
     if (val) {
       val = val.toLowerCase().replace("ctrl", "accel").split(" + ");

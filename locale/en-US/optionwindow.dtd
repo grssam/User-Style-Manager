@@ -27,7 +27,11 @@
 <!ENTITY deleteBtn.tooltip            "Deleting here will not remove the file from Hard Disk">
 
 <!ENTITY settings.caption             "Style Sheet Settings">
-<!ENTITY menuEntry.caption            "Create Menu Entry in">
+
+<!ENTITY backupMenu.label             "Backup">
+<!ENTITY backupMenu.accesskey         "B">
+<!ENTITY entryMenu.label              "Menu Entry">
+<!ENTITY entryMenu.accesskey          "N">
 
 <!ENTITY backup.label                 "Maintain Backup">
 <!ENTITY backup.accesskey             "M">

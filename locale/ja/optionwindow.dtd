@@ -21,7 +21,10 @@
 <!ENTITY deleteBtn.accesskey  "D">
 <!ENTITY deleteBtn.tooltip  "ここで削除しても、ハードディスクからファイルを削除されません">
 <!ENTITY settings.caption  "スタイルシートの設定">
-<!ENTITY menuEntry.caption  "メニューエントリを作成します">
+<!ENTITY backupMenu.label  "バックアップ">
+<!ENTITY backupMenu.accesskey  "B">
+<!ENTITY entryMenu.label  "メニューエントリ">
+<!ENTITY entryMenu.accesskey  "Y">
 <!ENTITY backup.label  "バックアップを維持">
 <!ENTITY backup.accesskey  "M">
 <!ENTITY backup.tooltip  "スタイルシートの定期的なバックアップを維持">
@@ -38,7 +41,7 @@
 <!ENTITY toolsMenu.accesskey  "T">
 <!ENTITY toolsMenu.tooltip  "[ツール]メニューのエントリは、簡単にオプションウィンドウにアクセスし、迅速に有効化/スタイルを無効にするために作成">
 <!ENTITY button.label  "ツールバーボタン">
-<!ENTITY button.accesskey  "B">
+<!ENTITY button.accesskey  "O">
 <!ENTITY button.tooltip  "どこでも簡単にオプションウィンドウまたはスタイルシートにアクセスするために配置することができるツールバーボタンを作成します。">
 <!ENTITY hotkey.tooltip  "このオプションウィンドウを開くには、カスタマイズ可能なショートカットキーを作成します。">
 <!ENTITY hotkey.label  "キーボードショートカットを作成します。">
