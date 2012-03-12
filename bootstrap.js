@@ -357,12 +357,11 @@ function addToolbarButton(window) {
   toolbarButton.setAttribute("id", toolbarButtonID);
   toolbarButton.setAttribute("type", "button");
   toolbarButton.setAttribute("image", LOGO);
-  toolbarButton.setAttribute("class", "toolbarbutton-1 chromeclass-toolbar-additional");
   toolbarButton.setAttribute("label", l10n("USM.label"));
   toolbarButton.setAttribute("tooltiptext", l10n("USM.tooltip"));
-  toolbarButton.setAttribute("type", "menu-button");
-  listen(window, toolbarButton, "command", function(event) {
-    if (event.target.id == toolbarButtonID)
+  toolbarButton.setAttribute("type", "menu");
+  listen(window, toolbarButton, "click", function(event) {
+    if (event.target.id == toolbarButtonID && event.button == 1)
       openOptions(window);
   });
   let toolbarButtonMenupop = window.document.createElementNS(XUL, "menupopup");
