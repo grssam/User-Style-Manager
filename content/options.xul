@@ -68,8 +68,8 @@
       </menubar>
       <groupbox id="syleSheetListContainer" flex="1">
         <caption label="&styleSheet.list.caption;" style="font-size:14px;"/>
-        <tree id="styleSheetTree" flex="1" hidecolumnpicker="false" onclick="optionsWindow.onTreeClick();"
-          class="tree" rows="10" editable="true">
+        <tree id="styleSheetTree" flex="1" hidecolumnpicker="false" onselect="optionsWindow.onTreeClick();"
+          class="tree" rows="10" editable="true" onkeypress="optionsWindow.onTreeKeypress(event);">
 
           <treecols>
             <treecol id="styleSheetStateCol" primary="true" flex="0" label=""
