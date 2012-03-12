@@ -34,6 +34,8 @@
 <!ENTITY hideWindow.label  "Ocultar ventana de Opciones durante la edición de las Hojas de Estilo">
 <!ENTITY hideWindow.accesskey  "O">
 <!ENTITY hideWindow.tooltip  "Oculta la ventana Opciones durante la edición de hojas de estilo.\nEste permite cambiar de pestañas y ventanas.">
+<!ENTITY deleteFromDisk.label  "También elimina el archivo de hoja de estilos en el disco duro al eliminar aquí">
+<!ENTITY deleteFromDisk.tooltip  "ADVERTENCIA: Al habilitar esta función hará que la eliminación del archivo correspondiente desde el disco duro cuando se elimina un estilo de usuario Administrador de estilos">
 <!ENTITY appMenu.label  "Aplicaciones del menú">
 <!ENTITY appMenu.accesskey  "P">
 <!ENTITY appMenu.tooltip  "Crea una entrada en el menú de aplicaciones para acceder fácilmente a la ventana de Opciones y activar rápidamente / desactivar un estilo">

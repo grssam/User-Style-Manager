@@ -71,7 +71,8 @@ pref.defaults = {
   shortcutModifiers: "accel, shift",
   createHotKey: true,
   buttonParentID: "",
-  buttonNextSiblingID: ""
+  buttonNextSiblingID: "",
+  deleteFromDisk: false
 };
 
 pref.observe = function(prefs, callback) {

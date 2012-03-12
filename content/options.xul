@@ -41,6 +41,7 @@
     <preferences>
       <preference id="hideWindow" name="extensions.UserStyleManager.hideOptionsWhileEditing" type="bool"/>
       <preference id="createHotKey" name="extensions.UserStyleManager.createHotKey" type="bool"/>
+      <preference id="deleteFromDisk" name="extensions.UserStyleManager.deleteFromDisk" type="bool"/>
     </preferences>
     <vbox flex="1">
       <menubar id="optionsMenubar" style="margin: 0px; border: solid black; border-width:0px 0px 1px 0px; !important" flex="1">
@@ -110,6 +111,10 @@
               <row>
                 <checkbox id="hideWindowCheckBox" preference="hideWindow" onclick="optionsWindow.notifyChange()"
                   tooltiptext="&hideWindow.tooltip;" accesskey="&hideWindow.accesskey;" label="&hideWindow.label;" />
+              </row>
+              <row>
+                <checkbox id="deleteFromDiskCheckBox" preference="deleteFromDisk" onclick="optionsWindow.notifyChange()"
+                  tooltiptext="&deleteFromDisk.tooltip;" label="&deleteFromDisk.label;" />
               </row>
             </rows>
           </grid>

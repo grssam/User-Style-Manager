@@ -34,6 +34,8 @@
 <!ENTITY hideWindow.label  "スタイルシートの編集中に[オプション]ウィンドウを非表示">
 <!ENTITY hideWindow.accesskey  "H">
 <!ENTITY hideWindow.tooltip  "スタイルシートの編集中に[オプション]ウィンドウを非表示にします。\nこれ、タブを変更することができます。">
+<!ENTITY deleteFromDisk.label  "ここで削除するときにも、ハード·ディスクからスタイルシートファイルを削除する">
+<!ENTITY deleteFromDisk.tooltip  "警告：あなたはユーザースタイルのマネージャーからスタイルを削除するときにこの機能を有効にすると、ハードディスクから対応するファイルの削除が発生します">
 <!ENTITY appMenu.label  "アプリメニュー">
 <!ENTITY appMenu.accesskey  "P">
 <!ENTITY appMenu.tooltip  "アプリメニューのエントリは、簡単にオプションウィンドウにアクセスし、迅速に有効化/スタイルを無効にするために作成">

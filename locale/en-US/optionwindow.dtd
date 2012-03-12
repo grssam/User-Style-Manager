@@ -45,6 +45,9 @@
 <!ENTITY hideWindow.accesskey         "H">
 <!ENTITY hideWindow.tooltip           "Hides the Options window while editing Style Sheets. This enables changing of Tabs and Windows.">
 
+<!ENTITY deleteFromDisk.label         "Also delete the Style Sheet File from Hard-disk when deleting here">
+<!ENTITY deleteFromDisk.tooltip       "WARNING: Enabling this feature will cause deletion of the corresponding file from your hard disk when you delete a style from User Styles Manager">
+
 <!ENTITY appMenu.label                "Apps Menu">
 <!ENTITY appMenu.accesskey            "P">
 <!ENTITY appMenu.tooltip              "Creates an entry in Apps Menu to easily access the Options window and to quickly enable/disable a style">

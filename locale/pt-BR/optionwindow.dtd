@@ -34,6 +34,8 @@
 <!ENTITY hideWindow.label  "Esconder Janela Opções durante a edição de Folhas de Estilo">
 <!ENTITY hideWindow.accesskey  "O">
 <!ENTITY hideWindow.tooltip  "Oculta a janela Opções durante a edição de Folhas de Estilo. Isso permite mudar de abas e janelas.">
+<!ENTITY deleteFromDisk.label  "Além disso, exclua o arquivo de folha de estilo a partir do disco rígido quando a exclusão aqui">
+<!ENTITY deleteFromDisk.tooltip  "AVISO: A ativação desse recurso fará com exclusão do arquivo correspondente do seu disco rígido quando você excluir um estilo a partir do Gerenciador Estilos Usuário">
 <!ENTITY appMenu.label  "Apps Menu">
 <!ENTITY appMenu.accesskey  "P">
 <!ENTITY appMenu.tooltip  "Cria uma entrada no menu Firefox para acessar facilmente a janela Opções e rapidamente ativar / desativar um estilo">

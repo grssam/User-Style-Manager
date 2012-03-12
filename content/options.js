@@ -349,6 +349,11 @@ let optionsWindow = {
         if (styleSheetList[index][0] == 'enabled')
           unloadStyleSheet(index);
         let deletedStyle = styleSheetList.splice(index, 1);
+        if (pref("deleteFromDisk")) {
+          let deletedFile = getFileURI(deletedStyle[0][2]).QueryInterface(Ci.nsIFileURL).file;
+          if (deletedFile.exists())
+            deletedFile.remove(false);
+        }
         writeJSONPref();
         this.populateStyles();
       }
@@ -367,6 +372,11 @@ let optionsWindow = {
           if (styleSheetList[index][0] == 'enabled')
             unloadStyleSheet(index);
           let deletedStyle = styleSheetList.splice(index, 1);
+          if (pref("deleteFromDisk")) {
+            let deletedFile = getFileURI(deletedStyle[0][2]).QueryInterface(Ci.nsIFileURL).file;
+            if (deletedFile.exists())
+              deletedFile.remove(false);
+          }
         }
       }
       writeJSONPref();
