@@ -61,7 +61,9 @@ let styleEditor = {
   stylePath: "",
   initialText: "",
   lastFind: "",
+  regexpIndex: 0,
   replaceVisible: false,
+  searchVisible: false,
   lastReplacedIndex: -1,
   strings: null,
   sourceEditorEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "10.0") >= 0),
@@ -538,6 +540,114 @@ let styleEditor = {
     styleEditor.doc.getElementById("se-cmd-addWebNamespace").setAttribute("disabled", false);
   },
 
+  find: function SE_find(aString, aOptions) {
+    function $(id) document.getElementById(id);
+    aOptions = aOptions || {};
+    let text = this.getText();
+    if (!$("se-search-regexp").checked) {
+      let str = aOptions.ignoreCase ? aString.toLowerCase() : aString;
+
+      if (aOptions.ignoreCase)
+        text = text.toLowerCase();
+
+      return (aOptions.backwards ? text.lastIndexOf(str, aOptions.start) :
+        text.indexOf(str, aOptions.start));
+    }
+    else {
+      if (this.regexpIndex == -1)
+        return [-1, null];
+      let modifiers = "gm";
+      if (aOptions.ignoreCase)
+        modifiers += "i";
+      let r;
+      try {
+        r = new RegExp(aString, modifiers);
+      } catch (ex) {
+        return [-1, null];
+      }
+      // Hack to set the regexpindex to last possible value
+      if (this.regexpIndex == -2)
+        this.regexpIndex = text.split(r).length - 1;
+      this.regexpIndex += (aOptions.backwards? -1: 1);
+      if (this.regexpIndex <= 0)
+        return [-1, null];
+      for (let i = 1; i < this.regexpIndex; i++)
+        r.exec(text);
+      let result = r.exec(text);
+      result = result?result[0]:null;
+      if (!result)
+        return [-1, null];
+      let index = r.lastIndex - result.length;
+      return [index, result];
+    }
+  },
+
+  handleRestOfFind: function SE_handleRestOfFind(searchText, searchOptions) {
+    function $(id) document.getElementById(id);
+    let index, resultText;
+    let searchIndex = 0, count = 0;
+    if ($("se-search-regexp").checked)
+      [index, resultText] = this.find(searchText, searchOptions);
+    else
+      index = this.find(searchText, searchOptions);
+    if ($("se-search-wrap").checked && index < 0) {
+      searchOptions.start = searchOptions.backwards? this.getText().length: 0;
+      this.regexpIndex = searchOptions.backwards? -2: 0;
+      if ($("se-search-regexp").checked)
+        [index, resultText] = this.find(searchText, searchOptions);
+      else
+        index = this.find(searchText, searchOptions);
+    }
+    if ($("se-search-regexp").checked) {
+      try {
+        count = this.getText().split(new RegExp(searchText,
+          "gm" + (searchOptions.ignoreCase? "i": ""))).length - 1;
+      } catch (ex) {
+        count = 0;
+      }
+    }
+    else {
+      let txt = searchOptions.ignoreCase? this.getText().toLowerCase(): this.getText();
+      searchText = searchOptions.ignoreCase? searchText.toLowerCase(): searchText
+      count = txt.split(searchText).length - 1;
+    }
+    // don't update searchindex if we think that it is because
+    // of trying to wrap on no wrap
+    if (index < 0 && count <= 0)
+      this.regexpIndex = -1;
+    else if (index >= 0) {
+      if ($("se-search-regexp").checked) {
+        searchIndex = this.regexpIndex - 1;
+        this.selectRange(index, index + resultText.length);
+      }
+      else {
+        this.selectRange(index, index + searchText.length);
+        let txt = searchOptions.ignoreCase? this.getText().toLowerCase(): this.getText();
+        searchIndex = txt.slice(0, index).split(searchText).length - 1;
+      }
+    }
+    else {
+      searchIndex = searchOptions.backwards? 0: count - 1;
+      this.regexpIndex = searchOptions.backwards? 1: count;
+    }
+    $("se-search-index").value = searchIndex + (count > 0? 1: 0);
+    $("se-search-count").value = count;
+    $("se-search-count").style.color = count? "green": "red";
+    $("se-search-box").focus();
+    if ($("se-search-regexp").checked)
+      return [index, resultText];
+    else
+      return [index]
+  },
+
+  doNewFind: function SE_doNewFind() {
+    function $(id) styleEditor.doc.getElementById(id);
+    let selected = this.selectedText();
+    if (selected && selected.length > 0)
+      $("se-search-box").value = selected;
+    this.doFind();
+  },
+
   doFind: function SE_doFind() {
     function $(id) styleEditor.doc.getElementById(id);
     let searchText = $("se-search-box").value;
@@ -549,43 +659,23 @@ let styleEditor = {
     }
     else if (searchText.length > 0) {
       let searchOptions = [];
-      let searchIndex = 0, count = 0;
-      if (searchText == this.lastFind) {
+      if (searchText == this.lastFind)
         searchOptions = {
-          backwards: false,
+          backwards: $("se-search-backwards").checked,
           ignoreCase: $("se-search-case").checked,
           start: this.getCaretOffset(),
         };
-      }
       else {
         this.lastFind = searchText;
         searchOptions = {
-          backwards: false,
+          backwards: $("se-search-backwards").checked,
           ignoreCase: $("se-search-case").checked,
           start: this.getCaretOffset() - searchText.length - 1,
         };
       }
-      let index = this.editor.find(searchText, searchOptions);
-      if ($("se-search-wrap").checked && index < 0) {
-        searchOptions.start = 0;
-        index = this.editor.find(searchText, searchOptions);
-      }
-      if (index >= 0) {
-        this.selectRange(index, index + searchText.length);
-        let txt = searchOptions.ignoreCase? this.editor.getText().toLowerCase(): this.editor.getText();
-        searchText = searchOptions.ignoreCase? searchText.toLowerCase(): searchText
-        count = txt.split(searchText).length - 1;
-        searchIndex = txt.slice(0, index).split(searchText).length - 1;
-      }
-      else
-        count = searchIndex = 0;
-      $("se-search-box").focus();
-      $("se-search-index").value = searchIndex;
-      $("se-search-count").value = count;
-      $("se-search-count").style.color = count? "green": "red";
-      return index;
+      return this.handleRestOfFind(searchText, searchOptions);
     }
-    return -1;
+    return [-1, null];
   },
 
   doFindPrevious: function SE_doFindPrevious() {
@@ -598,11 +688,10 @@ let styleEditor = {
       $("se-search-count").style.color = "rgb(50,50,50)";
     }
     else if (searchText.length > 0) {
-      let searchIndex = 0, count = 0;
       let searchOptions = {};
       if (searchText == this.lastFind) {
         searchOptions = {
-          backwards: true,
+          backwards: !$("se-search-backwards").checked,
           ignoreCase: $("se-search-case").checked,
           start: this.getCaretOffset() - searchText.length - 1,
         };
@@ -610,32 +699,13 @@ let styleEditor = {
       else {
         this.lastFind = searchText;
         searchOptions = {
-          backwards: true,
+          backwards: !$("se-search-backwards").checked,
           ignoreCase: $("se-search-case").checked,
           start: this.getCaretOffset(),
         };
       }
-      let index = this.editor.find(searchText, searchOptions);
-      if ($("se-search-wrap").checked && index < 0) {
-        searchOptions.start = this.getText().length;
-        index = this.editor.find(searchText, searchOptions);
-      }
-      if (index >= 0) {
-        this.selectRange(index, index + searchText.length);
-        let txt = searchOptions.ignoreCase? this.editor.getText().toLowerCase(): this.editor.getText();
-        searchText = searchOptions.ignoreCase? searchText.toLowerCase(): searchText
-        count = txt.split(searchText).length - 1;
-        searchIndex = txt.slice(0, index).split(searchText).length - 1;
-      }
-      else
-        searchIndex = count = 0;
-      $("se-search-box").focus();
-      $("se-search-index").value = searchIndex;
-      $("se-search-count").value = count;
-      $("se-search-count").style.color = count? "green": "red";
-      return index;
+      this.handleRestOfFind(searchText, searchOptions);
     }
-    return -1;
   },
 
   doReplace: function SE_doReplace(replaceAll) {
@@ -657,7 +727,7 @@ let styleEditor = {
         let caretOffset = this.getCaretOffset();
         if (replaceAll) {
           let text = this.getText();
-          let modifiers = "g";
+          let modifiers = "gm";
           if ($("se-search-case").checked)
             modifiers += "i";
           text = text.replace(new RegExp(searchText, modifiers), replaceText);
@@ -667,7 +737,13 @@ let styleEditor = {
         else {
           if (this.lastReplacedIndex != caretOffset - this.selectedText().length)
             this.setCaretOffset(caretOffset - this.selectedText().length);
-          let index = this.doFind();
+          let index;
+          if ($("se-search-regexp").checked) {
+            this.regexpIndex = searchIndex - 1;
+            [index, searchText] = this.doFind();
+          }
+          else
+            [index] = this.doFind();
           this.lastReplacedIndex = index;
           if (index >= 0) {
             this.setText(replaceText, index, index + searchText.length);
@@ -702,7 +778,7 @@ let styleEditor = {
     if (this.replaceVisible) {
       $("se-replace-container").style.opacity = 0;
       $("se-replace-container").style.maxHeight = "0px";
-      $("se-replace-container").style.margin = "-70px 0px 40px 0px";
+      $("se-replace-container").style.margin = "-70px 0px 44px 0px";
       this.replaceVisible = false;
     }
     this.onSearchBlur();
@@ -712,6 +788,7 @@ let styleEditor = {
     function $(id) styleEditor.doc.getElementById(id);
     $("se-search-toolbar").style.opacity = 1;
     $("se-search-toolbar").style.maxWidth = "200px";
+    this.searchVisible = true;
   },
 
   onSearchBlur: function SE_onSearchBlur() {
@@ -720,6 +797,7 @@ let styleEditor = {
       return;
     $("se-search-toolbar").style.opacity = 0;
     $("se-search-toolbar").style.maxWidth = "0px";
+    this.searchVisible = false;
   },
 
   searchPanelHidden: function DE_searchPanelHidden() {

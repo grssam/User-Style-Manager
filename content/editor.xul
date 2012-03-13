@@ -29,7 +29,7 @@
  -
  - ***** END LICENSE BLOCK ***** -->
 <!DOCTYPE window SYSTEM "chrome://userstylemanager/locale/styleeditor.dtd">
-<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
 <?xml-stylesheet href="editor.css" type="text/css"?>
 <?xul-overlay href="chrome://global/content/editMenuOverlay.xul"?>
 <?xul-overlay href="chrome://browser/content/source-editor-overlay.xul"?>
@@ -43,6 +43,7 @@
   <commandset id="sourceEditorCommands"/>
   <commandset>
     <command id="se-cmd-find" oncommand="styleEditor.doFind();"/>
+    <command id="se-cmd-findNew" oncommand="styleEditor.doNewFind();"/>
     <command id="se-cmd-findPrevious" oncommand="styleEditor.doFindPrevious();"/>
     <command id="se-cmd-replace" oncommand="styleEditor.doReplace();"/>
     <command id="se-cmd-undo" oncommand="styleEditor.undo();" disabled="true"/>
@@ -70,7 +71,6 @@
          command="se-cmd-exit"
          modifiers="accel"/>
 
-
     <key id="key_cut"
          key="&cutCmd.key;"
          modifiers="accel"/>
@@ -85,16 +85,14 @@
          oncommand="styleEditor.undo();"/>
     <key id="key_redo" key="&undoCmd.key;" modifiers="accel,shift"
          oncommand="styleEditor.redo();"/>
-#ifdef XP_MACOSX
-    <key id="key_find"
+    <key id="key_findNew"
          key="&findCmd.key;"
-         command="se-cmd-find"
+         command="se-cmd-findNew"
          modifiers="accel"/>
     <key id="key_findPrevious"
          key="&findPreviousCmd.key;"
          command="se-cmd-findPrevious"
          modifiers="accel,shift"/>
-#else
     <key id="key_find"
          keycode="VK_F3"
          command="se-cmd-find"/>
@@ -102,8 +100,6 @@
          keycode="VK_F3"
          command="se-cmd-findPrevious"
          modifiers="shift"/>
-#endif
-
     <key id="key_replace"
          key="&replaceCmd.key;"
          command="se-cmd-replace"
@@ -268,7 +264,7 @@
                       <checkbox label="&search.ignoreCase;" accesskey="&search.ignoreCase.accesskey;"
                         id="se-search-case" tooltiptext="&search.ignoreCase.tooltip;" checked="true"/>
                       <checkbox label="&search.highlightAll;" accesskey="&search.highlightAll.accesskey;"
-                        id="se-search-highlight" tooltiptext="&search.highlightAll.tooltip;"/>
+                        id="se-search-highlight" tooltiptext="&search.highlightAll.tooltip;" disabled="true"/>
                     </row>
                     <row>
                       <checkbox label="&search.regexp;" accesskey="&search.regexp.accesskey;"
