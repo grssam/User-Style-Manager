@@ -62,7 +62,7 @@ let optionsWindow = {
       let args = [true, styleSheetList.length, false, fp.file.path, true];
       Services.wm.getMostRecentWindow("navigator:browser")
         .openDialog("chrome://userstylemanager/content/editor.xul",
-        "User Style Manager - Editor","chrome,resizable,height=600,width=800,top="
+        "User Style Manager - Editor - Open File","chrome,resizable,height=600,width=800,top="
         + (window.screen.height/2 - 300) + ",left="
         + (window.screen.width/2 - 400), args);
       this.editorOpened = true;
@@ -327,7 +327,7 @@ let optionsWindow = {
     let args = [false, styleSheetList.length, true, "", true];
     Services.wm.getMostRecentWindow("navigator:browser")
       .openDialog("chrome://userstylemanager/content/editor.xul",
-      "User Style Manager - Editor","chrome,resizable,height=600,width=800,top="
+      "User Style Manager - Editor - New","chrome,resizable,height=600,width=800,top="
       + (window.screen.height/2 - 300) + ",left="
       + (window.screen.width/2 - 400), args).focus();
     this.editorOpened = true;

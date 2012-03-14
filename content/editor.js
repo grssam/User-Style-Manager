@@ -332,6 +332,7 @@ let styleEditor = {
    **   index, // in case of editing an existing file, use this
    **   createNew, // bool , true if creating a new file.CANNOT be true if above true
    **   path, // string containing the path of the new file to open when openNew true
+   **         // or when createNew, the initialText to be displayed in the editor window
    **   callback // bool to tell whther to callback to open options window or not
    ** ]
    **/

@@ -113,6 +113,50 @@ function addContextMenuEntry(window) {
   }
 }
 
+function getDomain(win) {
+  let url = getURL(win);
+  return url.replace(/^(https?:\/\/)?(www\.)?/, '').match(/^([^\/]+)\/?/)[1];
+}
+
+function getURL(window) {
+  // Get the current browser's URI even if loading
+  let channel = window.gBrowser.selectedBrowser.webNavigation.documentChannel;
+  if (channel != null)
+    return decodeURI(channel.originalURI.spec);
+
+  // Just return the finished loading uri
+  return decodeURI(window.gBrowser.selectedBrowser.currentURI.spec);
+}
+
+function createNew(window, type) {
+  let args = [false, null, true, "", false];
+  switch (type) {
+    case 'blank':
+      args[3] = "";
+      break;
+    case 'domain':
+      args[3] = "@namespace url(http://www.w3.org/1999/xhtml);\n"
+                + "@-moz-document domain('" + getDomain(window) + "') {\n"
+                + l10n("writeStyleHere") + "\n}";
+      break;
+    case 'url':
+      args[3] = "@namespace url(http://www.w3.org/1999/xhtml);\n"
+                + "@-moz-document url('" + getURL(window) + "') {\n"
+                + l10n("writeStyleHere") + "\n}";
+      break;
+    case 'fx':
+      args[3] = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n"
+                + "@-moz-document url-prefix('chrome://') {\n"
+                + l10n("writeStyleHere") + "\n}";
+      break;
+  }
+  Services.wm.getMostRecentWindow("navigator:browser")
+    .openDialog("chrome://userstylemanager/content/editor.xul",
+    "User Style Manager - Editor - Create New","chrome,resizable,height=600,width=800,top="
+    + (window.screen.height/2 - 300) + ",left="
+    + (window.screen.width/2 - 400), args).focus();
+}
+
 function populateMenuPopupList(window, id, event) {
   if (event.target.id != id)
     return;
@@ -131,6 +175,45 @@ function populateMenuPopupList(window, id, event) {
       itemManage.setAttribute("tooltiptext", l10n("manage.tooltip"));
       listen(window, itemManage, "command", function() openOptions(window));
       menupop.appendChild(itemManage);
+    }
+    // Adding menu to create new styles based on current domain/url/blank/Fx Chrome
+    let (createMenu = window.document.createElementNS(XUL, "menu")) {
+      createMenu.setAttribute("label", l10n("create.label"));
+      createMenu.setAttribute("accesskey", l10n("create.accesskey"));
+      createMenu.setAttribute("tooltiptext", l10n("create.tooltip"));
+      let (createMenupop = window.document.createElementNS(XUL, "menupopup")) {
+        createMenupop.setAttribute("class", "popup-internal-box");
+        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+          createItem.setAttribute("label", l10n("create.blank.label"));
+          createItem.setAttribute("accesskey", l10n("create.blank.accesskey"));
+          createItem.setAttribute("tooltiptext", l10n("create.blank.tooltip"));
+          listen(window, createItem, "command", function() createNew(window, 'blank'));
+          createMenupop.appendChild(createItem);
+        }
+        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+          createItem.setAttribute("label", l10n("create.domain.label"));
+          createItem.setAttribute("accesskey", l10n("create.domain.accesskey"));
+          createItem.setAttribute("tooltiptext", l10n("create.domain.tooltip") + " " + getDomain(window));
+          listen(window, createItem, "command", function() createNew(window, 'domain'));
+          createMenupop.appendChild(createItem);
+        }
+        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+          createItem.setAttribute("label", l10n("create.url.label"));
+          createItem.setAttribute("accesskey", l10n("create.url.accesskey"));
+          createItem.setAttribute("tooltiptext", l10n("create.url.tooltip") + " " + getURL(window));
+          listen(window, createItem, "command", function() createNew(window, 'url'));
+          createMenupop.appendChild(createItem);
+        }
+        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+          createItem.setAttribute("label", l10n("create.fx.label"));
+          createItem.setAttribute("accesskey", l10n("create.fx.accesskey"));
+          createItem.setAttribute("tooltiptext", l10n("create.fx.tooltip"));
+          listen(window, createItem, "command", function() createNew(window, 'fx'));
+          createMenupop.appendChild(createItem);
+        }
+        createMenu.appendChild(createMenupop);
+      }
+      menupop.appendChild(createMenu);
     }
     // Adding the menu containing sorted stylesheets
     let (sortedMenu = window.document.createElementNS(XUL, "menu")) {
