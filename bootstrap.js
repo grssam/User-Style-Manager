@@ -387,6 +387,8 @@ function addMenuItem(window) {
     }
   }
   if (pref("createAppMenuButton")) {
+    if (window.navigator.oscpu.search(/^mac/i) == 0)
+      return;
     let appMenu = $("appmenuPrimaryPane");
     if (appMenu) {
       let (appMenuItem = window.document.createElementNS(XUL, "menu")) {

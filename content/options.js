@@ -242,6 +242,8 @@ let optionsWindow = {
 
   onLoad: function OW_onLoad() {
     function $(id) document.getElementById(id);
+    if (window.navigator.oscpu.search(/^mac/i) == 0)
+      $("createAppMenuMenuitem").disabled = $("createAppMenuMenuitem").hidden = true;
     this.tree = document.getElementById("styleSheetTree");
     this.initialized = true;
     readJSONPref(function() {
