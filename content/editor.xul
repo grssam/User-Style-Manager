@@ -298,6 +298,12 @@
   </vbox>
   <vbox id="USMTextEditorContainer" flex="1">
     <vbox id="USMTextEditor" flex="1"/>
+    <hbox class="error-label" id="USMErrorLabel">
+      <label value="Erros and Warnings" style="padding:4px 0px;"/>
+      <spacer flex="1"/>
+      <label class="close-button" onclick="styleEditor.closeErrorPanel();"/>
+    </hbox>
+    <vbox id="USMErrorPanel" flex="0" class="error-panel" minheight="0"/>
   </vbox>
   <vbox id="USMButtonContainerV">
     <hbox id="USMButtonContainer" style="margin:10px">

@@ -91,6 +91,13 @@ let styleEditor = {
     return [this.getSelectionRange().start, this.getSelectionRange().end];
   },
 
+  getCaretLine: function SE_getCaretLine() {
+    if (this.sourceEditorEnabled)
+      return styleEditor.editor.getCaretPosition().line;
+    else
+      return null;
+  },
+
   getText: function SE_getText(aStart, aEnd) {
     if (this.sourceEditorEnabled)
       return this.editor.getText(aStart, aEnd);
@@ -863,10 +870,43 @@ let styleEditor = {
     this.setCaretOffset(pos + 23);
   },
 
+  closeErrorPanel: function SE_closeErrorPanel() {
+    function $(id) document.getElementById(id);
+    let (errorPanel = $("USMErrorPanel")) {
+      $("USMErrorLabel").style.opacity = 0;
+      $("USMErrorLabel").style.margin = "30px 0px -60px 0px";
+      errorPanel.style.opacity = 0;
+      errorPanel.style.margin = "100px 0px -100px 0px;";
+      while (errorPanel.firstChild)
+        errorPanel.removeChild(errorPanel.firstChild);
+    }
+  },
+
   validateCSS: function SE_validateCSS() {
+    function $(id) document.getElementById(id);
     function getLine(i) {
       styleEditor.setCaretOffset(i);
-      return styleEditor.editor.getCaretPosition().line;
+      return styleEditor.getCaretLine() || numLines;
+    }
+
+    function createErrorLine(aLineNum, aMsg, aOffset) {
+      let line = document.createElementNS(XUL, "hbox");
+      line.setAttribute("class", "error-panel-line");
+      line.onclick = function() {
+        styleEditor.setCaretOffset(aOffset);
+        styleEditor.editor.focus();
+      };
+      let lineNum = document.createElementNS(XUL, "label");
+      lineNum.setAttribute("value", "Line " + (aLineNum + 1) + ":");
+      lineNum.setAttribute("class", "error-panel-line-num");
+      lineNum.setAttribute("flex", "0");
+      let msg = document.createElementNS(XUL, "label");
+      msg.setAttribute("value", aMsg);
+      msg.setAttribute("class", "error-panel-msg");
+      msg.setAttribute("flex", "1");
+      line.appendChild(lineNum);
+      line.appendChild(msg);
+      return line;
     }
 
     // This is a syntax validator as of now.
@@ -877,7 +917,10 @@ let styleEditor = {
     let warningList = [];
     let bracketStack = [];
     let bracketStackLine = [];
+    let bracketStackOffset = [];
+    let numLines = 0;
     // comments in this bracketStack are represented by #
+
     bracketStack.__defineGetter__("last", function() {
       if (bracketStack.length == 0)
         return "";
@@ -885,19 +928,21 @@ let styleEditor = {
     });
 
     function add(x, i) {
-      bracketStackLine.push(i);
+      bracketStackOffset.push(i);
+      bracketStackLine.push(getLine(i));
       bracketStack.push(x);
     };
 
     function del() {
+      bracketStackOffset.pop();
       bracketStackLine.pop();
       bracketStack.pop();
     };
 
-
     for (let i = 0; i < text.length; i++) {
       switch (text[i]) {
         case '\n':
+          numLines++;
           while (bracketStack.last == '"' || bracketStack.last == "'")
             del();
           break;
@@ -911,12 +956,12 @@ let styleEditor = {
             del();
             // checking if this comment was even started
             if (bracketStack.last != '#')
-              errorList.push([getLine(i), "Comment ending without a start"]);
+              errorList.push([getLine(i), i, "Comment ending without a start"]);
             else
               del();
           }
           else if (bracketStack.last != '/')
-            add('/', getLine(i));
+            add('/', i);
           break;
 
         case '*':
@@ -928,10 +973,10 @@ let styleEditor = {
             del();
             // checking if any comment was started before also
             if (bracketStack.last != '#')
-              add('#', getLine(i));
+              add('#', i);
           }
           else if (bracketStack.last != '*')
-            add('*', getLine(i));
+            add('*', i);
           break;
 
         case "'":
@@ -940,7 +985,7 @@ let styleEditor = {
           else if (bracketStack.last == '"')
             break;
           else
-            add("'", getLine(i));
+            add("'", i);
           break;
 
         case '"':
@@ -949,7 +994,7 @@ let styleEditor = {
           else if (bracketStack.last == "'")
             break;
           else
-            add('"', getLine(i));
+            add('"', i);
           break;
 
         case '{':
@@ -958,10 +1003,10 @@ let styleEditor = {
           else if (bracketStack.last == '/' || bracketStack.last == '*')
             del();
           if (bracketStack.last == ':') {
-            errorList.push([getLine(i), "Missing ;"]);
+            errorList.push([getLine(i), i, "Missing ;"]);
             del();
           }
-          add('{', getLine(i));
+          add('{', i);
           break;
 
         case '}':
@@ -972,7 +1017,7 @@ let styleEditor = {
           if (bracketStack.last == ':')
             del();
           if (bracketStack.last == '{')
-            add('}', getLine(i));
+            add('}', i);
           else if (bracketStack.last == '}') {
             while (bracketStack.last == '}' && bracketStack[bracketStack.length - 2] == '{') {
               del();
@@ -981,10 +1026,10 @@ let styleEditor = {
             if (bracketStack.last == '{')
               del();
             else
-              errorList.push([getLine(i), "Unmatched }"]);
+              errorList.push([getLine(i), i, "Unmatched }"]);
           }
           else
-            errorList.push([getLine(i), "Unmatched }"]);
+            errorList.push([getLine(i), i, "Unmatched }"]);
           break;
 
         case '(':
@@ -992,7 +1037,7 @@ let styleEditor = {
             break;
           else if (bracketStack.last == '/' || bracketStack.last == '*')
             del();
-          add('(', getLine(i));
+          add('(', i);
           break;
 
         case ')':
@@ -1003,7 +1048,7 @@ let styleEditor = {
           if (bracketStack.last == '(')
             del();
           else
-            errorList.push([getLine(i), "Unmatched )"]);
+            errorList.push([getLine(i), i, "Unmatched )"]);
           break;
 
         case '[':
@@ -1012,10 +1057,10 @@ let styleEditor = {
           else if (bracketStack.last == '/' || bracketStack.last == '*')
             del();
           if (bracketStack.last == ':') {
-            errorList.push([getLine(i), "Missing ;"]);
+            errorList.push([getLine(i), i, "Missing ;"]);
             del();
           }
-          add('[', getLine(i));
+          add('[', i);
           break;
 
         case ']':
@@ -1026,7 +1071,7 @@ let styleEditor = {
           if (bracketStack.last == '[')
             del();
           else
-            errorList.push([getLine(i), "Unmatched ]"]);
+            errorList.push([getLine(i), i, "Unmatched ]"]);
           break;
 
         case ':':
@@ -1035,9 +1080,9 @@ let styleEditor = {
           else if (bracketStack.last == '/' || bracketStack.last == '*')
             del();
           if (bracketStack.last == '{')
-            add(':', getLine(i));
+            add(':', i);
           else if (bracketStack.last == ':')
-            errorList.push([getLine(i), "Missing ;"]);
+            errorList.push([getLine(i), i, "Missing ;"]);
           break;
 
         case ';':
@@ -1048,13 +1093,60 @@ let styleEditor = {
           if (bracketStack.last == ':')
             del();
           break;
+        default:
+          if (bracketStack.last == "*" || bracketStack.last == "/")
+            del();
       }
     }
-    if (errorList.length || warningList.length || bracketStack.length%2)
+    styleEditor.setCaretOffset(0);
+
+    // Checking bracklist for matching brackets
+    let i = 0;
+    while (bracketStack.length > 0) {
+      if ((bracketStack[i] == '{' && bracketStack[i + 1] == '}')
+        || (bracketStack[i] == '[' && bracketStack[i + 1] == ']')
+        || (bracketStack[i] == '(' && bracketStack[i + 1] == ')')) {
+          del();
+          del();
+          i = 0;
+      }
+      else
+        i++;
+      if (i == bracketStack.length - 1)
+        break;
+    }
+    for (i = 0; i < bracketStack.length; i++)
+      errorList.push([bracketStackLine[i], bracketStackOffset[i], "Unmatched " + bracketStack[i]]);
+
+    if (errorList.length || warningList.length)
       error = true;
 
-    if (error)
-      return promptService.confirm(null, styleEditor.STR("validate.error"), styleEditor.STR("validate.notCSS"));
+    // Sorting errors based on line num
+    errorList.sort(function(a,b) {
+      return a[1] - b[1];
+    });
+
+    if (error) {
+      let answer = promptService.confirm(null, styleEditor.STR("validate.error"), styleEditor.STR("validate.notCSS"));
+      if (!answer) {
+        let (errorPanel = $("USMErrorPanel")) {
+          while (errorPanel.firstChild)
+            errorPanel.removeChild(errorPanel.firstChild);
+          if (error) {
+            $("USMErrorLabel").style.opacity = 1;
+            $("USMErrorLabel").style.margin = "0px";
+            errorPanel.style.opacity = 1;
+            errorPanel.style.margin = "0px";
+            errorList.forEach(function([lineNum, offset, msg]) {
+              errorPanel.appendChild(createErrorLine(lineNum, msg, offset));
+            });
+          }
+        }
+        return false;
+      }
+      else
+        return true;
+    }
 
     // No error found, now looking for url suffixes
     if (text.search(/[@]namespace[ ]+url\([^\)]{1,}\)/) == -1) {
