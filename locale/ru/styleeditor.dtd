@@ -81,3 +81,4 @@
 <!ENTITY replace  "заменять">
 <!ENTITY replace.accesskey  "т">
 <!ENTITY replace.tooltip  "Отображает окно замены диалог.">
+<!ENTITY error.label  "Ошибки и предупреждения">

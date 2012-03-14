@@ -108,3 +108,4 @@
 <!ENTITY replace                      "Replace">
 <!ENTITY replace.accesskey            "R">
 <!ENTITY replace.tooltip              "Displays the replace dialog box.">
+<!ENTITY error.label                  "Errors and Warnings">

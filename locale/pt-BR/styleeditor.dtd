@@ -81,3 +81,4 @@
 <!ENTITY replace  "Substituir">
 <!ENTITY replace.accesskey  "S">
 <!ENTITY replace.tooltip  "Exibe a caixa de diálogo Substituir.">
+<!ENTITY error.label  "Erros e avisos">

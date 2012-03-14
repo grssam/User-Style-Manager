@@ -81,3 +81,4 @@
 <!ENTITY replace  "Reemplazar">
 <!ENTITY replace.accesskey  "R">
 <!ENTITY replace.tooltip  "Muestra el cuadro de diálogo Reemplazar.">
+<!ENTITY error.label  "Errores y advertencias">

@@ -956,7 +956,7 @@ let styleEditor = {
             del();
             // checking if this comment was even started
             if (bracketStack.last != '#')
-              errorList.push([getLine(i), i, "Comment ending without a start"]);
+              errorList.push([getLine(i), i, styleEditor.STR("error.comment")]);
             else
               del();
           }
@@ -1003,10 +1003,13 @@ let styleEditor = {
           else if (bracketStack.last == '/' || bracketStack.last == '*')
             del();
           if (bracketStack.last == ':') {
-            errorList.push([getLine(i), i, "Missing ;"]);
+            errorList.push([getLine(i), i, styleEditor.STR("error.missing") + " ;"]);
             del();
           }
-          add('{', i);
+          if (text.slice(0, i + 1).match(/[@]-moz-document[ ]+(url(-prefix)?|domain|regexp)[^\{\}]+\{$/))
+            add('{{', i);
+          else
+            add('{', i);
           break;
 
         case '}':
@@ -1018,18 +1021,22 @@ let styleEditor = {
             del();
           if (bracketStack.last == '{')
             add('}', i);
+          else if (bracketStack.last == '{{')
+            del();
           else if (bracketStack.last == '}') {
-            while (bracketStack.last == '}' && bracketStack[bracketStack.length - 2] == '{') {
-              del();
-              del();
+            while (bracketStack.last == '}' &&
+              (bracketStack[bracketStack.length - 2] == '{' ||
+              bracketStack[bracketStack.length - 2] == '{{')) {
+                del();
+                del();
             }
-            if (bracketStack.last == '{')
+            if (bracketStack.last == '{' || bracketStack.last == '{{')
               del();
             else
-              errorList.push([getLine(i), i, "Unmatched }"]);
+              errorList.push([getLine(i), i, styleEditor.STR("error.unmatched") + " }"]);
           }
           else
-            errorList.push([getLine(i), i, "Unmatched }"]);
+            errorList.push([getLine(i), i, styleEditor.STR("error.unmatched") + " }"]);
           break;
 
         case '(':
@@ -1048,7 +1055,7 @@ let styleEditor = {
           if (bracketStack.last == '(')
             del();
           else
-            errorList.push([getLine(i), i, "Unmatched )"]);
+            errorList.push([getLine(i), i, styleEditor.STR("error.unmatched") + " )"]);
           break;
 
         case '[':
@@ -1057,7 +1064,7 @@ let styleEditor = {
           else if (bracketStack.last == '/' || bracketStack.last == '*')
             del();
           if (bracketStack.last == ':') {
-            errorList.push([getLine(i), i, "Missing ;"]);
+            errorList.push([getLine(i), i, styleEditor.STR("error.missing") + " ;"]);
             del();
           }
           add('[', i);
@@ -1071,7 +1078,7 @@ let styleEditor = {
           if (bracketStack.last == '[')
             del();
           else
-            errorList.push([getLine(i), i, "Unmatched ]"]);
+            errorList.push([getLine(i), i, styleEditor.STR("error.unmatched") + " ]"]);
           break;
 
         case ':':
@@ -1082,7 +1089,7 @@ let styleEditor = {
           if (bracketStack.last == '{')
             add(':', i);
           else if (bracketStack.last == ':')
-            errorList.push([getLine(i), i, "Missing ;"]);
+            errorList.push([getLine(i), i, styleEditor.STR("error.missing") + " ;"]);
           break;
 
         case ';':
@@ -1103,7 +1110,7 @@ let styleEditor = {
     // Checking bracklist for matching brackets
     let i = 0;
     while (bracketStack.length > 0) {
-      if ((bracketStack[i] == '{' && bracketStack[i + 1] == '}')
+      if (((bracketStack[i] == '{' || bracketStack[i] == '{{') && bracketStack[i + 1] == '}')
         || (bracketStack[i] == '[' && bracketStack[i + 1] == ']')
         || (bracketStack[i] == '(' && bracketStack[i + 1] == ')')) {
           del();
@@ -1116,7 +1123,8 @@ let styleEditor = {
         break;
     }
     for (i = 0; i < bracketStack.length; i++)
-      errorList.push([bracketStackLine[i], bracketStackOffset[i], "Unmatched " + bracketStack[i]]);
+      errorList.push([bracketStackLine[i], bracketStackOffset[i], styleEditor.STR("error.unmatched") + " "
+        + bracketStack[i].replace(/\{+/, "{")]);
 
     if (errorList.length || warningList.length)
       error = true;

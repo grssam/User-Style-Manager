@@ -81,3 +81,4 @@
 <!ENTITY replace  "交換する">
 <!ENTITY replace.accesskey  "R">
 <!ENTITY replace.tooltip  "[置換]ダイアログボックスが表示されます。">
+<!ENTITY error.label  "エラーと警告">
