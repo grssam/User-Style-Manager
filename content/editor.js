@@ -163,18 +163,72 @@ let styleEditor = {
     let currentPos = styleEditor.getCaretOffset();
     let text = styleEditor.getText();
     // check if the types word is !
-    if ("!" != text.slice(currentPos - 1, currentPos))
-      return;
-    // checking whether we are not inside a comment
-    let textBefore = text.slice(0, currentPos - 1);
-    if (textBefore.lastIndexOf("\/*") > textBefore.lastIndexOf("*\/"))
-      return;
-    let textAfter = text.slice(currentPos, currentPos + 9);
-    if (textAfter.length == 0 || textAfter.toLowerCase() != "important".slice(0, textAfter.length)) {
-      styleEditor.setText("important", currentPos, currentPos);
-      if (textAfter[0] != ';')
-        styleEditor.setText(";", currentPos + 9, currentPos + 9);
-      styleEditor.setCaretOffset(currentPos + 10);
+    if ("!" == text.slice(currentPos - 1, currentPos)) {
+      // checking whether we are not inside a comment
+      let textBefore = text.slice(0, currentPos - 1);
+      if (textBefore.lastIndexOf("\/*") > textBefore.lastIndexOf("*\/"))
+        return;
+      let textAfter = text.slice(currentPos, currentPos + 9);
+      if (textAfter.length == 0 || textAfter.toLowerCase() != "important".slice(0, textAfter.length)) {
+        styleEditor.setText("important", currentPos, currentPos);
+        if (textAfter[0] != ';')
+          styleEditor.setText(";", currentPos + 9, currentPos + 9);
+        styleEditor.setCaretOffset(currentPos + 10);
+      }
+    }
+    else if ("'" == text.slice(currentPos - 1, currentPos)) {
+      let textAfter = text.slice(currentPos).split("\n")[0];
+      let textBefore = text.slice(0, currentPos).split("\n").slice(-1)[0];
+      if (textAfter.trim() == "" && textBefore.split("'").length%2 == 0) {
+        styleEditor.setText("'", currentPos, currentPos);
+        styleEditor.setCaretOffset(currentPos);
+      }
+    }
+    else if ('"' == text.slice(currentPos - 1, currentPos)) {
+      let textAfter = text.slice(currentPos).split("\n")[0];
+      let textBefore = text.slice(0, currentPos).split("\n").slice(-1)[0];
+      if (textAfter.trim() == "" && textBefore.split('"').length%2 == 0) {
+        styleEditor.setText('"', currentPos, currentPos);
+        styleEditor.setCaretOffset(currentPos);
+      }
+    }
+    else if (text.slice(0, currentPos).split("\n").slice(-1)[0].split("'").length%2
+            && text.slice(0, currentPos).split("\n").slice(-1)[0].split('"').length%2) {
+      if ("/*" == text.slice(currentPos - 2, currentPos)) {
+        styleEditor.setText("*/", currentPos, currentPos);
+        styleEditor.setCaretOffset(currentPos);
+      }
+      else if ("{" == text.slice(currentPos - 1, currentPos)) {
+        let textAfter = text.slice(currentPos);
+        let textBefore = text.slice(0, currentPos);
+        if (textBefore.split("{").length - textBefore.split("}").length
+            > textAfter.split("}").length - textAfter.split("{").length) {
+          let indent = textBefore.match(/\n[^\n]{0,}\{$/)[0].search(/[^ \n]/) - 1;
+          let indentation = "";
+          for (let i = 0; i < indent; i++)
+            indentation += " ";
+          styleEditor.setText("\n" + indentation + "}", currentPos, currentPos);
+          styleEditor.setCaretOffset(currentPos);
+        }
+      }
+      else if ("(" == text.slice(currentPos - 1, currentPos)) {
+        let textAfter = text.slice(currentPos);
+        let textBefore = text.slice(0, currentPos);
+        if (textBefore.split("(").length - textBefore.split(")").length
+            > textAfter.split(")").length - textAfter.split("(").length) {
+          styleEditor.setText(")", currentPos, currentPos);
+          styleEditor.setCaretOffset(currentPos);
+        }
+      }
+      else if ("[" == text.slice(currentPos - 1, currentPos)) {
+        let textAfter = text.slice(currentPos);
+        let textBefore = text.slice(0, currentPos);
+        if (textBefore.split("[").length - textBefore.split("]").length
+            > textAfter.split("]").length - textAfter.split("[").length) {
+          styleEditor.setText("]", currentPos, currentPos);
+          styleEditor.setCaretOffset(currentPos);
+        }
+      }
     }
   },
 
@@ -493,12 +547,6 @@ let styleEditor = {
       $("USMButtonSave").label = "Add";
     $("USMButtonPreview").onclick = styleEditor.previewButtonClick;
     $("USMButtonExit").onclick = styleEditor.exitButtonClick;
-  },
-
-  insertTextAtCaret: function SE_insertTextAtCaret(aText) {
-    let caretOffset = this.getCaretOffset();
-    this.setText(aText, caretOffset, caretOffset);
-    this.setCaretOffset(caretOffset + aText.length);
   },
 
   getCaretOffset: function SE_getCaretOffset() {
