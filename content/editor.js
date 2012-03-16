@@ -45,6 +45,63 @@ function getFileURI(path) {
   Services.scriptloader.loadSubScript(fileURL, global);
 });
 
+// constant list of css attributes
+const CSSKeywordsList = [
+  "alignment-adjust", "alignment-baseline", "animation", "animation-delay", "animation-direction",
+  "animation-duration", "animation-iteration-count", "animation-name", "animation-play-state",
+  "animation-timing-function", "appearance", "azimuth", "backface-visibility", "background",
+  "background-attachment", "background-clip", "background-color", "background-image",
+  "background-origin", "background-position", "background-repeat", "background-size",
+  "baseline-shift", "binding", "bleed", "bookmark-label", "bookmark-level", "bookmark-state",
+  "bookmark-target", "border", "border-bottom", "border-bottom-color", "border-bottom-left-radius",
+  "border-bottom-right-radius", "border-bottom-style", "border-bottom-width", "border-collapse",
+  "border-color", "border-image", "border-image-outset", "border-image-repeat", "border-image-slice",
+  "border-image-source", "border-image-width", "border-left", "border-left-color",
+  "border-left-style", "border-left-width", "border-radius", "border-right", "border-right-color",
+  "border-right-style", "border-right-width", "border-spacing", "border-style", "border-top",
+  "border-top-color", "border-top-left-radius", "border-top-right-radius", "border-top-style",
+  "border-top-width", "border-width", "bottom", "box-decoration-break", "box-shadow",
+  "box-sizing", "break-after", "break-before", "break-inside", "caption-side", "clear",
+  "clip", "color", "color-profile", "column-count", "column-fill", "column-gap", "column-rule",
+  "column-rule-color", "column-rule-style", "column-rule-width", "column-span", "column-width",
+  "columns", "content", "counter-increment", "counter-reset", "crop", "cue", "cue-after",
+  "cue-before", "cursor", "direction", "display", "dominant-baseline", "drop-initial-after-adjust",
+  "drop-initial-after-align", "drop-initial-before-adjust", "drop-initial-before-align",
+  "drop-initial-size", "drop-initial-value", "elevation", "empty-cells", "fit", "fit-position",
+  "flex-align", "flex-flow", "flex-line-pack", "flex-order", "flex-pack", "float", "float-offset",
+  "font", "font-family", "font-size", "font-size-adjust", "font-stretch", "font-style",
+  "font-variant", "font-weight", "grid-columns", "grid-rows", "hanging-punctuation", "height",
+  "hyphenate-after", "hyphenate-before", "hyphenate-character", "hyphenate-lines",
+  "hyphenate-resource", "hyphens", "icon", "image-orientation", "image-rendering",
+  "image-resolution", "inline-box-align", "left", "letter-spacing", "line-break", "line-height",
+  "line-stacking", "line-stacking-ruby", "line-stacking-shift", "line-stacking-strategy",
+  "list-style", "list-style-image", "list-style-position", "list-style-type", "margin",
+  "margin-bottom", "margin-left", "margin-right", "margin-top", "marker-offset", "marks",
+  "marquee-direction", "marquee-loop", "marquee-play-count", "marquee-speed", "marquee-style",
+  "max-height", "max-width", "min-height", "min-width", "move-to", "nav-down", "nav-index",
+  "nav-left", "nav-right", "nav-up", "opacity", "orphans", "outline", "outline-color",
+  "outline-offset", "outline-style", "outline-width", "overflow", "overflow-style",
+  "overflow-wrap", "overflow-x", "overflow-y", "padding", "padding-bottom", "padding-left",
+  "padding-right", "padding-top", "page", "page-break-after", "page-break-before",
+  "page-break-inside", "page-policy", "pause", "pause-after", "pause-before", "perspective",
+  "perspective-origin", "phonemes", "pitch", "pitch-range", "play-during", "position",
+  "presentation-level", "punctuation-trim", "quotes", "rendering-intent", "resize", "rest",
+  "rest-after", "rest-before", "richness", "right", "rotation", "rotation-point", "ruby-align",
+  "ruby-overhang", "ruby-position", "ruby-span", "size", "speak", "speak-header",
+  "speak-numeral", "speak-punctuation", "speech-rate", "stress", "string-set", "tab-size",
+  "table-layout", "target", "target-name", "target-new", "target-position", "text-align",
+  "text-align-last", "text-decoration", "text-decoration-color", "text-decoration-line",
+  "text-decoration-skip", "text-decoration-style", "text-emphasis", "text-emphasis-color",
+  "text-emphasis-position", "text-emphasis-style", "text-height", "text-indent", "text-justify",
+  "text-outline", "text-shadow", "text-space-collapse", "text-transform", "text-underline-position",
+  "text-wrap", "top", "transform", "transform-origin", "transform-style", "transition",
+  "transition-delay", "transition-duration", "transition-property", "transition-timing-function",
+  "unicode-bidi", "vertical-align", "visibility", "voice-balance", "voice-duration",
+  "voice-family", "voice-pitch", "voice-pitch-range", "voice-rate", "voice-stress",
+  "voice-volume", "volume", "white-space", "widows", "width", "word-break", "word-spacing",
+  "word-wrap", "z-index"
+];
+
 let styleEditor = {
   initialized: false,
   saved: false,
@@ -65,6 +122,8 @@ let styleEditor = {
   replaceVisible: false,
   searchVisible: false,
   lastReplacedIndex: -1,
+  caretPosLine: 0,
+  caretPosCol: 0,
   strings: null,
   sourceEditorEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "10.0") >= 0),
   editorFindEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "12.0") >= 0),
@@ -144,24 +203,63 @@ let styleEditor = {
   },
 
   inputHelper: function SE_inputHelper(event) {
+    function $(id) document.getElementById(id);
+
     switch (event.keyCode) {
       case event.DOM_VK_DELETE:
       case event.DOM_VK_BACK_SPACE:
-      case event.DOM_VK_DOWN:
+        if ($("USMAutocompletePanel").state == "open") {
+          $("USMAutocompletePanel").hidePopup();
+          return;
+        }
       case event.DOM_VK_UP:
+        if ($("USMAutocompletePanel").state == "open") {
+          if ($("USMAutocompleteList").currentIndex == 0)
+            $("USMAutocompleteList").currentIndex = $("USMAutocompleteList").selectedIndex = $("USMAutocompleteList").itemCount - 1;
+          else {
+            $("USMAutocompleteList").currentIndex--;
+            $("USMAutocompleteList").selectedIndex--;
+          }
+          styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
+          return;
+        }
+      case event.DOM_VK_DOWN:
+        if ($("USMAutocompletePanel").state == "open") {
+          if ($("USMAutocompleteList").currentIndex == $("USMAutocompleteList").itemCount - 1)
+            $("USMAutocompleteList").currentIndex = $("USMAutocompleteList").selectedIndex = 0;
+          else {
+            $("USMAutocompleteList").currentIndex++;
+            $("USMAutocompleteList").selectedIndex++;
+          }
+          styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
+          return;
+        }
       case event.DOM_VK_LEFT:
       case event.DOM_VK_RIGHT:
       case event.DOM_VK_HOME:
       case event.DOM_VK_END:
       case event.DOM_VK_ESCAPE:
+        if ($("USMAutocompletePanel").state == "open") {
+          $("USMAutocompletePanel").hidePopup();
+          return;
+        }
       case event.DOM_VK_ENTER:
       case event.DOM_VK_RETURN:
+        if ($("USMAutocompletePanel").state == "open") {
+          if ($("USMAutocompleteList").selectedItem) {
+            styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
+            let currentPos = styleEditor.getCaretOffset();
+            styleEditor.setText($("USMAutocompleteList").selectedItem.lastChild.value, currentPos, currentPos + 2);
+            $("USMAutocompletePanel").hidePopup();
+          }
+        }
         return;
       default:
         break;
     }
     let currentPos = styleEditor.getCaretOffset();
     let text = styleEditor.getText();
+    let matchedList = [];
     // check if the types word is !
     if ("!" == text.slice(currentPos - 1, currentPos)) {
       // checking whether we are not inside a comment
@@ -228,6 +326,81 @@ let styleEditor = {
           styleEditor.setText("]", currentPos, currentPos);
           styleEditor.setCaretOffset(currentPos);
         }
+      }
+      else {
+        let richlist = $("USMAutocompleteList");
+        // Closing already opened popup
+        try {
+          while (richlist.firstChild)
+            richlist.removeChild(richlist.firstChild);
+        } catch (ex) {
+          $("USMAutocompletePanel").hidePopup();
+        }
+        if (!styleEditor.sourceEditorEnabled)
+          return;
+        // Checking for autocompleting
+        let textBefore = text.slice(0, currentPos);
+        let word = textBefore.match(/([0-9a-zA-Z_\-]+)$/);
+        let colNum = styleEditor.editor.getCaretPosition().col;
+        styleEditor.caretPosCol = colNum;
+        let lineNum = styleEditor.editor.getCaretPosition().line;
+        styleEditor.caretPosLine = lineNum;
+        if (!word) {
+          try {
+            $("USMAutocompletePanel").hidePopup();
+          } catch (ex) {}
+          return;
+        }
+        word = word[1];
+        let lineBefore = textBefore.slice(-colNum).slice(0, colNum - word.length);
+        let numTabs = lineBefore.split("\t").length - 1;
+        colNum += numTabs*(Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize") - 1);
+        for (let i = 0; i < CSSKeywordsList.length; i++)
+          if (CSSKeywordsList[i].slice(0, word.length).toLowerCase() != word.toLowerCase())
+            continue;
+          else
+            matchedList.push(CSSKeywordsList[i]);
+        if (matchedList.length == 0) {
+          if ($("USMAutocompletePanel").state == "open")
+            $("USMAutocompletePanel").hidePopup();
+          return;
+        }
+        matchedList.sort();
+        let maxLen = 0;
+        for (let i = 0; i < matchedList.length; i++) {
+          if (maxLen < matchedList[i].length)
+            maxLen = matchedList[i].length;
+          let item = document.createElementNS(XUL, "richlistitem");
+          let matchingPart = document.createElementNS(XUL, "label");
+          matchingPart.setAttribute("value", word);
+          matchingPart.setAttribute("style", "margin: 2px 0px; font-family: monospace; font-size: inherit; font-size: 14px;");
+          item.appendChild(matchingPart);
+          let rest = document.createElementNS(XUL, "label");
+          rest.setAttribute("value", matchedList[i].slice(word.length));
+          rest.setAttribute("style", "color: #444; margin: 2px 0px; font-family: monospace; font-size: inherit; font-size: 14px;");
+          item.appendChild(rest);
+          richlist.appendChild(item);
+        }
+        // Convert the caret position into x,y coordinates.
+        let x = 0, y = 0;
+        let eStyle = window.getComputedStyle($("USMTextEditor").firstChild);
+        y = window.screenY + (lineNum + 1 - styleEditor.editor.getTopIndex())
+          * (eStyle.lineHeight.replace("px", "")*1 - 2)
+          + $("USMTextEditor").firstChild.boxObject.y
+          + 30 + (styleEditor.replaceVisible? 30: 0);
+        x = window.screenX + Math.min($("USMTextEditor").firstChild.boxObject.x
+          + 7*Math.max(styleEditor.editor.getLineCount(), 10).toString().length + 16
+          + (colNum - word.length)*8, window.innerWidth - (maxLen*8 + 30));
+        if ($("USMAutocompletePanel").state == "open")
+          $("USMAutocompletePanel").moveTo(x, y, false);
+        else
+          $("USMAutocompletePanel").openPopupAtScreen(x, y, false);
+        $("USMAutocompleteList").setAttribute("height", "" + Math.min(matchedList.length*20 + 20, 250) + "");
+        $("USMAutocompleteList").setAttribute("width", "" + (maxLen*8 + 30) + "");
+        $("USMAutocompleteList").focus();
+        $("USMAutocompleteList").currentIndex = $("USMAutocompleteList").selectedIndex = 0;
+        styleEditor.editor.focus();
+        styleEditor.setCaretOffset(currentPos);
       }
     }
   },

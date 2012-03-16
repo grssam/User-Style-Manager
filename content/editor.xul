@@ -340,4 +340,7 @@
                   command="se-cmd-redo"/>
     </menupopup>
   </popupset>
+  <panel id="USMAutocompletePanel" fade="fast">
+    <richlistbox id="USMAutocompleteList" seltype="single"  maxheight="250"/>
+  </panel>
 </window>
