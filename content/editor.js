@@ -368,13 +368,10 @@ let styleEditor = {
       }
       else {
         let richlist = $("USMAutocompleteList");
-        // Closing already opened popup
         try {
           while (richlist.firstChild)
             richlist.removeChild(richlist.firstChild);
-        } catch (ex) {
-          $("USMAutocompletePanel").hidePopup();
-        }
+        } catch (ex) {}
         if (!styleEditor.sourceEditorEnabled)
           return;
         // Checking for autocompleting
@@ -990,7 +987,7 @@ let styleEditor = {
     if (replaceText.length > 0 && searchText.length > 0) {
       let count = $("se-search-count").value.replace(/[ ]+/g, "")*1;
       let searchIndex = $("se-search-index").value.replace(/[ ]+/g, "")*1;
-      if (count > 0 && searchIndex < count) {
+      if (count > 0 && searchIndex <= count) {
         let caretOffset = this.getCaretOffset();
         if (replaceAll) {
           let text = this.getText();
