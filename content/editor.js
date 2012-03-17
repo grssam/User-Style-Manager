@@ -293,8 +293,11 @@ let styleEditor = {
     else if (text.slice(0, currentPos).split("\n").slice(-1)[0].split("'").length%2
             && text.slice(0, currentPos).split("\n").slice(-1)[0].split('"').length%2) {
       if ("/*" == text.slice(currentPos - 2, currentPos)) {
-        styleEditor.setText("*/", currentPos, currentPos);
-        styleEditor.setCaretOffset(currentPos);
+        if (text.slice(currentPos).split("*/").length == 1
+          || text.slice(currentPos).split("*/")[0].split("/*").length != 1) {
+            styleEditor.setText("*/", currentPos, currentPos);
+            styleEditor.setCaretOffset(currentPos);
+        }
       }
       else if ("{" == text.slice(currentPos - 1, currentPos)) {
         let textAfter = text.slice(currentPos);
@@ -365,7 +368,6 @@ let styleEditor = {
             $("USMAutocompletePanel").hidePopup();
           return;
         }
-        matchedList.sort();
         let maxLen = 0;
         for (let i = 0; i < matchedList.length; i++) {
           if (maxLen < matchedList[i].length)
@@ -1330,22 +1332,27 @@ let styleEditor = {
 
     // Checking bracklist for matching brackets
     let i = 0;
-    while (bracketStack.length > 0) {
-      if (((bracketStack[i] == '{' || bracketStack[i] == '{{') && bracketStack[i + 1] == '}')
+    while (i < bracketStack.length) {
+      if (bracketStack[i] && bracketStack[i + 1]
+        && (((bracketStack[i] == '{' || bracketStack[i] == '{{') && bracketStack[i + 1] == '}')
         || (bracketStack[i] == '[' && bracketStack[i + 1] == ']')
-        || (bracketStack[i] == '(' && bracketStack[i + 1] == ')')) {
-          del();
-          del();
-          i = 0;
+        || (bracketStack[i] == '(' && bracketStack[i + 1] == ')')
+        || (bracketStack[i] == '#' && bracketStack[i + 1] == '#')
+        || (bracketStack[i] == ':' && bracketStack[i + 1] == ';')
+        || (bracketStack[i] == "'" && bracketStack[i + 1] == "'")
+        || (bracketStack[i] == '"' && bracketStack[i + 1] == '"'))) {
+          bracketStackOffset.splice(i,2);
+          bracketStackLine.splice(i,2);
+          bracketStack.splice(i,2);
+          i = Math.max(0, i - 1);
       }
       else
         i++;
-      if (i == bracketStack.length - 1)
-        break;
     }
     for (i = 0; i < bracketStack.length; i++)
-      errorList.push([bracketStackLine[i], bracketStackOffset[i], styleEditor.STR("error.unmatched") + " "
-        + bracketStack[i].replace(/\{+/, "{")]);
+      errorList.push([bracketStackLine[i], bracketStackOffset[i],
+        bracketStack[i] != "#"? styleEditor.STR("error.unmatched") + " "
+        + bracketStack[i].replace(/\{+/, "{"): styleEditor.STR("error.commentStart")]);
 
     if (errorList.length || warningList.length)
       error = true;
@@ -1362,13 +1369,13 @@ let styleEditor = {
           while (errorPanel.firstChild)
             errorPanel.removeChild(errorPanel.firstChild);
           if (error) {
+            errorList.forEach(function([lineNum, offset, msg]) {
+              errorPanel.appendChild(createErrorLine(lineNum, msg, offset));
+            });
             $("USMErrorLabel").style.opacity = 1;
             $("USMErrorLabel").style.margin = "0px";
             errorPanel.style.opacity = 1;
             errorPanel.style.margin = "0px";
-            errorList.forEach(function([lineNum, offset, msg]) {
-              errorPanel.appendChild(createErrorLine(lineNum, msg, offset));
-            });
           }
         }
         return false;
