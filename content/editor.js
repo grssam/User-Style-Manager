@@ -230,8 +230,11 @@ let styleEditor = {
   inputHelper: function SE_inputHelper(event) {
     function $(id) document.getElementById(id);
 
-    if (event.ctrlKey || event.altKey || event.metaKey)
+    if (event.ctrlKey || event.altKey || event.metaKey) {
+      if ($("USMAutocompletePanel").state == "open")
+        $("USMAutocompletePanel").hidePopup();
       return;
+    }
 
     switch (event.keyCode) {
       case event.DOM_VK_DELETE:
@@ -422,7 +425,7 @@ let styleEditor = {
         y = window.screenY + (lineNum + 1 - styleEditor.editor.getTopIndex())
           * (eStyle.lineHeight.replace("px", "")*1 - 2)
           + $("USMTextEditor").firstChild.boxObject.y
-          + 30 + (styleEditor.replaceVisible? 30: 0);
+          + 30;
         x = window.screenX + Math.min($("USMTextEditor").firstChild.boxObject.x
           + 7*Math.max(styleEditor.editor.getLineCount(), 10).toString().length + 16
           + (colNum - word.length)*8, window.innerWidth - (maxLen*8 + 30));
