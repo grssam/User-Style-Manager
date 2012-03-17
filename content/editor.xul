@@ -341,6 +341,9 @@
     </menupopup>
   </popupset>
   <panel id="USMAutocompletePanel" fade="fast">
-    <richlistbox id="USMAutocompleteList" seltype="single"  maxheight="250"/>
+    <richlistbox id="USMAutocompleteList" seltype="single"  maxheight="250"
+      onkeypress="styleEditor.autocompletePanelPress(event);"
+      onclick="styleEditor.autocompletePanelPress(event);"
+      onpopupshown="styleEditor.autocompletePanelOpen();"/>
   </panel>
 </window>

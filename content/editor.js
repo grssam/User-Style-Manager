@@ -202,6 +202,31 @@ let styleEditor = {
     return text.replace(/![importan]{0,10}\s{0,};/gi,"!important;");
   },
 
+  //  function to handle click/enter on the panel
+  autocompletePanelPress: function SE_autocompletePanelPress(event) {
+    function $(id) document.getElementById(id);
+    if (event.button && event.button == 0
+      || event.keyCode == event.DOM_VK_ENTER
+      || event.keyCode == event.DOM_VK_RETURN) {
+        if ($("USMAutocompletePanel").state == "open") {
+          if ($("USMAutocompleteList").selectedItem) {
+            let value = $("USMAutocompleteList").selectedItem.lastChild.value;
+            $("USMAutocompletePanel").hidePopup();
+            styleEditor.editor.focus();
+            styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
+            let caretOffset = styleEditor.editor.getCaretOffset();
+            styleEditor.setText(value, caretOffset, caretOffset);
+          }
+        }
+    }
+  },
+
+  //  function to handle opening of autocomplete panel
+  autocompletePanelopen: function SE_autocompletePanelOpen() {
+    function $(id) document.getElementById(id);
+    $("USMAutocompleteList").currentIndex = $("USMAutocompleteList").selectedIndex = 0;
+  },
+
   inputHelper: function SE_inputHelper(event) {
     function $(id) document.getElementById(id);
 
@@ -243,6 +268,17 @@ let styleEditor = {
           $("USMAutocompletePanel").hidePopup();
           return;
         }
+      case event.DOM_VK_TAB:
+        if ($("USMAutocompletePanel").state == "open") {
+          if ($("USMAutocompleteList").selectedItem) {
+            styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
+            let currentPos = styleEditor.getCaretOffset();
+            let tabSize = Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize");
+            styleEditor.setText($("USMAutocompleteList").selectedItem.lastChild.value, currentPos, currentPos + tabSize);
+            $("USMAutocompletePanel").hidePopup();
+          }
+        }
+        return;
       case event.DOM_VK_ENTER:
       case event.DOM_VK_RETURN:
         if ($("USMAutocompletePanel").state == "open") {
