@@ -230,6 +230,9 @@ let styleEditor = {
   inputHelper: function SE_inputHelper(event) {
     function $(id) document.getElementById(id);
 
+    if (event.ctrlKey || event.altKey || event.metaKey)
+      return;
+
     switch (event.keyCode) {
       case event.DOM_VK_DELETE:
       case event.DOM_VK_BACK_SPACE:
@@ -271,11 +274,12 @@ let styleEditor = {
       case event.DOM_VK_TAB:
         if ($("USMAutocompletePanel").state == "open") {
           if ($("USMAutocompleteList").selectedItem) {
+            let value = $("USMAutocompleteList").selectedItem.lastChild.value;
+            $("USMAutocompletePanel").hidePopup();
+            let tabSize = Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize");
             styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
             let currentPos = styleEditor.getCaretOffset();
-            let tabSize = Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize");
-            styleEditor.setText($("USMAutocompleteList").selectedItem.lastChild.value, currentPos, currentPos + tabSize);
-            $("USMAutocompletePanel").hidePopup();
+            styleEditor.setText(value, currentPos, currentPos + tabSize - (styleEditor.caretPosCol)%tabSize);
           }
         }
         return;
@@ -303,12 +307,8 @@ let styleEditor = {
       if (textBefore.lastIndexOf("\/*") > textBefore.lastIndexOf("*\/"))
         return;
       let textAfter = text.slice(currentPos, currentPos + 9);
-      if (textAfter.length == 0 || textAfter.toLowerCase() != "important".slice(0, textAfter.length)) {
-        styleEditor.setText("important", currentPos, currentPos);
-        if (textAfter[0] != ';')
-          styleEditor.setText(";", currentPos + 9, currentPos + 9);
-        styleEditor.setCaretOffset(currentPos + 10);
-      }
+      if (textAfter.length == 0 || textAfter.toLowerCase() != "important".slice(0, textAfter.length))
+        styleEditor.setText('important' + (textAfter[0] != ';'? ';': ''), currentPos, currentPos);
     }
     else if ("'" == text.slice(currentPos - 1, currentPos)) {
       let textAfter = text.slice(currentPos).split("\n")[0];
