@@ -83,7 +83,9 @@
     <key id="key_selectAll" key="&selectAllCmd.key;" modifiers="accel"/>
     <key id="key_undo" key="&undoCmd.key;" modifiers="accel"
          oncommand="styleEditor.undo();"/>
-    <key id="key_redo" key="&undoCmd.key;" modifiers="accel,shift"
+    <key id="key_redo" key="&redoCmd.key;" modifiers="accel"
+         oncommand="styleEditor.redo();"/>
+    <key id="key_redo2" key="&undoCmd.key;" modifiers="accel,shift"
          oncommand="styleEditor.redo();"/>
     <key id="key_findNew"
          key="&findCmd.key;"
