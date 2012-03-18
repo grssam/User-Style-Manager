@@ -53,7 +53,7 @@ const CSSKeywordsList = [
   "-moz-animation-play-state", "-moz-animation-timing-function",
   "-moz-appearance", "-moz-backface-visibility", "-moz-background-inline-policy",
   "-moz-binding", "-moz-border-bottom-colors", "-moz-border-end",
-  "-moz-border-end-color", "-moz-border-end-style", "-moz-border-end-width"
+  "-moz-border-end-color", "-moz-border-end-style", "-moz-border-end-width",
   "-moz-border-image", "-moz-border-image-outset", "-moz-border-image-repeat",
   "-moz-border-image-slice", "-moz-border-image-source", "-moz-border-image-width",
   "-moz-border-left-colors", "-moz-border-right-colors", "-moz-border-start",
@@ -228,6 +228,42 @@ let styleEditor = {
 
   setTitle: function SE_setTitle(aTitle) {
     styleEditor.doc.title = unescape(aTitle);
+  },
+
+  // Function to convert mouse click coordinates into offset
+  getOffsetAtLocation: function SE_getOffsetAtLocation(aX, aY) {
+    if (this.sourceEditorEnabled) {
+      if (this.editor.getOffsetAtLocation)
+        return getOffsetAtLocation(aX, aY);
+      else if (this.editor._view.getOffsetAtLocation)
+        return this.editor._view.getOffsetAtLocation(aX, aY);
+      else
+        return 0;
+    }
+    else
+      return 0;
+  },
+
+  // Function to convert offset into X,Y coordinates
+  getLocationAtOffset: function SE_getLocationAtOffset(aOffset) {
+    function $(id) document.getElementById(id);
+    let eStyle = window.getComputedStyle($("USMTextEditor").firstChild);
+    let x = 0, y = 0;
+    if (this.sourceEditorEnabled) {
+      if (this.editor._view._getOffsetToX) {
+        x = this.editor._view._getOffsetToX(aOffset) + window.screenX
+          + $("USMTextEditor").firstChild.boxObject.x;
+      }
+      else {
+        x = window.screenX + Math.min($("USMTextEditor").firstChild.boxObject.x
+          + 7*Math.max(styleEditor.editor.getLineCount(), 10).toString().length
+          + 16 + (styleEditor.caretPosCol)*8, window.innerWidth - (maxLen*8 + 30));
+      }
+      y = window.screenY + (styleEditor.caretPosLine + 1 - styleEditor.editor.getTopIndex())
+        * (eStyle.lineHeight.replace("px", "")*1 - 2)
+        + $("USMTextEditor").firstChild.boxObject.y + 30;
+    }
+    return {x: x, y: y};
   },
 
   resetVariables: function SE_resetVariables() {
@@ -461,21 +497,19 @@ let styleEditor = {
           richlist.appendChild(item);
         }
         // Convert the caret position into x,y coordinates.
-        let x = 0, y = 0;
         let eStyle = window.getComputedStyle($("USMTextEditor").firstChild);
-        y = window.screenY + (lineNum + 1 - styleEditor.editor.getTopIndex())
-          * (eStyle.lineHeight.replace("px", "")*1 - 2)
-          + $("USMTextEditor").firstChild.boxObject.y
-          + 30;
-        x = window.screenX + Math.min($("USMTextEditor").firstChild.boxObject.x
-          + 7*Math.max(styleEditor.editor.getLineCount(), 10).toString().length + 16
-          + (colNum - word.length)*8, window.innerWidth - (maxLen*8 + 30));
+        let {x, y} = styleEditor.getLocationAtOffset(currentPos - word.length);
+        $("USMAutocompleteList").setAttribute("height", Math.min(matchedList.length*20 + 15, 250));
+        $("USMAutocompleteList").setAttribute("width", (maxLen*8 + 30));
         if ($("USMAutocompletePanel").state == "open")
-          $("USMAutocompletePanel").moveTo(x, y, false);
+          $("USMAutocompletePanel").moveTo(x, y);
         else
           $("USMAutocompletePanel").openPopupAtScreen(x, y, false);
-        $("USMAutocompleteList").setAttribute("height", "" + Math.min(matchedList.length*20 + 20, 250) + "");
-        $("USMAutocompleteList").setAttribute("width", "" + (maxLen*8 + 30) + "");
+        // Sifting the popup above one line if not enough space below
+        if (y + $("USMAutocompletePanel").boxObject.height > window.screen.height) {
+          y -= (eStyle.lineHeight.replace("px", "")*1 + $("USMAutocompletePanel").boxObject.height);
+          $("USMAutocompletePanel").moveTo(x, y);
+        }
         $("USMAutocompleteList").focus();
         $("USMAutocompleteList").currentIndex = $("USMAutocompleteList").selectedIndex = 0;
         styleEditor.editor.focus();
