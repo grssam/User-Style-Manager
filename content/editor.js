@@ -230,11 +230,16 @@ let styleEditor = {
     styleEditor.doc.title = unescape(aTitle);
   },
 
-  // Function to convert mouse click coordinates into offset
+  // Function to convert mouse click coordinates (screenX, screenY) into offset
   getOffsetAtLocation: function SE_getOffsetAtLocation(aX, aY) {
+    function $(id) document.getElementById(id);
+    aX -= (window.screenX + $("USMTextEditor").firstChild.boxObject.x
+      + 7*Math.max(styleEditor.editor.getLineCount(), 10).toString().length
+      + 20);
+    aY -= (window.screenY + $("USMTextEditor").firstChild.boxObject.y + 30);
     if (this.sourceEditorEnabled) {
       if (this.editor.getOffsetAtLocation)
-        return getOffsetAtLocation(aX, aY);
+        return this.editor.getOffsetAtLocation(aX, aY);
       else if (this.editor._view.getOffsetAtLocation)
         return this.editor._view.getOffsetAtLocation(aX, aY);
       else
