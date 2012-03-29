@@ -59,7 +59,7 @@ let optionsWindow = {
     fp.defaultString = "";
     fp.appendFilter("Style Sheets","*.css;");
     if (fp.show() != Ci.nsIFilePicker.returnCancel) {
-      let args = [true, styleSheetList.length, false, fp.file.path, true];
+      let args = [true, styleSheetList.length, false, escape(fp.file.path), true];
       Services.wm.getMostRecentWindow("navigator:browser")
         .openDialog("chrome://userstylemanager/content/editor.xul",
         "User Style Manager - Editor - Open File","chrome,resizable,height=600,width=800,top="
@@ -351,7 +351,7 @@ let optionsWindow = {
           unloadStyleSheet(index);
         let deletedStyle = styleSheetList.splice(index, 1);
         if (pref("deleteFromDisk")) {
-          let deletedFile = getFileURI(deletedStyle[0][2]).QueryInterface(Ci.nsIFileURL).file;
+          let deletedFile = getFileURI(unescape(deletedStyle[0][2])).QueryInterface(Ci.nsIFileURL).file;
           if (deletedFile.exists())
             deletedFile.remove(false);
         }
@@ -374,7 +374,7 @@ let optionsWindow = {
             unloadStyleSheet(index);
           let deletedStyle = styleSheetList.splice(index, 1);
           if (pref("deleteFromDisk")) {
-            let deletedFile = getFileURI(deletedStyle[0][2]).QueryInterface(Ci.nsIFileURL).file;
+            let deletedFile = getFileURI(unescape(deletedStyle[0][2])).QueryInterface(Ci.nsIFileURL).file;
             if (deletedFile.exists())
               deletedFile.remove(false);
           }

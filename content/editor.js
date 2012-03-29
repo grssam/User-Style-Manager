@@ -252,7 +252,7 @@ let styleEditor = {
   // Function to convert offset into X,Y coordinates
   getLocationAtOffset: function SE_getLocationAtOffset(aOffset) {
     function $(id) document.getElementById(id);
-    let eStyle = window.getComputedStyle($("USMTextEditor").firstChild);
+    let lineHeight = this.editor._view.getLineHeight() || 17;
     let x = 0, y = 0;
     if (this.sourceEditorEnabled) {
       if (this.editor._view._getOffsetToX) {
@@ -265,8 +265,7 @@ let styleEditor = {
           + 16 + (styleEditor.caretPosCol)*8, window.innerWidth - (maxLen*8 + 30));
       }
       y = window.screenY + (styleEditor.caretPosLine + 1 - styleEditor.editor.getTopIndex())
-        * (eStyle.lineHeight.replace("px", "")*1 - 2)
-        + $("USMTextEditor").firstChild.boxObject.y + 30;
+        * lineHeight + $("USMTextEditor").firstChild.boxObject.y + 30;
     }
     return {x: x, y: y};
   },
@@ -296,7 +295,7 @@ let styleEditor = {
             $("USMAutocompletePanel").hidePopup();
             styleEditor.editor.focus();
             styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
-            let caretOffset = styleEditor.editor.getCaretOffset();
+            let caretOffset = styleEditor.getCaretOffset();
             styleEditor.setText(value, caretOffset, caretOffset);
           }
         }
@@ -304,7 +303,7 @@ let styleEditor = {
   },
 
   //  function to handle opening of autocomplete panel
-  autocompletePanelopen: function SE_autocompletePanelOpen() {
+  autocompletePanelOpen: function SE_autocompletePanelOpen() {
     function $(id) document.getElementById(id);
     $("USMAutocompleteList").currentIndex = $("USMAutocompleteList").selectedIndex = 0;
   },
@@ -502,7 +501,7 @@ let styleEditor = {
           richlist.appendChild(item);
         }
         // Convert the caret position into x,y coordinates.
-        let eStyle = window.getComputedStyle($("USMTextEditor").firstChild);
+        let lineHeight = styleEditor.editor._view.getLineHeight() || 17;
         let {x, y} = styleEditor.getLocationAtOffset(currentPos - word.length);
         $("USMAutocompleteList").setAttribute("height", Math.min(matchedList.length*20 + 15, 250));
         $("USMAutocompleteList").setAttribute("width", (maxLen*8 + 30));
@@ -512,7 +511,7 @@ let styleEditor = {
           $("USMAutocompletePanel").openPopupAtScreen(x, y, false);
         // Sifting the popup above one line if not enough space below
         if (y + $("USMAutocompletePanel").boxObject.height > window.screen.height) {
-          y -= (eStyle.lineHeight.replace("px", "")*1 + $("USMAutocompletePanel").boxObject.height);
+          y -= (lineHeight + $("USMAutocompletePanel").boxObject.height);
           $("USMAutocompletePanel").moveTo(x, y);
         }
         $("USMAutocompleteList").focus();
@@ -553,11 +552,11 @@ let styleEditor = {
       unloadStyleSheet(styleEditor.index);
     if (styleEditor.createNew) {
       styleSheetList[styleEditor.index][1] = escape(styleEditor.doc.getElementById("USMFileNameBox").value);
-      styleSheetList[styleEditor.index][2] = styleEditor.doc.getElementById("USMFileNameBox")
-        .value.replace(/[^0-9a-z\u0000-\u007F\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\~!@#$\%\^&\(\)_\-=+\`\,\.;\'\[\]\{\} ]+/gi, "") + ".css";
-      if (styleSheetList[styleEditor.index][2] == ".css")
-        styleSheetList[styleEditor.index][2] = "User Created Style Sheet " + styleEditor.index + ".css";
-      styleEditor.styleSheetFile = getFileURI(styleSheetList[styleEditor.index][2])
+      styleSheetList[styleEditor.index][2] = escape(styleEditor.doc.getElementById("USMFileNameBox")
+        .value.replace(/[^0-9a-z\u0000-\u007F\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\~!@#$\%\^&\(\)_\-=+\`\,\.;\'\[\]\{\} ]+/gi, "") + ".css");
+      if (unescape(styleSheetList[styleEditor.index][2]) == ".css")
+        styleSheetList[styleEditor.index][2] = escape("User Created Style Sheet " + styleEditor.index + ".css");
+      styleEditor.styleSheetFile = getFileURI(unescape(styleSheetList[styleEditor.index][2]))
         .QueryInterface(Ci.nsIFileURL).file;
       if (!styleEditor.styleSheetFile.exists())
         try {
@@ -567,15 +566,15 @@ let styleEditor = {
     else {
       let fileName = styleEditor.doc.getElementById("USMFileNameBox")
         .value.replace(/[^0-9a-z\u0000-\u007F\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\~!@#$\%\^&\(\)_\-=+\`\,\.;\'\[\]\{\} ]+/gi, "");
-      if (styleSheetList[styleEditor.index][2].match(/[\\\/]?([^\\\/]{0,})\.css$/)[1] != fileName) {
-        styleEditor.styleSheetFile = getFileURI(styleSheetList[styleEditor.index][2])
+      if (unescape(styleSheetList[styleEditor.index][2]).match(/[\\\/]?([^\\\/]{0,})\.css$/)[1] != fileName) {
+        styleEditor.styleSheetFile = getFileURI(unescape(styleSheetList[styleEditor.index][2]))
           .QueryInterface(Ci.nsIFileURL).file;
         if (styleEditor.styleSheetFile.exists())
           try {
             styleEditor.styleSheetFile.remove(false);
           } catch (ex) {}
-        styleSheetList[styleEditor.index][2] = styleSheetList[styleEditor.index][2].replace(/[^\\\/]{0,}\.css$/, fileName + ".css");
-        styleEditor.styleSheetFile = getFileURI(styleSheetList[styleEditor.index][2])
+        styleSheetList[styleEditor.index][2] = escape(unescape(styleSheetList[styleEditor.index][2]).replace(/[^\\\/]{0,}\.css$/, fileName + ".css"));
+        styleEditor.styleSheetFile = getFileURI(unescape(styleSheetList[styleEditor.index][2]))
           .QueryInterface(Ci.nsIFileURL).file;
         if (!styleEditor.styleSheetFile.exists())
           try {
@@ -585,9 +584,9 @@ let styleEditor = {
         else {
           let i = 1;
           while (styleEditor.styleSheetFile.exists()) {
-            styleSheetList[styleEditor.index][2] = styleSheetList[styleEditor.index][2]
-              .replace(/[^\\\/]{0,}\.css$/, fileName + " (" + i++ + ").css");
-            styleEditor.styleSheetFile = getFileURI(styleSheetList[styleEditor.index][2])
+            styleSheetList[styleEditor.index][2] = escape(unescape(styleSheetList[styleEditor.index][2])
+              .replace(/[^\\\/]{0,}\.css$/, fileName + " (" + i++ + ").css"));
+            styleEditor.styleSheetFile = getFileURI(unescape(styleSheetList[styleEditor.index][2]))
               .QueryInterface(Ci.nsIFileURL).file;
           }
           styleEditor.styleSheetFile.create(0, parseInt('0666', 8));
@@ -672,7 +671,7 @@ let styleEditor = {
         unloadStyleSheet(styleEditor.index);
       styleEditor.previewShown = true;
       styleSheetList[styleEditor.index][0] = 'enabled';
-      styleSheetList[styleEditor.index][2] = "tmpFile.css";
+      styleSheetList[styleEditor.index][2] = escape("tmpFile.css");
       loadStyleSheet(styleEditor.index);
     });
   },
@@ -717,7 +716,7 @@ let styleEditor = {
         // open a new file
         this.openNew = true;
         this.styleName = escape(args[3].split(/[\/\\]/g).slice(-1)[0].replace(".css", ""));
-        this.stylePath = "file:///" + args[3].replace(/[\\]/g, "/");
+        this.stylePath = "file:///" + unescape(args[3]).replace(/[\\]/g, "/");
       }
       else if (args[2]) {
         this.createNew = true;
@@ -762,12 +761,12 @@ let styleEditor = {
       if (styleEditor.createNew) {
         styleEditor.index = styleSheetList.length;
         styleSheetList.push(['enabled', "User Created Style Sheet "
-          + styleEditor.index, "userCreatedStyleSheet" + styleEditor.index + ".css", ""
+          + styleEditor.index, escape("userCreatedStyleSheet" + styleEditor.index + ".css"), ""
           , "", JSON.stringify(new Date()), ""]);
       }
       else if (styleEditor.openNew) {
         styleEditor.index = styleSheetList.length;
-        styleSheetList.push(['enabled', styleEditor.styleName, styleEditor.stylePath,
+        styleSheetList.push(['enabled', styleEditor.styleName, escape(styleEditor.stylePath),
           "", "", JSON.stringify(new Date()), ""]);
       }
 
@@ -783,7 +782,7 @@ let styleEditor = {
       }
       // Read the file and put the content in textBox
       else {
-        let fileURI = getFileURI(styleSheetList[styleEditor.index][2]);
+        let fileURI = getFileURI(unescape(styleSheetList[styleEditor.index][2]));
         styleEditor.styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
         NetUtil.asyncFetch(styleEditor.styleSheetFile, function(inputStream, status) {
           if (!Components.isSuccessCode(status)) {

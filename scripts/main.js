@@ -99,7 +99,7 @@ function updateAffectedContents(index) {
     updateAffectedContents(0);
   }
   else {
-    let fileURI = getFileURI(styleSheetList[index][2]);
+    let fileURI = getFileURI(unescape(styleSheetList[index][2]));
     NetUtil.asyncFetch(fileURI, function(inputStream, status) {
       if (!Components.isSuccessCode(status))
         return;
@@ -161,65 +161,60 @@ function updateSortedList() {
    If called with no arguments, will check for null JSON
    If called with proper arguments, will update the JSON pref
 */
-function updateStyleSheetList(name, path, url, appliesOn) {
-  if (path == null) {
-    // Case for a upgrade or a new install
+function updateStyleSheetList() {
+  // Case for a upgrade or a new install
+  if (styleSheetList.length == 0) {
+    // If an upgrade, json pref overrides the values.
+    styleSheetList = JSON.parse(pref("userStyleList"));
     if (styleSheetList.length == 0) {
-      // If an upgrade, json pref overrides the values.
-      styleSheetList = JSON.parse(pref("userStyleList"));
-      if (styleSheetList.length == 0) {
-        addDefaultStyles();
-        return false;
-      }
-      else {
-        // Compatibility bump for 0.3
-        if (styleSheetList[0].length < 5)
-          for (let i = 0; i < styleSheetList.length; i++) {
-            styleSheetList[i][4] = "";
-            styleSheetList[i][5] = styleSheetList[i][6] = JSON.stringify(new Date());
-          }
-        writeJSONPref();
-      }
+      addDefaultStyles();
+      return false;
     }
-    // Compatibility bump for 0.3
-    else if (styleSheetList[0].length < 5) {
-      for (let i = 0; i < styleSheetList.length; i++) {
-        styleSheetList[i][4] = "";
-        styleSheetList[i][5] = styleSheetList[i][6] = JSON.stringify(new Date());
-      }
+    else {
+      // Compatibility bump for 0.3
+      if (styleSheetList[0].length < 5)
+        for (let i = 0; i < styleSheetList.length; i++) {
+          styleSheetList[i][4] = "";
+          styleSheetList[i][5] = styleSheetList[i][6] = JSON.stringify(new Date());
+        }
       writeJSONPref();
     }
-    // If user has chosen to maintain backup, do it
-    if (pref("maintainBackup")) {
-      let bckpDirectory = getURIForFileInUserStyles("Backup/")
-        .QueryInterface(Ci.nsIFileURL).file;
-      if (!bckpDirectory.exists())
-        bckpDirectory.create(1, parseInt('0777', 8));
-      styleSheetList.forEach(function([enabled, name, path, url, appOn, added, modified], index) {
-        let origFile = getFileURI(path).QueryInterface(Ci.nsIFileURL).file;
-        if (!origFile.exists())
-          return;
-        let bckpFile = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index
-          + ".css").QueryInterface(Ci.nsIFileURL).file;
-        if (bckpFile.exists())
-          bckpFile.remove(false);
-        origFile.copyTo(bckpDirectory, "backupOfUserStyle" + index + ".css");
-      });
-    }
-    // compatibility bump for 0.5
-    if (updateAffectedInfo)
-      updateAffectedContents();
-    return true;
   }
-  else {
-    // Path not is null, i.e. add data for a new sheet
-    let index = styleSheetList.length;
-    styleSheetList.push(['enabled', unescape(name), "file:///" + path
-      .replace(/[\\]/g, "/"), url?url:"", appliesOn?appliesOn: "",
-      JSON.stringify(new Date()), JSON.stringify(new Date())]);
-    loadStyleSheet(index);
+  // Compatibility bump for 0.3
+  else if (styleSheetList[0].length < 5) {
+    for (let i = 0; i < styleSheetList.length; i++) {
+      styleSheetList[i][4] = "";
+      styleSheetList[i][5] = styleSheetList[i][6] = JSON.stringify(new Date());
+    }
     writeJSONPref();
   }
+  // Compatibility bump for 0.8
+  if (updateAffectedInfo) {
+    for (let i = 0; i < styleSheetList.length; i++)
+      styleSheetList[i][2] = escape(styleSheetList[i][2]);
+    writeJSONPref();
+  }
+  // If user has chosen to maintain backup, do it
+  if (pref("maintainBackup")) {
+    let bckpDirectory = getURIForFileInUserStyles("Backup/")
+      .QueryInterface(Ci.nsIFileURL).file;
+    if (!bckpDirectory.exists())
+      bckpDirectory.create(1, parseInt('0777', 8));
+    styleSheetList.forEach(function([enabled, name, path, url, appOn, added, modified], index) {
+      let origFile = getFileURI(unescape(path)).QueryInterface(Ci.nsIFileURL).file;
+      if (!origFile.exists())
+        return;
+      let bckpFile = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index
+        + ".css").QueryInterface(Ci.nsIFileURL).file;
+      if (bckpFile.exists())
+        bckpFile.remove(false);
+      origFile.copyTo(bckpDirectory, "backupOfUserStyle" + index + ".css");
+    });
+  }
+  // compatibility bump for 0.8
+  if (updateAffectedInfo)
+    updateAffectedContents();
+  return true;
 }
 
 // Function to add default Style Sheets to the list
@@ -228,22 +223,22 @@ function addDefaultStyles() {
   if (!pref("firstRun"))
     return;
   // Add AwesomeBar Popup
-  styleSheetList.push(['enabled', "AwesomeBar Popup", "AwesomeBar_Popup.css",
+  styleSheetList.push(['enabled', "AwesomeBar Popup", escape("AwesomeBar_Popup.css"),
     "http://userstyles.org/styles/19308/awesomebar-popup",
     "chrome://", JSON.stringify(new Date()), ""]);
   // Add Sleek Dialog boxes
-  styleSheetList.push(['enabled', "Sleek Dialog boxes", "Sleek_Dialog_Box.css",
+  styleSheetList.push(['enabled', "Sleek Dialog boxes", escape("Sleek_Dialog_Box.css"),
     "http://userstyles.org/styles/46249/firefox-4-sleek-dialog-boxes",
     "chrome://", JSON.stringify(new Date()), ""]);
   // Add Cleanest Add-on Manager
-  styleSheetList.push(['enabled', "Cleanest Add-on Manager", "cam.css",
+  styleSheetList.push(['enabled', "Cleanest Add-on Manager", escape("cam.css"),
     "http://userstyles.org/styles/46642/xff4-cleanest-addon-manager-use-addon-instead",
     "chrome://mozapps/content/extensions/extensions.xul,about:addons", JSON.stringify(new Date()), ""]);
   let styleDirectory = getURIForFileInUserStyles("/").QueryInterface(Ci.nsIFileURL).file;
   if (!styleDirectory.exists())
     styleDirectory.create(1, parseInt('0777', 8));
   styleSheetList.forEach(function([enabled, name, path, url, appliesOn, added, modified], index) {
-    let origFileURI = Services.io.newURI("chrome://userstylemanager-styles/content/" + path, null, null);
+    let origFileURI = Services.io.newURI("chrome://userstylemanager-styles/content/" + unescape(path), null, null);
     NetUtil.asyncFetch(origFileURI, function(inputStream, status) {
       if (!Components.isSuccessCode(status))
         return;
@@ -253,7 +248,7 @@ function addDefaultStyles() {
       } catch (ex) {
         data = "";
       }
-      let styleFile = getURIForFileInUserStyles(path).QueryInterface(Ci.nsIFileURL).file;
+      let styleFile = getURIForFileInUserStyles(unescape(path)).QueryInterface(Ci.nsIFileURL).file;
       if (!styleFile.exists())
         styleFile.create(0, parseInt('0666', 8));
       let ostream = FileUtils.openSafeFileOutputStream(styleFile);
@@ -277,7 +272,7 @@ function loadStyleSheet(index) {
       fileURL, appliesOn, fileAdded, fileModified], index) {
         if (enabled == 'disabled')
           return;
-        let fileURI = getFileURI(filePath);
+        let fileURI = getFileURI(unescape(filePath));
         try {
           sss.loadAndRegisterSheet(fileURI, sss.USER_SHEET);
           backUpLoaded[index] = false;
@@ -297,7 +292,7 @@ function loadStyleSheet(index) {
   else if (index < styleSheetList.length) {
     if (styleSheetList[index][0] == 'disabled')
       return;
-    let fileURI = getFileURI(styleSheetList[index][2]);
+    let fileURI = getFileURI(unescape(styleSheetList[index][2]));
     try {
       sss.loadAndRegisterSheet(fileURI, sss.USER_SHEET);
     } catch (ex) {}
@@ -310,7 +305,7 @@ function unloadStyleSheet(index) {
       fileURL, appliesOn, fileAdded, fileModified], index) {
         if (enabled == 'disabled')
           return;
-        let fileURI = getFileURI(filePath);
+        let fileURI = getFileURI(unescape(filePath));
         let origFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
         if (!origFile.exists() || backUpLoaded[index]) {
           let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index + ".css");
@@ -327,7 +322,7 @@ function unloadStyleSheet(index) {
   else if (index < styleSheetList.length) {
     if (styleSheetList[index][0] == 'disabled')
       return;
-    let fileURI = getFileURI(styleSheetList[index][2]);
+    let fileURI = getFileURI(unescape(styleSheetList[index][2]));
     let origFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
     if (!origFile.exists()) {
       let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index + ".css");

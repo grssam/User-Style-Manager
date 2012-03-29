@@ -590,7 +590,7 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     unloadStyleSheet();
     loadStyleSheet();
   };
-  if (data.version*1 == 0.7 && (reason == 7 || reason == 5))
+  if (data.version == "0.8" && (reason == 7 || reason == 5))
     updateAffectedInfo = true;
   initiate();
 });
