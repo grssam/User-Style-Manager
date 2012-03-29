@@ -335,6 +335,7 @@ let styleEditor = {
           styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
           return;
         }
+        return;
       case event.DOM_VK_DOWN:
         if ($("USMAutocompletePanel").state == "open") {
           if ($("USMAutocompleteList").currentIndex == $("USMAutocompleteList").itemCount - 1)
@@ -346,6 +347,11 @@ let styleEditor = {
           styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
           return;
         }
+        // move to end of line if at last line
+        let text = styleEditor.getText();
+        let offset = styleEditor.getCaretOffset();
+        if (text.slice(offset).split("\n").length == 1)
+          styleEditor.setCaretOffset(text.length);
       case event.DOM_VK_LEFT:
       case event.DOM_VK_RIGHT:
       case event.DOM_VK_HOME:
