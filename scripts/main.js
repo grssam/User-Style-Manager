@@ -41,7 +41,7 @@ let promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
   .getService(Ci.nsIPromptService);
 
 const XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-
+const HTML = "http://www.w3.org/1999/xhtml";
 // Function to read the preferences
 function readJSONPref(callback) {
   let JSONFile = getURIForFileInUserStyles("Preferences/usm.pref").QueryInterface(Ci.nsIFileURL).file;

@@ -31,6 +31,7 @@
 <!DOCTYPE window SYSTEM "chrome://userstylemanager/locale/styleeditor.dtd">
 <?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
 <?xml-stylesheet href="editor.css" type="text/css"?>
+<?xml-stylesheet href="colorPicker/styles.css" type="text/css"?>
 <?xul-overlay href="chrome://global/content/editMenuOverlay.xul"?>
 <?xul-overlay href="chrome://browser/content/source-editor-overlay.xul"?>
 <window id="USMEditor" width="800" height="600"
@@ -38,6 +39,7 @@
   persist="screenX screenY width height sizemode"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/javascript" src="chrome://global/content/globalOverlay.js"/>
+  <script type="application/x-javascript" src="colorPicker/colorPicker.js"/>
   <script type="application/x-javascript" src="editor.js"/>
   <commandset id="editMenuCommands"/>
   <commandset id="sourceEditorCommands"/>
@@ -347,5 +349,7 @@
       onkeypress="styleEditor.autocompletePanelPress(event);"
       onclick="styleEditor.autocompletePanelPress(event);"
       onpopupshown="styleEditor.autocompletePanelOpen();"/>
+  </panel>
+  <panel id="USMColorPickerPanel" fade="fast">
   </panel>
 </window>

@@ -532,6 +532,11 @@ let styleEditor = {
   },
 
   onMouseClick: function SE_onMouseClick(event) {
+    let offset = styleEditor.getOffsetAtLocation(event.screenX, event.screeny);
+    let panel = document.getElementById("USMColorPickerPanel");
+    //colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,parentObj,parentXY,color,difPad,rSpeed,docBody)
+    colorPicker(event, 'B', 3, false, null, null, null, panel, null, null, null, null, panel);
+    panel.openPopupAtScreen(event.screenX, event.screenY, false);
   },
 
   getAffectedContent: function SE_getAffectedContent() {

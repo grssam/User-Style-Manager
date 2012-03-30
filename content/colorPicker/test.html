@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>colorPicker 0.9</title>
+<script type="text/javascript" src="colorPicker.js"></script>
+<link type="text/css" rel="stylesheet" href="styles.css"></link>
+</head>
+<body>
+<p>Inline: <input type="text" onClick="colorPicker(event, null, null, true)" /> onclick=&quot;colorPicker(event)&quot;</p>
+<p>Injected: <input class="color" type="text" /> see script below...</p>
+<code>
+	&lt;script&gt;<br>
+  &nbsp;&nbsp;var inputTags = document.getElementsByTagName('input');<br><br>
+  &nbsp;&nbsp;for (var n=inputTags.length;n--;) {<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;if (inputTags[n].className &amp;&amp; inputTags[n].className.indexOf('color') &gt; -1) {<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inputTags[n].onclick = function(e) {e = e || window.event; colorPicker(e)}<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+  &nbsp;&nbsp;}<br>
+  &lt;/script&gt;
+</code>
+<script>
+var inputTags = document.getElementsByTagName('input');
+
+for (var n=inputTags.length;n--;) {
+	if (inputTags[n].className && inputTags[n].className.indexOf('color') > -1) {
+		inputTags[n].onclick = function(e) {e = e || window.event; colorPicker(e); colorPicker.cP.style.zIndex = 1;}
+	}
+}
+</script>
+
+</body>
+</html>
