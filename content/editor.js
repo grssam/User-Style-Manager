@@ -528,6 +528,12 @@ let styleEditor = {
     }
   },
 
+  onMouseMove: function SE_onMouseMove(event) {
+  },
+
+  onMouseClick: function SE_onMouseClick(event) {
+  },
+
   getAffectedContent: function SE_getAffectedContent() {
     let text = styleEditor.getText();
     let matchedURL = text.match(/[@]-moz-document[ ]+(((url|url-prefix|domain)[ ]{0,}\([\'\"]{0,1}([^\'\"\)]+)[\'\"]{0,1}\)[ ,]{0,})+)/);

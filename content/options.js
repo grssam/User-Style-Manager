@@ -341,7 +341,14 @@ let optionsWindow = {
     let numRanges = this.tree.view.selection.getRangeCount();
     if (numRanges < 1)
       return;
-    else if (numRanges == 1) {
+    let start = new Object();
+    let end = new Object();
+    let count = 0;
+    for (let t = 0; t < numRanges; t++) {
+      this.tree.view.selection.getRangeAt(t, start, end);
+      count += (end.value - start.value + 1);
+    }
+    if (count == 1) {
       let index = this.treeView.list[this.tree.currentIndex][7];
       let finalAnswer = promptService.confirm(null, this.STR("confirm.pls"),
         this.STR("remove.preText") + " " + unescape(styleSheetList[index][1]) + " " + this.STR("remove.postText"));
@@ -361,14 +368,13 @@ let optionsWindow = {
     }
     else {
       let finalAnswer = promptService.confirm(null, this.STR("confirm.pls"),
-        this.STR("remove.preText") + " " + numRanges + " " + this.STR("remove.postText"));
+        this.STR("remove.preText") + " " + count + " " + this.STR("remove.postText"));
       if (!finalAnswer)
         return;
-      let start = new Object();
-      let end = new Object();
-      for (let t = 0; t < numRanges; t++){
+      for (let t = 0; t < numRanges; t++) {
         this.tree.view.selection.getRangeAt(t, start, end);
-        for (let index = start.value; index <= end.value; index++) {
+        for (let i = start.value; i <= end.value; i++) {
+          let index = optionsWindow.treeView.list[i][7];
           // Unload the stylesheet if enabled
           if (styleSheetList[index][0] == 'enabled')
             unloadStyleSheet(index);
