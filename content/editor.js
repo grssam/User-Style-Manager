@@ -430,7 +430,7 @@ let styleEditor = {
         let textBefore = text.slice(0, currentPos);
         if (textBefore.split("{").length - textBefore.split("}").length
             > textAfter.split("}").length - textAfter.split("{").length) {
-          let indent = textBefore.match(/\n[^\n]{0,}\{$/)[0].search(/[^ \n]/) - 1;
+          let indent = textBefore.match(/\n?[^\n]{0,}\{$/)[0].search(/[^ \n]/) - 1;
           let indentation = "";
           for (let i = 0; i < indent; i++)
             indentation += " ";
@@ -559,7 +559,7 @@ let styleEditor = {
     if (styleEditor.createNew) {
       styleSheetList[styleEditor.index][1] = escape(styleEditor.doc.getElementById("USMFileNameBox").value);
       styleSheetList[styleEditor.index][2] = escape(styleEditor.doc.getElementById("USMFileNameBox")
-        .value.replace(/[^0-9a-z\u0000-\u007F\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\~!@#$\%\^&\(\)_\-=+\`\,\.;\'\[\]\{\} ]+/gi, "") + ".css");
+        .value.replace(/[^0-9a-z\u0000-\u007F\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\~!@#$\%\^&\(\)_\-=+\`\,\.;:\'\[\]\{\} ]+/gi, "") + ".css");
       if (unescape(styleSheetList[styleEditor.index][2]) == ".css")
         styleSheetList[styleEditor.index][2] = escape("User Created Style Sheet " + styleEditor.index + ".css");
       styleEditor.styleSheetFile = getFileURI(unescape(styleSheetList[styleEditor.index][2]))
@@ -571,7 +571,7 @@ let styleEditor = {
     }
     else {
       let fileName = styleEditor.doc.getElementById("USMFileNameBox")
-        .value.replace(/[^0-9a-z\u0000-\u007F\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\~!@#$\%\^&\(\)_\-=+\`\,\.;\'\[\]\{\} ]+/gi, "");
+        .value.replace(/[^0-9a-z\u0000-\u007F\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\~!@#$\%\^&\(\)_\-=+\`\,\.;:\'\[\]\{\} ]+/gi, "");
       if (unescape(styleSheetList[styleEditor.index][2]).match(/[\\\/]?([^\\\/]{0,})\.css$/)[1] != fileName) {
         styleEditor.styleSheetFile = getFileURI(unescape(styleSheetList[styleEditor.index][2]))
           .QueryInterface(Ci.nsIFileURL).file;
@@ -843,6 +843,12 @@ let styleEditor = {
       $("USMButtonSave").label = "Add";
     $("USMButtonPreview").onclick = styleEditor.previewButtonClick;
     $("USMButtonExit").onclick = styleEditor.exitButtonClick;
+    // Assigning the mouse move and mouse click handler
+    if (this.sourceEditorEnabled) {
+      this.editor.addEventListener(
+        SourceEditor.EVENTS.MOUSE_MOVE, styleEditor.onMouseMove);
+      styleEditor.doc.getElementById("USMTextEditor").firstChild.addEventListener("click", styleEditor.onMouseClick);
+    }
   },
 
   getCaretOffset: function SE_getCaretOffset() {
@@ -1229,8 +1235,7 @@ let styleEditor = {
   validateCSS: function SE_validateCSS() {
     function $(id) document.getElementById(id);
     function getLine(i) {
-      styleEditor.setCaretOffset(i);
-      return styleEditor.getCaretLine() || numLines;
+      return numLines;
     }
 
     function createErrorLine(aLineNum, aMsg, aOffset) {
@@ -1324,6 +1329,8 @@ let styleEditor = {
           break;
 
         case "'":
+          if (bracketStack.last == '#')
+            break;
           if (bracketStack.last == "'")
             del();
           else if (bracketStack.last == '"')
@@ -1333,6 +1340,8 @@ let styleEditor = {
           break;
 
         case '"':
+          if (bracketStack.last == '#')
+            break;
           if (bracketStack.last == '"')
             del();
           else if (bracketStack.last == "'")
@@ -1517,15 +1526,16 @@ let styleEditor = {
       }
       else {
         let flags = promptService.BUTTON_POS_0 * promptService.BUTTON_TITLE_IS_STRING
-          + promptService.BUTTON_POS_1 * promptService.BUTTON_TITLE_IS_STRING;
+          + promptService.BUTTON_POS_1 * promptService.BUTTON_TITLE_IS_STRING
+          + promptService.BUTTON_POS_2 * promptService.BUTTON_TITLE_IS_STRING;;
         let button = promptService.confirmEx(null, styleEditor.STR("validate.title"),
           styleEditor.STR("validate.text"), flags, styleEditor.STR("validate.chrome"),
-          styleEditor.STR("validate.website"),"", null, {value: false});
+          styleEditor.STR("validate.website"),styleEditor.STR("validate.none"), null, {value: false});
         if (button == 0) {
           // Adding a xul namespace
           text = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n" + text;
         }
-        else {
+        else if (button == 1) {
           // Adding an xhtml namespace
           text = "@namespace url(http://www.w3.org/1999/xhtml);\n" + text;
         }
@@ -1534,7 +1544,7 @@ let styleEditor = {
     else if (text.match(/[@]-moz-document[ ]+(url[\-prefix]{0,7}|domain|regexp)[ ]{0,}\(['"]?([^'"\)]+)['"]?\)[ ]/) == null) {
       // namespace is there, adding moz url only when it is for web site
       if (text.search(/[@]namespace[ ]+url\(['"]?http:\/\/www.mozilla.org\/keymaster\/gatekeeper\/there\.is\.only\.xul['"]?\);/) < 0) {
-        let match = text.match(/([@]namespace[ ]+url\(['"]?http:\/\/www.w3.org\/1999\/xhtml['"]?\);)(.+)/);
+        let match = text.match(/([@]namespace[ ]+url\(['"]?http:\/\/www.w3.org\/1999\/xhtml['"]?\);[^\n]{0,}\n)(.{0,})/);
         text = match[1] + "@-moz-document domain('') {\n" + match[2] + "\n}";
         caret = match[1].length + 23;
       }
