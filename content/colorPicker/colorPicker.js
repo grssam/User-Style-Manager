@@ -40,10 +40,8 @@ function colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,pare
 
   CP=(!cP)?function(obj) { // building the colorPicker / setting up events and methodes
     var div = document.createElementNS("http://www.w3.org/1999/xhtml", 'body'),
-      testPix = document.createElement('img'),
-      cPDir = "",
-      HTMLTxt='<div class="cPSkin"><input class="cPdummy" type="" /><div class="cPSkinC01"></div><div class="cPSkinC02"></div><div class="cPSkinC03"></div><div class="cPSkinC04"></div><div class="cPSkinS01"></div><div class="cPSkinS02"></div><div class="cPSlides"><div class="cPSL1"></div><span class="cPSL2"></span><span class="cPSL3"></span><div class="cPSLC"></div><span class="cPSL4"></span><span class="cPSR1"></span><span class="cPSR2"></span><div class="cPSR3"></div><div class="cPSRCL"></div><div class="cPSRCR"></div><span class="cPSR5"></span></div><div class="cPMemory"><div class="cPM1"></div><div class="cPM2"></div><div class="cPM3 ext"></div><div class="cPM4"></div><div class="cPM5"></div><div class="cPM6"></div><div class="cPM7 ext"></div><div class="cPM8"></div><div class="cPM9"></div><div class="cPM0"></div></div><div class="cPPanel"><div class="cPHSB"><div class="cPBLH bUp">H</div><input type="text" name="cPIH" value="0" maxlength="3" /><div class="cPBRH noB">²</div><div class="cPBLS bUp">S</div><input type="text" name="cPIS" value="0" maxlength="3" /><div class="cPBRS noB">%</div><div class="cPBLV bUp">B</div><input type="text" name="cPIV" value="0" maxlength="3" /><div class="cPBRV noB">%</div></div><div class="cPRGB"><div class="cPBLR bUp">R</div><input type="text" name="cPIR" value="0" maxlength="3" /><div class="cPBRR bDown"> </div><div class="cPBLG bUp">G</div><input type="text" name="cPIG" value="0" maxlength="3" /><div class="cPBRG bDown"> </div><div class="cPBLB bDown">B</div><input type="text" name="cPIB" value="0" maxlength="3" /><div class="cPBRB bDown"> </div></div><div class="cPCMYK"><div class="cPBLC noB">C</div><input type="text" name="cPIC" value="0" readonly="readonly" /><div class="cPBRC noB">%</div><div class="cPBLM noB">M</div><input type="text" name="cPIM" value="0" readonly="readonly" /><div class="cPBRM noB">%</div><div class="cPBLY noB">Y</div><input type="text" name="cPIY" value="0" readonly="readonly" /><div class="cPBRY noB">%</div><div class="cPBLK noB">K</div><input type="text" name="cPIK" value="100" readonly="readonly" /><div class="cPBRK noB">%</div></div><div class="cPHEX"><div class="cPBLX noB">#</div><input type="text" name="cPIX" value="000000" maxlength="6" /><div class="cPBRX bUp">W</div></div><div class="cPCTRT"></div><div class="cPCD"></div><div class="cPControl"><div class="cPCB1 bUp"></div><div class="cPCB2 bUp"></div><div class="cPCB3 bUp">RES</div><div class="cPCB4 bUp">SAVE</div></div></div><div class="cPClose"></div><div class="cPResize"></div><div class="cPResizer"><div class="cPOP30"></div></div></div>',
-      CSSTxt = '.CTRTop{background-color:transparent;z-index:2}.cPCD1{background-color:#FF9900}.cPCD2{background-color:#44DD00}';
+      cPDir = "",dC='<div class="',$='</div>',D='">'+$,
+      HTMLTxt=dC+'cPSkin"><input class="cPdummy" type="" />'+dC+'cPSkinC01'+D+dC+'cPSkinC02'+D+dC+'cPSkinC03'+D+dC+'cPSkinC04'+D+dC+'cPSkinS01'+D+dC+'cPSkinS02'+D+dC+'cPSlides">'+dC+'cPSL1'+D+'<span class="cPSL2"></span><span class="cPSL3"></span>'+dC+'cPSLC'+D+'<span class="cPSL4"></span><span class="cPSR1"></span><span class="cPSR2"></span>'+dC+'cPSR3'+D+dC+'cPSRCL'+D+dC+'cPSRCR'+D+'<span class="cPSR5"></span>'+$+dC+'cPMemory">'+dC+'cPM1'+D+dC+'cPM2'+D+dC+'cPM3 ext'+D+dC+'cPM4'+D+dC+'cPM5'+D+dC+'cPM6'+D+dC+'cPM7 ext'+D+dC+'cPM8'+D+dC+'cPM9'+D+dC+'cPM0'+D+$+dC+'cPPanel">'+dC+'cPHSB">'+dC+'cPBLH bUp">H'+$+'<input type="text" name="cPIH" value="0" maxlength="3" />'+dC+'cPBRH noB">²'+$+dC+'cPBLS bUp">S'+$+'<input type="text" name="cPIS" value="0" maxlength="3" />'+dC+'cPBRS noB">%'+$+dC+'cPBLV bUp">B'+$+'<input type="text" name="cPIV" value="0" maxlength="3" />'+dC+'cPBRV noB">%'+$+$+dC+'cPRGB">'+dC+'cPBLR bUp">R'+$+'<input type="text" name="cPIR" value="0" maxlength="3" />'+dC+'cPBRR bDown"> '+$+dC+'cPBLG bUp">G'+$+'<input type="text" name="cPIG" value="0" maxlength="3" />'+dC+'cPBRG bDown"> '+$+dC+'cPBLB bDown">B'+$+'<input type="text" name="cPIB" value="0" maxlength="3" />'+dC+'cPBRB bDown"> '+$+$+dC+'cPCMYK">'+dC+'cPBLC noB">C'+$+'<input type="text" name="cPIC" value="0" readonly="readonly" />'+dC+'cPBRC noB">%'+$+dC+'cPBLM noB">M'+$+'<input type="text" name="cPIM" value="0" readonly="readonly" />'+dC+'cPBRM noB">%'+$+dC+'cPBLY noB">Y'+$+'<input type="text" name="cPIY" value="0" readonly="readonly" />'+dC+'cPBRY noB">%'+$+dC+'cPBLK noB">K'+$+'<input type="text" name="cPIK" value="100" readonly="readonly" />'+dC+'cPBRK noB">%'+$+$+dC+'cPHEX">'+dC+'cPBLX noB">#'+$+'<input type="text" name="cPIX" value="000000" maxlength="6" />'+dC+'cPBRX bUp">W'+$+$+dC+'cPCTRT'+D+dC+'cPCD'+D+dC+'cPControl">'+dC+'cPCB1 bUp'+D+dC+'cPCB2 bUp'+D+dC+'cPCB3 bUp">RES'+$+dC+'cPCB4 bUp">SAVE'+$+$+$+dC+'cPClose'+D+dC+'cPResize'+D+dC+'cPResizer">'+dC+'cPOP30'+D+$+$+'';
 
     // collect HTML elements
     try {
@@ -59,11 +57,8 @@ function colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,pare
       if (nN) {cP[nN]=div[n]; if (!div[n].name && div[n].className.search(/cP(B|P|Sl|d|Sk|RGB|HSB|CMYK|HEX|Mem|Cont|CB(3|4)|SL[2-3]|SR(1|3))/)) // this saves memory
         cP[nN+'s']=div[n].style; else if (nB = /cPB(.)(.)\s+b/.exec(div[n].className)) {cP.but[m]=[nN,nB[1],nB[2],m++]}}
     }
-
-    // some special style-grabbing to speed up contrast/color bar
-    cP.CTRTop = (cP.CTRTop = /\.CTRTop\s*{(.*?)}/.exec(CSSTxt))? cP.CTRTop[1]: '';
-    cP.cPCD1 = (cP.cPCD1 = /\.cPCD1\s*{(.*?)}/.exec(CSSTxt)) ? cP.cPCD1[1]: '';
-    cP.cPCD2 = (cP.cPCD2 = /\.cPCD2\s*{(.*?)}/.exec(CSSTxt)) ? cP.cPCD2[1]: '';
+    // css assigning for cursor contrast change
+    _bC='background-color:'; cP.CTRTop = _bC+'transparent;z-index:2'; cP.cPCD1 = _bC+'#FF9900'; cP.cPCD2 = _bC+'#44DD00';
 
     // add events; 100% event delegation
     cP.onmousedown = function(e){
@@ -169,7 +164,7 @@ function colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,pare
     colorPicker.importColor = function(color) {initCp(X2RGB(color))};
     colorPicker.stopRendering = function() {clearInterval(cPRender); cPRender=false; doRender(true,true)};
 
-    scripts=div=n=m=cPDir=nN=nB=CSSTxt=HTMLTxt=testPix=null;
+    scripts=div=n=m=cPDir=nN=nB=HTMLTxt=null;
     CP=colorPicker.CP={}; CP.modeRGB={}; CP.mode=colorPicker.mode||mode; colorPicker.rSpeed=rSpeed;
   }:colorPicker.CP, // collection of colors/coords
 
