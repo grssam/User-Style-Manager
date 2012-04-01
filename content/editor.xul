@@ -350,6 +350,8 @@
       onclick="styleEditor.autocompletePanelPress(event);"
       onpopupshown="styleEditor.autocompletePanelOpen();"/>
   </panel>
-  <panel id="USMColorPickerPanel" fade="fast">
+  <panel id="USMColorPickerPanel" fade="fast" noautofocus="true" />
+  <panel id="USMPreviewPanel" fade="fast" noautofocus="true">
+    <image id="USMPreviewPanelImage" />
   </panel>
 </window>

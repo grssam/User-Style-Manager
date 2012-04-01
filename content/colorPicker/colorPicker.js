@@ -10,7 +10,7 @@
  * Date: Mon Aug 15 12:02:56 2011 -0100
  * @edited By: Girish Sharma, 2012-03-31
 */
-function colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,parentObj,parentXY,color,difPad,rSpeed,docBody, onColorSave, onColorChange){
+function colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,parentObj,parentXY,color,difPad,rSpeed,docBody,onColorSave,onColorChange){
   // attribute definitions
   var cP = colorPicker, // for now to make code shorter
   mode = mode||cP.mode||'B', // ['H', 'S', 'V', 'R', 'G', 'B'] initial colorMode
@@ -90,7 +90,8 @@ function colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,pare
         if (nB[1]==1) initCp(HSV2RGB(CP.hsv[0]+(CP.hsv[0]>127.5?-127.5:127.5),CP.hsv[1],CP.hsv[2],true)); // shift color 180°
         else if (nB[1]==2) initCp(X2RGB(CP.CB2Color)); // set saved color
         else if (nB[1]==3) {cP.cPCB2s.backgroundColor='rgb('+cP.cObj.color+')'; CP.CB2Color=cP.cObj.color; CP.iCtr = getBrightness(CP.CB2Color); doRender(true,true)} // reset color 
-        else {cP.cPCB2s.backgroundColor='rgb('+CP.rgbRND+')'; CP.CB2Color=CP.rgbRND; initCp(CP.rgbRND); if(onColorSave) onColorSave(CP.rgbRND);}// save color
+        else {cP.cPCB2s.backgroundColor='rgb('+CP.rgbRND+')'; CP.CB2Color=CP.rgbRND; initCp(CP.rgbRND);
+          if(onColorSave){var rgb=X2RGB(CP.rgbRND); onColorSave(rgb,RGB2HSV(rgb[0],rgb[1],rgb[2]),RGB2HEX(rgb[0],rgb[1],rgb[2]));}}// save color
         chBut(obj,false)
       } else if (nB = /cPB(.)(.)\s+b/.exec(obj.className)) { // all other buttons
         if(nB[1]=='L'){CP.mode=obj.className.substr(4,1); initCp(CP.rgb)} // change mode
@@ -100,8 +101,9 @@ function colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,pare
             cP.WEBS1 = cP.WEBS1||CP.rgbRND; if (cP.cPBRX.firstChild.data == 'W') initCp(cP.WEBS1); // cP.WEBS1=null in chInput/SL|SR mousedown/init
             else {initCp([r+(r%s>t?s:0)-r%s, g+(g%s>t?s:0)-g%s, b+(b%s>t?s:0)-b%s])} chBut(obj,false)}}
       } else if (obj == cP.cPClose) {toggleCp(true); // close app
-      } else if (nB = /cPM([0-9]).*/.exec(obj.className)) if (nB[1]!='0') initCp(X2RGB(obj.style.backgroundColor)); // memory squares
-        else {var color = 'rgb('+CP.rgbRND+')', nB; // save color to memory squares
+      } else if (nB = /cPM([0-9]).*/.exec(obj.className)) if (nB[1]!='0') {
+          var rgb=X2RGB(obj.style.backgroundColor);initCp(rgb); if(onColorChange) onColorChange(rgb, RGB2HSV(rgb[0],rgb[1],rgb[2]),RGB2HEX(rgb[0],rgb[1],rgb[2]));// memory squares
+        } else {var color = 'rgb('+CP.rgbRND+')', nB; // save color to memory squares
           for (var n=1; n<9; n++) {nB='cPM'+n+'s'; if (X2RGB(cP[nB].backgroundColor)+'' == CP.rgbRND+'') {
             cP['cPM'+n].color = color; cP[nB].backgroundColor = (getBrightness(X2RGB(color)) > 129)?'#333':'#CCC';
             cP.timeOut = setTimeout(function(){cP[nB].backgroundColor = cP['cPM'+n].color; cP.timeOut = null},200); return false}}
@@ -208,7 +210,7 @@ function colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,pare
     CP.cmyk = RGB2CMYK(CP.rgb[0],CP.rgb[1],CP.rgb[2]); CP.cmyk = [Math.round(CP.cmyk[0]*100),Math.round(CP.cmyk[1]*100),Math.round(CP.cmyk[2]*100),Math.round((1-CP.cmyk[3])*100)];
     CP.hex = RGB2HEX(CP.rgbRND[0],CP.rgbRND[1],CP.rgbRND[2]);
 
-    if (onColorChange) onColorChange([CP.rgbRND, CP.cmyk, CP.hex]);
+    if (onColorChange) {var rgb=X2RGB(CP.rgbRND); onColorChange(rgb, RGB2HSV(rgb[0],rgb[1],rgb[2]), RGB2HEX(rgb[0],rgb[1],rgb[2]));}
     if (!rSpeed || render) doRender(xy,mouseIs);
   },
 
@@ -430,7 +432,7 @@ function colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,pare
   (function() {
     var obj = parentObj || e.target, n, c;
       if (!cP) {CP(obj); e=false}
-      CP.CB2Color = obj.color = X2RGB(obj.value||color||[204,0,0]);
+      CP.CB2Color = obj.color = X2RGB(color||[204,0,0]);
       if (cP.WEBS1) cP.WEBS1=null; // kill the memory of webSmart/Save button
       cP.cObjs = obj.style;
       if (obj.value) CP.valPrefix = /(#*)/.exec(obj.value)[0]; else CP.valPrefix = '#'; // wether you have an # or an ## (Cold Fusion) or none

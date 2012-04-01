@@ -143,6 +143,9 @@ const CSSKeywordsList = [
   "width", "word-break", "word-spacing", "word-wrap", "z-index"
 ];
 
+const RGB_HSLA_MATCH = '(rgba?|hsla?)[ ]{0,}\\(([0-9 .]+,[0-9% .]+,[0-9% .]+,?[0-9 .]{0,})\\)';
+const HEX_MATCH = '(#)([0-9abcdef]{3,9})';
+
 let styleEditor = {
   initialized: false,
   saved: false,
@@ -166,6 +169,9 @@ let styleEditor = {
   caretPosLine: 0,
   caretPosCol: 0,
   strings: null,
+  color: [],
+  colorCaretOffset: -1,
+  colorMatch: '',
   sourceEditorEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "10.0") >= 0),
   editorFindEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "12.0") >= 0),
 
@@ -235,8 +241,9 @@ let styleEditor = {
     function $(id) document.getElementById(id);
     aX -= (window.screenX + $("USMTextEditor").firstChild.boxObject.x
       + 7*Math.max(styleEditor.editor.getLineCount(), 10).toString().length
-      + 20);
-    aY -= (window.screenY + $("USMTextEditor").firstChild.boxObject.y + 30);
+      + 20 - styleEditor.editor._view._getScroll().x);
+    aY -= (window.screenY + $("USMTextEditor").firstChild.boxObject.y + 30
+      - styleEditor.editor._view._getScroll().y);
     if (this.sourceEditorEnabled) {
       if (this.editor.getOffsetAtLocation)
         return this.editor.getOffsetAtLocation(aX, aY);
@@ -308,6 +315,25 @@ let styleEditor = {
     $("USMAutocompleteList").currentIndex = $("USMAutocompleteList").selectedIndex = 0;
   },
 
+  preInputHelper: function SE_preInputHelper(event) {
+    function $(id) document.getElementById(id);
+    switch (event.keyCode) {
+      case event.DOM_VK_DOWN:
+        // move to end of line if at last line
+        let text = styleEditor.getText();
+        let offset = styleEditor.getCaretOffset();
+        if (text.slice(offset).indexOf("\n") == -1)
+          styleEditor.setCaretOffset(text.length);
+
+      case event.DOM_VK_UP:
+        if ($("USMColorPickerPanel").state == "open") {
+          $("USMColorPickerPanel").hidePopup();
+          return;
+        }
+        break;
+    }
+  },
+
   inputHelper: function SE_inputHelper(event) {
     function $(id) document.getElementById(id);
 
@@ -347,11 +373,6 @@ let styleEditor = {
           styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
           return;
         }
-        // move to end of line if at last line
-        let text = styleEditor.getText();
-        let offset = styleEditor.getCaretOffset();
-        if (text.slice(offset).split("\n").length == 1)
-          styleEditor.setCaretOffset(text.length);
       case event.DOM_VK_LEFT:
       case event.DOM_VK_RIGHT:
       case event.DOM_VK_HOME:
@@ -515,7 +536,7 @@ let styleEditor = {
           $("USMAutocompletePanel").moveTo(x, y);
         else
           $("USMAutocompletePanel").openPopupAtScreen(x, y, false);
-        // Sifting the popup above one line if not enough space below
+        // Shifting the popup above one line if not enough space below
         if (y + $("USMAutocompletePanel").boxObject.height > window.screen.height) {
           y -= (lineHeight + $("USMAutocompletePanel").boxObject.height);
           $("USMAutocompletePanel").moveTo(x, y);
@@ -528,15 +549,182 @@ let styleEditor = {
     }
   },
 
-  onMouseMove: function SE_onMouseMove(event) {
+  onMouseMove: function SE_onMouseMove({event}) {
+    function $(id) document.getElementById(id);
+    let panel = $("USMPreviewPanel");
+    if ($("USMColorPickerPanel").state == "open") {
+      panel.hidePopup();
+      return;
+    }
+    let offset = styleEditor.getOffsetAtLocation(event.screenX, event.screenY);
+    let text = styleEditor.getText();
+    let rgbhslaMatch = false, color;
+    let startIndex = offset - text.slice(0, offset)
+      .match(/(r?g?b?a?|h?s?l?a?|#?)[ ,0-9%.\)\(]{0,}$/)[0].length;
+    let match = text.slice(startIndex).match(new RegExp(RGB_HSLA_MATCH, 'i'));
+    if (!match)
+      match = text.slice(startIndex).match(new RegExp(HEX_MATCH, 'i'));
+    else
+      rgbhslaMatch = true;
+    if (!match) {
+      panel.hidePopup();
+      return;
+    }
+    // Updating startIndex to be accurate
+    startIndex += rgbhslaMatch
+      ?text.slice(startIndex).search(new RegExp(RGB_HSLA_MATCH, 'i'))
+      :text.slice(startIndex).search(new RegExp(HEX_MATCH, 'i'));
+    styleEditor.caretPosCol = text.slice(0, startIndex).match(/\n?.{0,}$/).length;
+    styleEditor.caretPosLine = text.slice(0, startIndex).split("\n").length - 1;
+    let screen = styleEditor.getLocationAtOffset(startIndex);
+    if ((screen.x - event.screenX) > 20 || (screen.x - event.screenX) < -8*(match[0].length + (rgbhslaMatch?0:6))
+      || (screen.y - event.screenY) > 20 || (screen.y - event.screenY) < -5) {
+      panel.hidePopup();
+      return;
+    }
+    if (rgbhslaMatch && match[2]) {
+      let len = match[2].split(",").length;
+      if (len == 3 || len == 4) {
+        color = match[2].replace(/[ ]{0,}/g, "").split(",");
+        if (color.length == 4)
+          color.pop();
+      }
+      else {
+        panel.hidePopup();
+        return;
+      }
+    }
+    else if (!rgbhslaMatch && match[2]) {
+      color = match[2];
+      if (color.length%3 != 0) {
+        panel.hidePopup();
+        return;
+      }
+    }
+    else {
+      panel.hidePopup();
+      return;
+    }
+    let rgb = match[2];
+    rgb = rgb.replace(/[ %]+/g, "").split(",").map(function(s) {return Math.round(parseFloat(s));});
+    styleEditor.setPreviewImage(styleEditor.regexp2RGB(match, rgb, rgb, rgb));
+    if (panel.state == "closed")
+      panel.openPopupAtScreen(screen.x, screen.y, false);
+    else
+      panel.moveTo(screen.x, screen.y);
   },
 
-  onMouseClick: function SE_onMouseClick(event) {
-    let offset = styleEditor.getOffsetAtLocation(event.screenX, event.screeny);
+  setPreviewImage: function SE_setPreviewImage(url) {
+    let image = document.getElementById("USMPreviewPanelImage");
+    image.setAttribute("style", "background-color:" + url);
+  },
+
+  onMouseUp: function SE_onMouseUp(event) {
+    let offset = styleEditor.getOffsetAtLocation(event.screenX, event.screenY);
+    styleEditor.caretPosCol= styleEditor.editor.getCaretPosition().col;
+    styleEditor.caretPosLine = styleEditor.editor.getCaretPosition().line;
     let panel = document.getElementById("USMColorPickerPanel");
-    //colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation,parentObj,parentXY,color,difPad,rSpeed,docBody)
-    colorPicker(event, 'B', 3, false, null, null, null, panel, null, null, null, null, panel);
-    panel.openPopupAtScreen(event.screenX, event.screenY, false);
+    let text = styleEditor.getText();
+    let rgbhslaMatch = false, color;
+    let startIndex = offset - text.slice(0, offset)
+      .match(/(r?g?b?a?|h?s?l?a?|#?)[ ,0-9%.\)\(]{0,}$/)[0].length;
+    let match = text.slice(startIndex).match(new RegExp(RGB_HSLA_MATCH, 'i'));
+    if (!match)
+      match = text.slice(startIndex).match(new RegExp(HEX_MATCH, 'i'));
+    else
+      rgbhslaMatch = true;
+    if (!match)
+      return;
+    // Updating startIndex to be accurate
+    startIndex += rgbhslaMatch
+      ?text.slice(startIndex).search(new RegExp(RGB_HSLA_MATCH, 'i'))
+      :text.slice(startIndex).search(new RegExp(HEX_MATCH, 'i'));
+    let screen = styleEditor.getLocationAtOffset(startIndex);
+    if ((screen.x - event.screenX) > 20 || (screen.x - event.screenX) < -10*(match[0].length + (rgbhslaMatch?0:6))
+      || (screen.y - event.screenY) > 20 || (screen.y - event.screenY) < -20)
+        return;
+
+    if (rgbhslaMatch && match[2]) {
+      let len = match[2].split(",").length;
+      if (len == 3 || len == 4) {
+        color = match[2].replace(/[ ]{0,}/g, "").split(",");
+        if (color.length == 4)
+          color.pop();
+      }
+      else
+        return;
+    }
+    else if (!rgbhslaMatch && match[2]) {
+      color = match[2];
+      if (color.length%3 != 0)
+        return;
+    }
+    else
+      return;
+    styleEditor.colorCaretOffset = startIndex;
+    styleEditor.colorMatch = rgbhslaMatch? RGB_HSLA_MATCH: HEX_MATCH;
+    styleEditor.color = color;
+    //colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation
+    //,parentObj,parentXY,color,difPad,rSpeed,docBody,onColorSave,onColorChange)
+    if (match[1].search('hsl') > -1) // only rgb and hex values for now
+      return;
+    colorPicker(event, 'B', 3, false, null, null, null, panel, null, match[1].search('hsl') > -1? styleEditor.HSV2RGB(color): color,
+      null, null, panel, styleEditor.onColorPickerSave);
+    if (panel.state == "open")
+      panel.moveTo(event.screenX, event.screenY + 15);
+    else
+      panel.openPopupAtScreen(event.screenX, event.screenY + 15, false);
+    listen(window, panel, "popupshowing", function() {
+      styleEditor.editor.startCompoundChange();
+    });
+    listen(window, panel, "popuphidden", function() {
+      styleEditor.colorCaretOffset = -1;
+      styleEditor.colorMatch = '';
+      styleEditor.color = [];
+      styleEditor.editor.focus();
+      styleEditor.editor.endCompoundChange();
+    });
+  },
+
+  HSV2RGB: function SE_HSV2RGB([x,y,z]) {
+    x = x.replace("%",""); y = y.replace("%",""); z = z.replace("%","");
+    var r=0, g=0, b=0, c=0, d=(100-y/2.55)/100, i=z/255,j=z*(255-y)/255;
+
+    if (x<42.5){r=z;g=x*6*i;g+=(z-g)*d;b=j}
+    else if (x>=42.5&&x< 85){c=42.5;r=(255-(x-c)*6)*i;r+=(z-r)*d;g=z;b=j}
+    else if (x>=85&&x<127.5){c=85;r=j;g=z;b=(x-c)*6*i;b+=(z-b)*d}
+    else if (x>=127.5&&x<170){c=127.5;r=j;g=(255-(x-c)*6)*i;g+=(z-g)*d;b=z}
+    else if (x>=170&&x<212.5){c=170;r=(x-c)*6*i;r+=(z-r)*d;g=j;b=z}
+    else if (x>=212.5){c=212.5;r=z;g=j;b=(255-(x-c)*6)*i;b+=(z-b)*d}
+    return [Math.round(r),Math.round(g),Math.round(b)];
+  },
+
+  onColorPickerSave: function SE_onColorPickerSave(rgb, hsv, hex) {
+    if (styleEditor.colorCaretOffset == -1
+      || styleEditor.colorMatch == ''
+      || styleEditor.color == [])
+        return;
+    let text = styleEditor.getText().slice(styleEditor.colorCaretOffset);
+    let match = text.match(new RegExp(styleEditor.colorMatch, 'i'));
+    let color = styleEditor.regexp2RGB(match, rgb, hsv, hex);
+    if (color.match(new RegExp(styleEditor.colorMatch, 'i'))[2] == match[2])
+      return;
+    styleEditor.setText(color, styleEditor.colorCaretOffset, styleEditor.colorCaretOffset + match[0].length);
+  },
+
+  regexp2RGB: function SE_regexp2RGB(match, rgb, hsv, hex) {
+    let color = match[2].split(",");
+    rgb = match[1].search(/rgba?/i) > -1? rgb: match[1].search(/hsla?/i) > -1? hsv: null;
+    if (!rgb)
+      color = hex;
+    else {
+      for (let i = 0; i < 3; i++)
+        color[i] = color[i].replace(/[0-9.]+/,Math.round(rgb[i]));
+      color = color.join(",");
+    }
+
+    return match[1] + (match[1] != '#'? '(': '')
+      + color + (match[1] != '#'? ')': '');
   },
 
   getAffectedContent: function SE_getAffectedContent() {
@@ -827,7 +1015,8 @@ let styleEditor = {
     styleEditor.initialized = true;
     if (styleEditor.sourceEditorEnabled)
       styleEditor.editor.addEventListener(SourceEditor.EVENTS.CONTEXT_MENU, styleEditor.onContextMenu);
-    styleEditor.doc.getElementById("USMTextEditor").firstChild.addEventListener("keypress", styleEditor.inputHelper);
+    styleEditor.doc.getElementById("USMTextEditor").firstChild.addEventListener("keypress", styleEditor.inputHelper, true);
+    styleEditor.doc.getElementById("USMTextEditor").firstChild.addEventListener("keydown", styleEditor.preInputHelper, true);
 
     if (!styleEditor.createNew) {
       styleEditor.setCaretOffset(0);
@@ -858,7 +1047,7 @@ let styleEditor = {
     if (this.sourceEditorEnabled) {
       this.editor.addEventListener(
         SourceEditor.EVENTS.MOUSE_MOVE, styleEditor.onMouseMove);
-      styleEditor.doc.getElementById("USMTextEditor").firstChild.addEventListener("click", styleEditor.onMouseClick);
+      styleEditor.doc.getElementById("USMTextEditor").firstChild.addEventListener("mouseup", styleEditor.onMouseUp);
     }
   },
 
@@ -1605,9 +1794,14 @@ let styleEditor = {
       return;
 
     this.resetVariables();
-    if (this.sourceEditorEnabled)
+    if (this.sourceEditorEnabled) {
       this.editor.removeEventListener(SourceEditor.EVENTS.CONTEXT_MENU, this.onContextMenu);
-    styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keypress", this.inputHelper);
+      this.editor.removeEventListener(
+        SourceEditor.EVENTS.MOUSE_MOVE, styleEditor.onMouseMove);
+      styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("mouseup", styleEditor.onMouseUp);
+    }
+    styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keypress", this.inputHelper, true);
+    styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keydown", styleEditor.preInputHelper, true);
     this.editor.destroy();
     this.editor = null;
     this.initialized = false;
