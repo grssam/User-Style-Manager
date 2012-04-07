@@ -145,6 +145,7 @@ const CSSKeywordsList = [
 
 const RGB_HSLA_MATCH = '(rgba?|hsla?)[ ]{0,}\\(([0-9 .]+,[0-9% .]+,[0-9% .]+,?[0-9 .]{0,})\\)';
 const HEX_MATCH = '(#)([0-9abcdef]{3,9})';
+const URL_MATCH = 'url\\s{0,}\\((([\'\"]?([^\'\"\\)]{0,})[\'\"]?){0,}([ \\n]{0,}\\+[^\\+]+\\+[ \\n]{0,}){0,}([\'\"]?([^\'\"\\)]{0,})[\'\"]?){0,}){0,}\\)';
 
 let styleEditor = {
   initialized: false,
@@ -271,7 +272,12 @@ let styleEditor = {
           + 7*Math.max(styleEditor.editor.getLineCount(), 10).toString().length
           + 16 + (styleEditor.caretPosCol)*8, window.innerWidth - (maxLen*8 + 30));
       }
-      y = window.screenY + (styleEditor.caretPosLine + 1 - styleEditor.editor.getTopIndex())
+      let line = 0;
+      if (styleEditor.editor._model.getLineAtOffset)
+        line = styleEditor.editor._model.getLineAtOffset(aOffset);
+      else
+        line = styleEditor.caretPosLine;
+      y = window.screenY + (line + 1 - styleEditor.editor.getTopIndex())
         * lineHeight + $("USMTextEditor").firstChild.boxObject.y + 30;
     }
     return {x: x, y: y};
@@ -411,15 +417,6 @@ let styleEditor = {
   postInputHelper: function SE_postInputHelper(event) {
     function $(id) document.getElementById(id);
 
-    if (event.ctrlKey || event.altKey || event.metaKey) {
-      if ($("USMAutocompletePanel").state == "open")
-        $("USMAutocompletePanel").hidePopup();
-      return;
-    }
-
-    if (styleEditor.selectedText().length > 0)
-      return;
-
     switch (event.keyCode) {
       case event.DOM_VK_CONTROL:
       case event.DOM_VK_ALT:
@@ -438,6 +435,15 @@ let styleEditor = {
       case event.DOM_VK_RETURN:
         return;
     }
+
+    if (event.ctrlKey || event.altKey || event.metaKey) {
+      if ($("USMAutocompletePanel").state == "open")
+        $("USMAutocompletePanel").hidePopup();
+      return;
+    }
+
+    if (styleEditor.selectedText().length > 0)
+      return;
 
     let currentPos = styleEditor.getCaretOffset();
     let text = styleEditor.getText();
@@ -580,6 +586,40 @@ let styleEditor = {
     }
   },
 
+  onDblClick: function SE_onDblClick(event) {
+    function $(id) document.getElementById(id);
+    let panel = $("USMPreviewPanel");
+    if ($("USMColorPickerPanel").state == "open") {
+      panel.hidePopup();
+      return;
+    }
+    let offset = styleEditor.getOffsetAtLocation(event.screenX, event.screenY), startIndex;
+    let text = styleEditor.getText();
+    let match = Math.max(text.slice(0, offset).lastIndexOf('url('), text.slice(0, offset).lastIndexOf('url ('));
+    if (!match == -1) {
+      panel.hidePopup();
+      return;
+    }
+    else
+      startIndex = match;
+    event.preventDefault();
+    event.stopPropagation();
+    styleEditor.setCaretOffset(offset);
+    match = text.slice(startIndex).match(new RegExp('^' + URL_MATCH, 'i'));
+    let url = match[1].replace(/[\n ]{0,}/g, "").replace(/['"]\+{0,}['"]/g, "")
+      .replace(/^['"]/, "").replace(/['"]$/, "");
+
+    $("USMPreviewPanelImage").style.display = "none";
+    panel.removeAttribute("class");
+    panel.setAttribute("style", "min-width: 150px !important; min-height: 150px !important;"
+      + "background-size:100% 100%; background-image: url(" + url + ")");
+
+    if (panel.state == "closed")
+      panel.openPopupAtScreen(event.screenX, event.screenY, false);
+    else
+      panel.moveTo(event.screenX, event.screenY);
+  },
+
   onMouseMove: function SE_onMouseMove({event}) {
     function $(id) document.getElementById(id);
     let panel = $("USMPreviewPanel");
@@ -589,7 +629,7 @@ let styleEditor = {
     }
     let offset = styleEditor.getOffsetAtLocation(event.screenX, event.screenY);
     let text = styleEditor.getText();
-    let rgbhslaMatch = false, color;
+    let rgbhslaMatch = false, urlMatch = false, color;
     let startIndex = offset - text.slice(0, offset)
       .match(/(r?g?b?a?|h?s?l?a?|#?)[ ,0-9%.\)\(]{0,}$/)[0].length;
     let match = text.slice(startIndex).match(new RegExp(RGB_HSLA_MATCH, 'i'));
@@ -645,12 +685,19 @@ let styleEditor = {
       panel.moveTo(screen.x, screen.y);
   },
 
-  setPreviewImage: function SE_setPreviewImage(url) {
+  setPreviewImage: function SE_setPreviewImage(url, isImage) {
     let image = document.getElementById("USMPreviewPanelImage");
+    let panel = document.getElementById("USMPreviewPanel");
+    panel.removeAttribute("style");
+    image.removeAttribute("style");
+    panel.setAttribute("class", "checkerboard");
     image.setAttribute("style", "background-color:" + url);
   },
 
-  onMouseUp: function SE_onMouseUp(event) {
+  onMouseClick: function SE_onMouseClick(event) {
+    function $(id) document.getElementById(id);
+    if ($("USMPreviewPanel").state == "open")
+      $("USMPreviewPanel").hidePopup();
     let offset = styleEditor.getOffsetAtLocation(event.screenX, event.screenY);
     styleEditor.caretPosCol= styleEditor.editor.getCaretPosition().col;
     styleEditor.caretPosLine = styleEditor.editor.getCaretPosition().line;
@@ -667,12 +714,12 @@ let styleEditor = {
     if (!match)
       return;
     // Updating startIndex to be accurate
-    startIndex += rgbhslaMatch
-      ?text.slice(startIndex).search(new RegExp(RGB_HSLA_MATCH, 'i'))
-      :text.slice(startIndex).search(new RegExp(HEX_MATCH, 'i'));
+    startIndex += rgbhslaMatch?
+      text.slice(startIndex).search(new RegExp(RGB_HSLA_MATCH, 'i')):
+      text.slice(startIndex).search(new RegExp(HEX_MATCH, 'i'));
     let screen = styleEditor.getLocationAtOffset(startIndex);
     if ((screen.x - event.screenX) > 20 || (screen.x - event.screenX) < -10*(match[0].length + (rgbhslaMatch?0:6))
-      || (screen.y - event.screenY) > 20 || (screen.y - event.screenY) < -20)
+      || (screen.y - event.screenY) > 20 || (screen.y - event.screenY) < -5)
         return;
 
     if (rgbhslaMatch && match[2]) {
@@ -1086,7 +1133,8 @@ let styleEditor = {
     if (this.sourceEditorEnabled) {
       this.editor.addEventListener(
         SourceEditor.EVENTS.MOUSE_MOVE, styleEditor.onMouseMove);
-      $("USMTextEditor").firstChild.addEventListener("mouseup", styleEditor.onMouseUp);
+      $("USMTextEditor").firstChild.addEventListener("click", styleEditor.onMouseClick);
+      $("USMTextEditor").firstChild.addEventListener("dblclick", styleEditor.onDblClick);
     }
   },
 
@@ -1837,7 +1885,8 @@ let styleEditor = {
       this.editor.removeEventListener(SourceEditor.EVENTS.CONTEXT_MENU, this.onContextMenu);
       this.editor.removeEventListener(
         SourceEditor.EVENTS.MOUSE_MOVE, styleEditor.onMouseMove);
-      styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("mouseup", styleEditor.onMouseUp);
+      styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("click", styleEditor.onMouseClick);
+      styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("dblclick", styleEditor.onDblClick);
     }
     styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keypress", this.inputHelper, true);
     styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keyup", this.postInputHelper, true);

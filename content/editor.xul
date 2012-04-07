@@ -351,7 +351,7 @@
       onpopupshown="styleEditor.autocompletePanelOpen();"/>
   </panel>
   <panel id="USMColorPickerPanel" fade="fast" noautofocus="true" />
-  <panel id="USMPreviewPanel" fade="fast" noautofocus="true">
+  <panel id="USMPreviewPanel" fade="fast" noautofocus="true" class="checkerboard">
     <image id="USMPreviewPanelImage" />
   </panel>
 </window>
