@@ -29,6 +29,10 @@
 <!ENTITY selectAllCmd.label  "Выделить всё">
 <!ENTITY selectAllCmd.key  "A">
 <!ENTITY selectAllCmd.accesskey  "д">
+<!ENTITY beautifyCmd.label  "Beautify CSS">
+<!ENTITY beautifyCmd.key  "Ф">
+<!ENTITY beautifyCmd.accesskey  "Ф">
+<!ENTITY beautifyCmd.tooltip  "Формат CSS с соответствующим отступов и выравнивания.">
 <!ENTITY gotoLineCmd.label  "Перейти к строке…">
 <!ENTITY gotoLineCmd.key  "J">
 <!ENTITY gotoLineCmd.accesskey  "е">

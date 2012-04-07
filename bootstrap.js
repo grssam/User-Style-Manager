@@ -78,7 +78,12 @@ function addContextMenuEntry(window) {
   }
   removeContextEntry();
   function openEditor() {
-    let args = [false, styleSheetList.length, true, window.content.document.getSelection().toString(), false];
+    let CSSText = window.content.document.getSelection().toString();
+    CSSText = cssbeautify(CSSText, {
+                indent:'    '.slice(
+                  Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize"))
+              });
+    let args = [false, styleSheetList.length, true, CSSText, false];
     window.openDialog("chrome://userstylemanager/content/editor.xul",
       "User Style Manager - Editor","chrome,resizable,height=600,width=800,top="
       + (window.screen.height/2 - 300) + ",left="
@@ -533,7 +538,7 @@ function disable(id) {
 function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon) {
   gAddon = addon;
   // Load various javascript includes for helper functions
-  ["helper", "pref", "main"].forEach(function(fileName) {
+  ["helper", "pref", "main", "cssbeautify"].forEach(function(fileName) {
     let fileURI = addon.getResourceURI("scripts/" + fileName + ".js");
     Services.scriptloader.loadSubScript(fileURI.spec, global);
   });

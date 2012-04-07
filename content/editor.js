@@ -40,7 +40,7 @@ function getFileURI(path) {
     getURIForFileInUserStyles(path.replace(/^(styles\/)/, ""));
 }
 
-["helper", "pref", "main"].forEach(function(fileName) {
+["helper", "pref", "main", "cssbeautify"].forEach(function(fileName) {
   let fileURL = "chrome://userstylemanager-scripts/content/" + fileName + ".js";
   Services.scriptloader.loadSubScript(fileURL, global);
 });
@@ -1847,6 +1847,16 @@ let styleEditor = {
 
   redo: function SE_redo() {
     this.editor.redo();
+  },
+
+  beautify: function SE_beautify() {
+    let selection = this.selectedText();
+    if (selection.length == 0)
+      selection = this.getText();
+    this.setText(cssbeautify(selection, {
+                  indent:'    '.slice(
+                    Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize"))
+                }));
   },
 
   onTextSaved: function SE_onTextSaved(aStatus) {

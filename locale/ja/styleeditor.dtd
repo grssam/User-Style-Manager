@@ -29,6 +29,10 @@
 <!ENTITY selectAllCmd.label  "すべてを選択します。">
 <!ENTITY selectAllCmd.key  "A">
 <!ENTITY selectAllCmd.accesskey  "A">
+<!ENTITY beautifyCmd.label  "美しくCSS">
+<!ENTITY beautifyCmd.key  "B">
+<!ENTITY beautifyCmd.accesskey  "B">
+<!ENTITY beautifyCmd.tooltip  "適切なインデントと配置形式CSS">
 <!ENTITY gotoLineCmd.label  "行にジャンプ…">
 <!ENTITY gotoLineCmd.key  "J">
 <!ENTITY gotoLineCmd.accesskey  "J">

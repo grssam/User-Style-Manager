@@ -50,6 +50,7 @@
     <command id="se-cmd-replace" oncommand="styleEditor.doReplace();"/>
     <command id="se-cmd-undo" oncommand="styleEditor.undo();" disabled="true"/>
     <command id="se-cmd-redo" oncommand="styleEditor.redo();" disabled="true"/>
+    <command id="se-cmd-beautify" oncommand="styleEditor.beautify();" />
     <command id="se-cmd-preview" oncommand="styleEditor.previewButtonClick();"/>
     <command id="se-cmd-save" oncommand="styleEditor.saveButtonClick();"/>
     <command id="se-cmd-exit" oncommand="styleEditor.exitButtonClick();"/>
@@ -82,12 +83,23 @@
     <key id="key_paste"
          key="&pasteCmd.key;"
          modifiers="accel"/>
-    <key id="key_selectAll" key="&selectAllCmd.key;" modifiers="accel"/>
-    <key id="key_undo" key="&undoCmd.key;" modifiers="accel"
+    <key id="key_selectAll"
+         key="&selectAllCmd.key;"
+         modifiers="accel"/>
+    <key id="key_beautify"
+         key="&beautifyCmd.key;"
+         modifiers="accel"/>
+    <key id="key_undo"
+         key="&undoCmd.key;"
+         modifiers="accel"
          oncommand="styleEditor.undo();"/>
-    <key id="key_redo" key="&redoCmd.key;" modifiers="accel"
+    <key id="key_redo"
+         key="&redoCmd.key;"
+         modifiers="accel"
          oncommand="styleEditor.redo();"/>
-    <key id="key_redo2" key="&undoCmd.key;" modifiers="accel,shift"
+    <key id="key_redo2"
+         key="&undoCmd.key;"
+         modifiers="accel,shift"
          oncommand="styleEditor.redo();"/>
     <key id="key_findNew"
          key="&findCmd.key;"
@@ -197,6 +209,12 @@
                       key="key_selectAll"
                       accesskey="&selectAllCmd.accesskey;"
                       command="cmd_selectAll"/>
+            <menuitem id="se-menu-beautify"
+                      label="&beautifyCmd.label;"
+                      key="key_beautify"
+                      accesskey="&beautifyCmd.accesskey;"
+                      tooltiptext="&beautifyCmd.tooltip;"
+                      command="se-cmd-beautify"/>
             <menuseparator/>
             <menuitem id="se-menu-gotoLine"
                       label="&gotoLineCmd.label;"
@@ -331,6 +349,12 @@
         <menuitem id="menu_delete"/>
         <menuseparator/>
         <menuitem id="menu_selectAll"/>
+        <menuitem id="menu_beautify"
+                  label="&beautifyCmd.label;"
+                  key="key_beautify"
+                  accesskey="&beautifyCmd.accesskey;"
+                  tooltiptext="&beautifyCmd.tooltip;"
+                  command="se-cmd-beautify"/>
         <menuseparator/>
         <menuitem id="se-menu_undo"
                   label="&undoCmd.label;"

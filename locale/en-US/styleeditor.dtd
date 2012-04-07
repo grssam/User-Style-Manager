@@ -40,6 +40,11 @@
 <!ENTITY selectAllCmd.key             "A">
 <!ENTITY selectAllCmd.accesskey       "A">
 
+<!ENTITY beautifyCmd.label            "Beautify CSS">
+<!ENTITY beautifyCmd.key              "B">
+<!ENTITY beautifyCmd.accesskey        "B">
+<!ENTITY beautifyCmd.tooltip          "Format CSS with proper indentation and alignment.">
+
 <!ENTITY gotoLineCmd.label            "Jump to line…">
 <!ENTITY gotoLineCmd.key              "J">
 <!ENTITY gotoLineCmd.accesskey        "J">

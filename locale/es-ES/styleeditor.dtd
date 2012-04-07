@@ -29,6 +29,10 @@
 <!ENTITY selectAllCmd.label  "Seleccionar todo">
 <!ENTITY selectAllCmd.key  "A">
 <!ENTITY selectAllCmd.accesskey  "A">
+<!ENTITY beautifyCmd.label  "embellecer CSS">
+<!ENTITY beautifyCmd.key  "B">
+<!ENTITY beautifyCmd.accesskey  "B">
+<!ENTITY beautifyCmd.tooltip  "Formato de CSS con sangría y alineación correcta.">
 <!ENTITY gotoLineCmd.label  "Saltar a la línea…">
 <!ENTITY gotoLineCmd.key  "J">
 <!ENTITY gotoLineCmd.accesskey  "S">
