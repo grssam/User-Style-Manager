@@ -596,16 +596,20 @@ let styleEditor = {
     let offset = styleEditor.getOffsetAtLocation(event.screenX, event.screenY), startIndex;
     let text = styleEditor.getText();
     let match = Math.max(text.slice(0, offset).lastIndexOf('url('), text.slice(0, offset).lastIndexOf('url ('));
-    if (!match == -1) {
+    if (match == -1) {
       panel.hidePopup();
       return;
     }
     else
       startIndex = match;
+    match = text.slice(startIndex).match(new RegExp('^' + URL_MATCH, 'i'));
+    if (match[0].length < offset - startIndex) {
+      panel.hidePopup();
+      return;
+    }
     event.preventDefault();
     event.stopPropagation();
     styleEditor.setCaretOffset(offset);
-    match = text.slice(startIndex).match(new RegExp('^' + URL_MATCH, 'i'));
     let url = match[1].replace(/[\n ]{0,}/g, "").replace(/['"]\+{0,}['"]/g, "")
       .replace(/^['"]/, "").replace(/['"]$/, "");
 
@@ -629,12 +633,15 @@ let styleEditor = {
     }
     let offset = styleEditor.getOffsetAtLocation(event.screenX, event.screenY);
     let text = styleEditor.getText();
-    let rgbhslaMatch = false, urlMatch = false, color;
+    if (text.length < 4)
+      return;
+    let rgbhslaMatch = false, color;
     let startIndex = offset - text.slice(0, offset)
       .match(/(r?g?b?a?|h?s?l?a?|#?)[ ,0-9%.\)\(]{0,}$/)[0].length;
-    let match = text.slice(startIndex).match(new RegExp(RGB_HSLA_MATCH, 'i'));
+    text = text.slice(startIndex);
+    let match = text.match(new RegExp(RGB_HSLA_MATCH, 'i'));
     if (!match)
-      match = text.slice(startIndex).match(new RegExp(HEX_MATCH, 'i'));
+      match = text.match(new RegExp(HEX_MATCH, 'i'));
     else
       rgbhslaMatch = true;
     if (!match) {
@@ -643,10 +650,10 @@ let styleEditor = {
     }
     // Updating startIndex to be accurate
     startIndex += rgbhslaMatch
-      ?text.slice(startIndex).search(new RegExp(RGB_HSLA_MATCH, 'i'))
-      :text.slice(startIndex).search(new RegExp(HEX_MATCH, 'i'));
-    styleEditor.caretPosCol = text.slice(0, startIndex).match(/\n?.{0,}$/).length;
-    styleEditor.caretPosLine = text.slice(0, startIndex).split("\n").length - 1;
+      ?text.search(new RegExp(RGB_HSLA_MATCH, 'i'))
+      :text.search(new RegExp(HEX_MATCH, 'i'));
+    // styleEditor.caretPosCol = text.slice(0, startIndex).match(/\n?.{0,}$/).length;
+    // styleEditor.caretPosLine = text.slice(0, startIndex).split("\n").length - 1;
     let screen = styleEditor.getLocationAtOffset(startIndex);
     if ((screen.x - event.screenX) > 20 || (screen.x - event.screenX) < -8*(match[0].length + (rgbhslaMatch?0:6))
       || (screen.y - event.screenY) > 20 || (screen.y - event.screenY) < -5) {
