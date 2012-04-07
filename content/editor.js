@@ -1772,8 +1772,11 @@ let styleEditor = {
     }
     for (i = 0; i < bracketStack.length; i++)
       errorList.push([bracketStackLine[i], bracketStackOffset[i],
-        bracketStack[i] != "#"? styleEditor.STR("error.unmatched") + " "
-        + bracketStack[i].replace(/\{+/, "{"): styleEditor.STR("error.commentStart")]);
+        bracketStack[i] != "#"?
+          (bracketStack[i] != ":"?
+            styleEditor.STR("error.unmatched") + " " + bracketStack[i].replace(/\{+/, "{"):
+            styleEditor.STR("error.missing") + " ;"
+          ): styleEditor.STR("error.commentStart")]);
 
     if (errorList.length || warningList.length)
       error = true;
