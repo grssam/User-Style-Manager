@@ -1521,6 +1521,10 @@ let styleEditor = {
 
   validateCSS: function SE_validateCSS() {
     function $(id) document.getElementById(id);
+    let (errorPanel = $("USMErrorPanel")) {
+      while (errorPanel.firstChild)
+        errorPanel.removeChild(errorPanel.firstChild);
+    }
     function getLine(i) {
       return numLines;
     }
