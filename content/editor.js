@@ -405,9 +405,40 @@ let styleEditor = {
           }
         }
         return;
-      default:
-        break;
     }
+  },
+
+  postInputHelper: function SE_postInputHelper(event) {
+    function $(id) document.getElementById(id);
+
+    if (event.ctrlKey || event.altKey || event.metaKey) {
+      if ($("USMAutocompletePanel").state == "open")
+        $("USMAutocompletePanel").hidePopup();
+      return;
+    }
+
+    if (styleEditor.selectedText().length > 0)
+      return;
+
+    switch (event.keyCode) {
+      case event.DOM_VK_CONTROL:
+      case event.DOM_VK_ALT:
+      case event.DOM_VK_SHIFT:
+      case event.DOM_VK_UP:
+      case event.DOM_VK_DELETE:
+      case event.DOM_VK_BACK_SPACE:
+      case event.DOM_VK_DOWN:
+      case event.DOM_VK_LEFT:
+      case event.DOM_VK_RIGHT:
+      case event.DOM_VK_HOME:
+      case event.DOM_VK_END:
+      case event.DOM_VK_ESCAPE:
+      case event.DOM_VK_TAB:
+      case event.DOM_VK_ENTER:
+      case event.DOM_VK_RETURN:
+        return;
+    }
+
     let currentPos = styleEditor.getCaretOffset();
     let text = styleEditor.getText();
     let matchedList = [];
@@ -1022,8 +1053,9 @@ let styleEditor = {
     styleEditor.initialized = true;
     if (styleEditor.sourceEditorEnabled)
       styleEditor.editor.addEventListener(SourceEditor.EVENTS.CONTEXT_MENU, styleEditor.onContextMenu);
-    styleEditor.doc.getElementById("USMTextEditor").firstChild.addEventListener("keypress", styleEditor.inputHelper, true);
-    styleEditor.doc.getElementById("USMTextEditor").firstChild.addEventListener("keydown", styleEditor.preInputHelper, true);
+    $("USMTextEditor").firstChild.addEventListener("keypress", styleEditor.inputHelper, true);
+    $("USMTextEditor").firstChild.addEventListener("keyup", styleEditor.postInputHelper, true);
+    $("USMTextEditor").firstChild.addEventListener("keydown", styleEditor.preInputHelper, true);
 
     if (!styleEditor.createNew) {
       styleEditor.setCaretOffset(0);
@@ -1054,7 +1086,7 @@ let styleEditor = {
     if (this.sourceEditorEnabled) {
       this.editor.addEventListener(
         SourceEditor.EVENTS.MOUSE_MOVE, styleEditor.onMouseMove);
-      styleEditor.doc.getElementById("USMTextEditor").firstChild.addEventListener("mouseup", styleEditor.onMouseUp);
+      $("USMTextEditor").firstChild.addEventListener("mouseup", styleEditor.onMouseUp);
     }
   },
 
@@ -1808,6 +1840,7 @@ let styleEditor = {
       styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("mouseup", styleEditor.onMouseUp);
     }
     styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keypress", this.inputHelper, true);
+    styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keyup", this.postInputHelper, true);
     styleEditor.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keydown", styleEditor.preInputHelper, true);
     this.editor.destroy();
     this.editor = null;
