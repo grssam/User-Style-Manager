@@ -391,7 +391,7 @@ let styleEditor = {
       case event.DOM_VK_TAB:
         if ($("USMAutocompletePanel").state == "open") {
           if ($("USMAutocompleteList").selectedItem) {
-            let value = $("USMAutocompleteList").selectedItem.lastChild.value;
+            let value = $("USMAutocompleteList").selectedItem.lastChild.value + " :";
             $("USMAutocompletePanel").hidePopup();
             let tabSize = Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize");
             styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
@@ -406,7 +406,8 @@ let styleEditor = {
           if ($("USMAutocompleteList").selectedItem) {
             styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
             let currentPos = styleEditor.getCaretOffset();
-            styleEditor.setText($("USMAutocompleteList").selectedItem.lastChild.value, currentPos, currentPos + 2);
+            styleEditor.setText($("USMAutocompleteList").selectedItem.lastChild.value + " :",
+              currentPos, currentPos + 2);
             $("USMAutocompletePanel").hidePopup();
           }
         }
