@@ -195,11 +195,20 @@ function updateStyleSheetList() {
     writeJSONPref();
   }
   // If user has chosen to maintain backup, do it
-  if (pref("maintainBackup")) {
-    let bckpDirectory = getURIForFileInUserStyles("Backup/")
-      .QueryInterface(Ci.nsIFileURL).file;
-    if (!bckpDirectory.exists())
-      bckpDirectory.create(1, parseInt('0777', 8));
+  if (pref("maintainBackup"))
+    doBackup();
+  // compatibility bump for 0.8
+  if (updateAffectedInfo)
+    updateAffectedContents();
+  return true;
+}
+
+function doBackup(index) {
+  let bckpDirectory = getURIForFileInUserStyles("Backup/")
+    .QueryInterface(Ci.nsIFileURL).file;
+  if (!bckpDirectory.exists())
+    bckpDirectory.create(1, parseInt('0777', 8));
+  if (index == null) {
     styleSheetList.forEach(function([enabled, name, path, url, appOn, added, modified], index) {
       let origFile = getFileURI(unescape(path)).QueryInterface(Ci.nsIFileURL).file;
       if (!origFile.exists())
@@ -211,10 +220,60 @@ function updateStyleSheetList() {
       origFile.copyTo(bckpDirectory, "backupOfUserStyle" + index + ".css");
     });
   }
-  // compatibility bump for 0.8
-  if (updateAffectedInfo)
-    updateAffectedContents();
-  return true;
+  else {
+    let origFile = getFileURI(unescape(styleSheetList[index][2])).QueryInterface(Ci.nsIFileURL).file;
+    if (!origFile.exists())
+      return;
+    let bckpFile = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index
+      + ".css").QueryInterface(Ci.nsIFileURL).file;
+    if (bckpFile.exists())
+      bckpFile.remove(false);
+    origFile.copyTo(bckpDirectory, "backupOfUserStyle" + index + ".css");
+  }
+}
+
+function doRestore(index, callback) {
+  let bckpDirectory = getURIForFileInUserStyles("Backup/")
+    .QueryInterface(Ci.nsIFileURL).file;
+  if (!bckpDirectory.exists())
+    return;
+  if (index == null) {
+    styleSheetList.forEach(function([enabled, name, path, url, appOn, added, modified], index) {
+      let bckpFile = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index
+        + ".css").QueryInterface(Ci.nsIFileURL).file;
+      if (!bckpFile.exists())
+        return;
+      unloadStyleSheet(index);
+      let origDirectory = getFileURI(unescape(path).replace(/[^\/\\]+$/, ""))
+        .QueryInterface(Ci.nsIFileURL).file;
+      if (!origDirectory.exists())
+        origDirectory.create(1, parseInt('0777', 8));
+      let origFile = getFileURI(unescape(path)).QueryInterface(Ci.nsIFileURL).file;
+      if (!origFile.exists()) {
+        bckpFile.copyTo(origDirectory, unescape(path).match(/[^\\\/]+$/)[0]);
+        if (enabled == "enabled")
+          loadStyleSheet(index);
+      }
+    });
+  }
+  else {
+    let bckpFile = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index
+      + ".css").QueryInterface(Ci.nsIFileURL).file;
+    if (!bckpFile.exists())
+      return;
+    unloadStyleSheet(index);
+    let origDirectory = getFileURI(unescape(styleSheetList[index][2]).replace(/[^\\\/]+$/, ""))
+      .QueryInterface(Ci.nsIFileURL).file;
+    if (!origDirectory.exists())
+      origDirectory.create(1, parseInt('0777', 8));
+    let origFile = getFileURI(unescape(styleSheetList[index][2])).QueryInterface(Ci.nsIFileURL).file;
+    if (!origFile.exists()) {
+      bckpFile.copyTo(origDirectory, unescape(styleSheetList[index][2]).match(/[^\\\/]+$/)[0]);
+      if (styleSheetList[index][0] == "enabled")
+        loadStyleSheet(index);
+    }
+  }
+  callback && callback();
 }
 
 // Function to add default Style Sheets to the list
@@ -295,7 +354,18 @@ function loadStyleSheet(index) {
     let fileURI = getFileURI(unescape(styleSheetList[index][2]));
     try {
       sss.loadAndRegisterSheet(fileURI, sss.USER_SHEET);
-    } catch (ex) {}
+      backUpLoaded[index] = false;
+    } catch (ex) {
+      // Seems like file does not exists
+      // Use backup is pref'd on
+      if (pref("fallBack")) {
+        let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index + ".css");
+        try {
+          sss.loadAndRegisterSheet(bckpFileURI, sss.USER_SHEET);
+          backUpLoaded[index] = true;
+        } catch (ex) {backUpLoaded[index] = false;}
+      }
+    }
   }
 }
 

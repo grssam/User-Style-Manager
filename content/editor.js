@@ -908,6 +908,25 @@ let styleEditor = {
         styleEditor.onEditorLoad();
     }
 
+    function readFileData() {
+      NetUtil.asyncFetch(styleEditor.styleSheetFile, function(inputStream, status) {
+        if (!Components.isSuccessCode(status)) {
+          styleEditor.resetVariables();
+          styleEditor.win.close();
+          return;
+        }
+        let data = "";
+        try {
+          data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+        } catch (ex) {}
+        try {
+          config.placeholderText = data;
+          config.initialText = data;
+        } catch (ex) {}
+        startEditor();
+      });
+    }
+
     if (styleEditor.win == null)
       styleEditor.win = window;
     if (styleEditor.doc == null)
@@ -989,22 +1008,10 @@ let styleEditor = {
       else {
         let fileURI = getFileURI(unescape(styleSheetList[styleEditor.index][2]));
         styleEditor.styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
-        NetUtil.asyncFetch(styleEditor.styleSheetFile, function(inputStream, status) {
-          if (!Components.isSuccessCode(status)) {
-            styleEditor.resetVariables();
-            styleEditor.win.close();
-            return;
-          }
-          let data = "";
-          try {
-            data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-          } catch (ex) {}
-          try {
-            config.placeholderText = data;
-            config.initialText = data;
-          } catch (ex) {}
-          startEditor();
-        });
+        if (!styleEditor.styleSheetFile.exists())
+          doRestore(styleEditor.index, readFileData);
+        else
+          readFileData();
       }
     });
   },
@@ -1741,10 +1748,10 @@ let styleEditor = {
         }
       }
     }
-    else if (text.match(/[@]-moz-document[ ]+(url[\-prefix]{0,7}|domain|regexp)[ ]{0,}\(['"]?([^'"\)]+)['"]?\)[ ]/) == null) {
+    else if (!text.match(/[@]-moz-document[ ]+(url[\-prefix]{0,7}|domain|regexp)[ ]{0,}\(['"]?[^'"\)]+['"]?\)/)) {
       // namespace is there, adding moz url only when it is for web site
-      if (text.search(/[@]namespace[ ]+url\(['"]?http:\/\/www.mozilla.org\/keymaster\/gatekeeper\/there\.is\.only\.xul['"]?\);/) < 0) {
-        let match = text.match(/([@]namespace[ ]+url\(['"]?http:\/\/www.w3.org\/1999\/xhtml['"]?\);[^\n]{0,}\n)(.{0,})/);
+      let match;
+      if (match = text.match(/(url\(['"]?http:\/\/www.w3.org\/1999\/xhtml['"]?\);[^\n]{0,}\n)(.{0,})/)) {
         text = match[1] + "@-moz-document domain('') {\n" + match[2] + "\n}";
         caret = match[1].length + 23;
       }
