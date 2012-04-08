@@ -391,7 +391,7 @@ let styleEditor = {
       case event.DOM_VK_TAB:
         if ($("USMAutocompletePanel").state == "open") {
           if ($("USMAutocompleteList").selectedItem) {
-            let value = $("USMAutocompleteList").selectedItem.lastChild.value + " :";
+            let value = $("USMAutocompleteList").selectedItem.lastChild.value + ": ";
             $("USMAutocompletePanel").hidePopup();
             let tabSize = Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize");
             styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
@@ -406,7 +406,7 @@ let styleEditor = {
           if ($("USMAutocompleteList").selectedItem) {
             styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
             let currentPos = styleEditor.getCaretOffset();
-            styleEditor.setText($("USMAutocompleteList").selectedItem.lastChild.value + " :",
+            styleEditor.setText($("USMAutocompleteList").selectedItem.lastChild.value + ": ",
               currentPos, currentPos + 2);
             $("USMAutocompletePanel").hidePopup();
           }
@@ -449,8 +449,9 @@ let styleEditor = {
     let currentPos = styleEditor.getCaretOffset();
     let text = styleEditor.getText();
     let matchedList = [];
+    let lastWord = text.slice(currentPos - 1, currentPos);
     // check if the types word is !
-    if ("!" == text.slice(currentPos - 1, currentPos)) {
+    if ("!" == lastWord) {
       // checking whether we are not inside a comment
       let textBefore = text.slice(0, currentPos - 1);
       if (textBefore.lastIndexOf("\/*") > textBefore.lastIndexOf("*\/"))
@@ -459,7 +460,7 @@ let styleEditor = {
       if (textAfter.length == 0 || textAfter.toLowerCase() != "important".slice(0, textAfter.length))
         styleEditor.setText('important' + (textAfter[0] != ';'? ';': ''), currentPos, currentPos);
     }
-    else if ("'" == text.slice(currentPos - 1, currentPos)) {
+    else if ("'" == lastWord) {
       let textAfter = text.slice(currentPos).split("\n")[0];
       let textBefore = text.slice(0, currentPos).split("\n").slice(-1)[0];
       if (textAfter.trim() == "" && textBefore.split("'").length%2 == 0) {
@@ -467,7 +468,7 @@ let styleEditor = {
         styleEditor.setCaretOffset(currentPos);
       }
     }
-    else if ('"' == text.slice(currentPos - 1, currentPos)) {
+    else if ('"' == lastWord) {
       let textAfter = text.slice(currentPos).split("\n")[0];
       let textBefore = text.slice(0, currentPos).split("\n").slice(-1)[0];
       if (textAfter.trim() == "" && textBefore.split('"').length%2 == 0) {
@@ -484,7 +485,7 @@ let styleEditor = {
             styleEditor.setCaretOffset(currentPos);
         }
       }
-      else if ("{" == text.slice(currentPos - 1, currentPos)) {
+      else if ("{" == lastWord) {
         let textAfter = text.slice(currentPos);
         let textBefore = text.slice(0, currentPos);
         if (textBefore.split("{").length - textBefore.split("}").length
@@ -497,7 +498,48 @@ let styleEditor = {
           styleEditor.setCaretOffset(currentPos);
         }
       }
-      else if ("(" == text.slice(currentPos - 1, currentPos)) {
+      // Case for color picker as you type
+      else if (("(" == lastWord || "#" == lastWord) && text.slice(0, currentPos).match(/(rgba?\s*\(|#)/)) {
+        let match = text.slice(0, currentPos).match(/(rgba?\s*\()|(#)/), color;
+        let panel = document.getElementById("USMColorPickerPanel");
+        if (match && match[2] != "#") {
+          let alpha = match[1].length > 4;
+          styleEditor.setText("150, 150, 150" + (alpha?", 1":"") + ")", currentPos, currentPos);
+          color = [150,150,150];
+        }
+        else if (match && match[2] == "#") {
+          let lineBefore = text.slice(0, currentPos).match(/\n?[^\n]*$/)[0];
+          let property = lineBefore.match(/\s*([a-zA-Z\-]+)\s*:[^:]*$/);
+          if (!property)
+            return;
+          property = property[1];
+          if (CSSKeywordsList.indexOf(property.toLowerCase()) < 0)
+            return;
+          styleEditor.setText("DDDDDD", currentPos, currentPos);
+          color = "DDDDDD";
+        }
+        else if (!match)
+          return;
+        styleEditor.colorCaretOffset = currentPos - match[0].length;
+        styleEditor.colorMatch = match[2] != "#"? RGB_HSLA_MATCH: HEX_MATCH;
+        styleEditor.color = color;
+        //colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation
+        //,parentObj,parentXY,color,difPad,rSpeed,docBody,onColorSave,onColorChange)
+        colorPicker(event, 'B', 3, false, null, null, null, panel, null, color,
+          null, null, panel, styleEditor.onColorPickerSave);
+        let screen = styleEditor.getLocationAtOffset(currentPos - match[0].length);
+        if (panel.state == "open")
+          panel.moveTo(screen.x, screen.y + 15);
+        else
+          panel.openPopupAtScreen(screen.x, screen.y + 15, false);
+        listen(window, panel, "popuphidden", function() {
+          styleEditor.colorCaretOffset = -1;
+          styleEditor.colorMatch = '';
+          styleEditor.color = [];
+          styleEditor.editor.focus();
+        });
+      }
+      else if ("(" == lastWord) {
         let textAfter = text.slice(currentPos);
         let textBefore = text.slice(0, currentPos);
         if (textBefore.split("(").length - textBefore.split(")").length
@@ -506,7 +548,7 @@ let styleEditor = {
           styleEditor.setCaretOffset(currentPos);
         }
       }
-      else if ("[" == text.slice(currentPos - 1, currentPos)) {
+      else if ("[" == lastWord) {
         let textAfter = text.slice(currentPos);
         let textBefore = text.slice(0, currentPos);
         if (textBefore.split("[").length - textBefore.split("]").length
@@ -760,15 +802,11 @@ let styleEditor = {
       panel.moveTo(event.screenX, event.screenY + 15);
     else
       panel.openPopupAtScreen(event.screenX, event.screenY + 15, false);
-    listen(window, panel, "popupshowing", function() {
-      styleEditor.editor.startCompoundChange();
-    });
     listen(window, panel, "popuphidden", function() {
       styleEditor.colorCaretOffset = -1;
       styleEditor.colorMatch = '';
       styleEditor.color = [];
       styleEditor.editor.focus();
-      styleEditor.editor.endCompoundChange();
     });
   },
 
