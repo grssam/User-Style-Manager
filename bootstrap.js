@@ -274,19 +274,28 @@ function populateMenuPopupList(window, id, event) {
             if (style[0] == 'enabled')
               item.setAttribute("checked", true);
             if (item.hasAttribute("checked"))
-              item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"))
+              item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
             else
-              item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"))
-            listen(window, item, "mousedown", function(event) {
+              item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"));
+            listen(window, item, "click", function(event) {
+              if (event.button == 2) {
+                let args = [false, index, false, "", false];
+                Services.wm.getMostRecentWindow("navigator:browser")
+                  .openDialog("chrome://userstylemanager/content/editor.xul",
+                  "User Style Manager - Editor " + index, "chrome,resizable,height=600,width=800,top="
+                  + (window.screen.height/2 - 300) + ",left="
+                  + (window.screen.width/2 - 400), args).focus();
+                return;
+              }
               event.preventDefault();
               event.stopPropagation();
               toggleStyleSheet(index, !item.hasAttribute("checked")?'disabled':'enabled',
                 !item.hasAttribute("checked")?'enabled':'disabled');
               if (item.hasAttribute("checked") && item.getAttribute("checked")) {
-                item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"))
+                item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
               }
               else {
-                item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"))
+                item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"));
               }
             });
             sortedItemMenupop.appendChild(item);
@@ -341,19 +350,28 @@ function populateMenuPopupList(window, id, event) {
       if (style[0] == 'enabled')
         item.setAttribute("checked", true);
       if (item.hasAttribute("checked"))
-        item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"))
+        item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
       else
-        item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"))
-      listen(window, item, "mousedown", function(event) {
+        item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"));
+      listen(window, item, "click", function(event) {
+        if (event.button == 2) {
+          let args = [false, index, false, "", false];
+          Services.wm.getMostRecentWindow("navigator:browser")
+            .openDialog("chrome://userstylemanager/content/editor.xul",
+            "User Style Manager - Editor " + index, "chrome,resizable,height=600,width=800,top="
+            + (window.screen.height/2 - 300) + ",left="
+            + (window.screen.width/2 - 400), args).focus();
+          return;
+        }
         event.preventDefault();
         event.stopPropagation();
         toggleStyleSheet(index, !item.hasAttribute("checked")?'disabled':'enabled',
           !item.hasAttribute("checked")?'enabled':'disabled');
         if (item.hasAttribute("checked") && item.getAttribute("checked")) {
-          item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"))
+          item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
         }
         else {
-          item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"))
+          item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"));
         }
       });
       menupop.appendChild(item);
