@@ -304,7 +304,7 @@ let styleEditor = {
       || event.keyCode == event.DOM_VK_RETURN) {
         if ($("USMAutocompletePanel").state == "open") {
           if ($("USMAutocompleteList").selectedItem) {
-            let value = $("USMAutocompleteList").selectedItem.lastChild.value;
+            let value = $("USMAutocompleteList").selectedItem.lastChild.value + ": ";
             $("USMAutocompletePanel").hidePopup();
             styleEditor.editor.focus();
             styleEditor.editor.setCaretPosition(styleEditor.caretPosLine, styleEditor.caretPosCol);
