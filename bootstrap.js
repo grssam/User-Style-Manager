@@ -544,7 +544,7 @@ function createHotKey(window) {
 
 function openOptions(window) {
   window.open("chrome://userstylemanager/content/options.xul",
-    "User Style Manager Options","chrome,resizable,centerscreen");
+    "User Style Manager Options","chrome,resizable,centerscreen").focus();
 }
 
 function disable(id) {
