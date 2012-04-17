@@ -1597,6 +1597,7 @@ let styleEditor = {
 
     // This is a syntax validator as of now.
     let text = this.getText();
+    let origCaretPos = this.getCaretOffset();
     let caret = 0;
     let error = false;
     let errorList = [];
@@ -1795,7 +1796,7 @@ let styleEditor = {
             del();
       }
     }
-    styleEditor.setCaretOffset(0);
+    styleEditor.setCaretOffset(origCaretPos);
 
     // Checking bracklist for matching brackets
     let i = 0;
@@ -1853,6 +1854,8 @@ let styleEditor = {
       else
         return true;
     }
+    else
+      this.editor.focus();
 
     // No error found, now looking for url suffixes
     if (text.search(/[@]namespace[ ]+url\([^\)]{1,}\)/) == -1) {
