@@ -998,7 +998,7 @@ let styleEditor = {
   },
 
   previewButtonClick: function () {
-    if (!styleEditor.validateCSS())
+    if (!styleEditor.validateCSS(true))
       return;
     let tmpFile = getURIForFileInUserStyles("tmpFile.css").QueryInterface(Ci.nsIFileURL).file;
     if (!tmpFile.exists())
@@ -1581,7 +1581,7 @@ let styleEditor = {
     }
   },
 
-  validateCSS: function SE_validateCSS() {
+  validateCSS: function SE_validateCSS(previewing) {
     function $(id) document.getElementById(id);
     let (errorPanel = $("USMErrorPanel")) {
       while (errorPanel.firstChild)
@@ -1622,6 +1622,8 @@ let styleEditor = {
     let bracketStackLine = [];
     let bracketStackOffset = [];
     let numLines = 0;
+    if (previewing == null)
+      previewing = false;
     // comments in this bracketStack are represented by #
 
     bracketStack.__defineGetter__("last", function() {
@@ -1850,7 +1852,8 @@ let styleEditor = {
     });
 
     if (error) {
-      let answer = promptService.confirm(null, styleEditor.STR("validate.error"), styleEditor.STR("validate.notCSS"));
+      let answer = previewing?false:
+        promptService.confirm(null, styleEditor.STR("validate.error"), styleEditor.STR("validate.notCSS"));
       if (!answer) {
         let (errorPanel = $("USMErrorPanel")) {
           while (errorPanel.firstChild)
@@ -1865,7 +1868,7 @@ let styleEditor = {
             errorPanel.style.margin = "0px";
           }
         }
-        return false;
+        return previewing == true;
       }
       else
         return true;
