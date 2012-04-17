@@ -465,6 +465,7 @@ function addToolbarButton(window) {
   // add toolbar button
   toolbarButton = window.document.createElementNS(XUL, "toolbarbutton");
   toolbarButton.setAttribute("id", toolbarButtonID);
+  toolbarButton.setAttribute("class", "chromeclass-toolbar-additional toolbarbutton-1");
   toolbarButton.setAttribute("type", "button");
   toolbarButton.setAttribute("image", LOGO);
   toolbarButton.setAttribute("label", l10n("USM.label"));
