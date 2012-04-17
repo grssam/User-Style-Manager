@@ -279,6 +279,7 @@ function populateMenuPopupList(window, id, event) {
               item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"));
             listen(window, item, "click", function(event) {
               if (event.button == 2) {
+                event.target.parentNode.hidePopup();
                 let args = [false, index, false, "", false];
                 Services.wm.getMostRecentWindow("navigator:browser")
                   .openDialog("chrome://userstylemanager/content/editor.xul",
@@ -355,6 +356,7 @@ function populateMenuPopupList(window, id, event) {
         item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"));
       listen(window, item, "click", function(event) {
         if (event.button == 2) {
+          event.target.parentNode.hidePopup();
           let args = [false, index, false, "", false];
           Services.wm.getMostRecentWindow("navigator:browser")
             .openDialog("chrome://userstylemanager/content/editor.xul",
