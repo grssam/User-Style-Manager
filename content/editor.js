@@ -499,8 +499,8 @@ let styleEditor = {
         }
       }
       // Case for color picker as you type
-      else if (("(" == lastWord || "#" == lastWord) && text.slice(0, currentPos).match(/(rgba?\s*\(|#)/)) {
-        let match = text.slice(0, currentPos).match(/(rgba?\s*\()|(#)/), color;
+      else if (("(" == lastWord || "#" == lastWord) && text.slice(0, currentPos).match(/(rgba?\s*\(|#)$/)) {
+        let match = text.slice(0, currentPos).match(/(rgba?\s*\()|(#)$/), color;
         let panel = document.getElementById("USMColorPickerPanel");
         if (match && match[2] != "#") {
           let alpha = match[1].length > 4;
@@ -679,10 +679,21 @@ let styleEditor = {
     if (text.length < 4)
       return;
     let rgbhslaMatch = false, color;
-    let startIndex = offset - text.slice(0, offset)
-      .match(/(r?g?b?a?|h?s?l?a?|#?)[ ,0-9%.\)\(]{0,}$/)[0].length;
+    let match = text.slice(0, offset).match(/(r|rg|rgb|rgba|h|hs|hsl|hsla)[ ,0-9%.\)\(]{0,}$/);
+    if (!match)
+      match = text.slice(0, offset).match(/(#)[0-9abcdef]{0,6}$/i);
+    if (!match) {
+      panel.hidePopup();
+      return;
+    }
+    let startIndex = offset - match[0].length;
+    // Check to allow only the colors after :
+    if (text.slice(0, startIndex).split("\n").slice(-1)[0].indexOf(":") == -1) {
+      panel.hidePopup();
+      return;
+    }
     text = text.slice(startIndex);
-    let match = text.match(new RegExp(RGB_HSLA_MATCH, 'i'));
+    match = text.match(new RegExp(RGB_HSLA_MATCH, 'i'));
     if (!match)
       match = text.match(new RegExp(HEX_MATCH, 'i'));
     else
@@ -698,7 +709,7 @@ let styleEditor = {
     // styleEditor.caretPosCol = text.slice(0, startIndex).match(/\n?.{0,}$/).length;
     // styleEditor.caretPosLine = text.slice(0, startIndex).split("\n").length - 1;
     let screen = styleEditor.getLocationAtOffset(startIndex);
-    if ((screen.x - event.screenX) > 20 || (screen.x - event.screenX) < -8*(match[0].length + (rgbhslaMatch?0:6))
+    if ((screen.x - event.screenX) > 20 || (screen.x - event.screenX) < -8*match[0].length
       || (screen.y - event.screenY) > 20 || (screen.y - event.screenY) < -5) {
       panel.hidePopup();
       return;
@@ -706,7 +717,9 @@ let styleEditor = {
     if (rgbhslaMatch && match[2]) {
       let len = match[2].split(",").length;
       if (len == 3 || len == 4) {
-        color = match[2].replace(/[ ]{0,}/g, "").split(",");
+        color = match[2].replace(/[ %]{0,}/g, "").split(",").map(function(s) {
+          return Math.round(parseFloat(s));
+        });
         if (color.length == 4)
           color.pop();
       }
@@ -726,9 +739,7 @@ let styleEditor = {
       panel.hidePopup();
       return;
     }
-    let rgb = match[2];
-    rgb = rgb.replace(/[ %]+/g, "").split(",").map(function(s) {return Math.round(parseFloat(s));});
-    styleEditor.setPreviewImage(styleEditor.regexp2RGB(match, rgb, rgb, rgb));
+    styleEditor.setPreviewImage(styleEditor.regexp2RGB(match, color, color, color));
     if (panel.state == "closed")
       panel.openPopupAtScreen(screen.x, screen.y, false);
     else
@@ -754,9 +765,15 @@ let styleEditor = {
     let panel = document.getElementById("USMColorPickerPanel");
     let text = styleEditor.getText();
     let rgbhslaMatch = false, color;
-    let startIndex = offset - text.slice(0, offset)
-      .match(/(r?g?b?a?|h?s?l?a?|#?)[ ,0-9%.\)\(]{0,}$/)[0].length;
-    let match = text.slice(startIndex).match(new RegExp(RGB_HSLA_MATCH, 'i'));
+    let match = text.slice(0, offset).match(/(r|rg|rgb|rgba|h|hs|hsl|hsla)[ ,0-9%.\)\(]{0,}$/);
+    if (!match)
+      match = text.slice(0, offset).match(/(#)[0-9abcdef]{0,6}$/i);
+    if (!match) {
+      panel.hidePopup();
+      return;
+    }
+    let startIndex = offset - match[0].length;
+    match = text.slice(startIndex).match(new RegExp(RGB_HSLA_MATCH, 'i'));
     if (!match)
       match = text.slice(startIndex).match(new RegExp(HEX_MATCH, 'i'));
     else
