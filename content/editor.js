@@ -882,7 +882,7 @@ let styleEditor = {
     if (styleEditor.createNew) {
       styleSheetList[styleEditor.index][1] = escape(styleEditor.doc.getElementById("USMFileNameBox").value);
       styleSheetList[styleEditor.index][2] = escape(styleEditor.doc.getElementById("USMFileNameBox")
-        .value.replace(/[^0-9a-z\u0000-\u007F\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\~!@#$\%\^&\(\)_\-=+\`\,\.;:\'\[\]\{\} ]+/gi, "") + ".css");
+        .value.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css");
       if (unescape(styleSheetList[styleEditor.index][2]) == ".css")
         styleSheetList[styleEditor.index][2] = escape("User Created Style Sheet " + styleEditor.index + ".css");
       styleEditor.styleSheetFile = getFileURI(unescape(styleSheetList[styleEditor.index][2]))
@@ -893,8 +893,7 @@ let styleEditor = {
         } catch (ex) { return; }
     }
     else {
-      let fileName = styleEditor.doc.getElementById("USMFileNameBox")
-        .value.replace(/[^0-9a-z\u0000-\u007F\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\~!@#$\%\^&\(\)_\-=+\`\,\.;:\'\[\]\{\} ]+/gi, "");
+      let fileName = styleEditor.doc.getElementById("USMFileNameBox").value.replace(/[\\\/:*?\"<>|]+/gi, "");
       if (unescape(styleSheetList[styleEditor.index][2]).match(/[\\\/]?([^\\\/]{0,})\.css$/)[1] != fileName) {
         styleEditor.styleSheetFile = getFileURI(unescape(styleSheetList[styleEditor.index][2]))
           .QueryInterface(Ci.nsIFileURL).file;
