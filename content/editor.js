@@ -1880,17 +1880,9 @@ let styleEditor = {
           text = "@namespace url(http://www.w3.org/1999/xhtml);\n" + text;
         }
       }
+      this.setText(text);
+      this.setCaretOffset(caret);
     }
-    else if (!text.match(/[@]-moz-document[ ]+(url[\-prefix]{0,7}|domain|regexp)[ ]{0,}\(['"]?[^'"\)]+['"]?\)/)) {
-      // namespace is there, adding moz url only when it is for web site
-      let match;
-      if (match = text.match(/(url\(['"]?http:\/\/www.w3.org\/1999\/xhtml['"]?\);[^\n]{0,}\n)(.{0,})/)) {
-        text = match[1] + "@-moz-document domain('') {\n" + match[2] + "\n}";
-        caret = match[1].length + 23;
-      }
-    }
-    this.setText(text);
-    this.setCaretOffset(caret);
     return true;
   },
 
