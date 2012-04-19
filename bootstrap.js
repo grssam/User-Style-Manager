@@ -280,6 +280,7 @@ function populateMenuPopupList(window, id, event) {
             listen(window, item, "click", function(event) {
               if (event.button == 2) {
                 event.target.parentNode.hidePopup();
+                event.preventDefault();
                 let args = [false, index, false, "", false];
                 Services.wm.getMostRecentWindow("navigator:browser")
                   .openDialog("chrome://userstylemanager/content/editor.xul",
@@ -357,6 +358,7 @@ function populateMenuPopupList(window, id, event) {
       listen(window, item, "click", function(event) {
         if (event.button == 2) {
           event.target.parentNode.hidePopup();
+          event.preventDefault();
           let args = [false, index, false, "", false];
           Services.wm.getMostRecentWindow("navigator:browser")
             .openDialog("chrome://userstylemanager/content/editor.xul",

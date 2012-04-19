@@ -45,6 +45,13 @@ function getFileURI(path) {
   Services.scriptloader.loadSubScript(fileURL, global);
 });
 
+// Namespace const
+const NAMESPACE = {
+  xul: 0,
+  xhtml: 1,
+  none: 2,
+};
+
 // constant list of css attributes
 const CSSKeywordsList = [
   "-moz-animation", "-moz-animation-delay", "-moz-animation-direction",
@@ -173,6 +180,7 @@ let styleEditor = {
   color: [],
   colorCaretOffset: -1,
   colorMatch: '',
+  namespace: null,
   sourceEditorEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "10.0") >= 0),
   editorFindEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "12.0") >= 0),
 
@@ -1886,7 +1894,7 @@ let styleEditor = {
         else
           text = "@namespace url(http://www.w3.org/1999/xhtml);\n" + text;
       }
-      else {
+      else if (this.namespace == null) {
         let flags = promptService.BUTTON_POS_0 * promptService.BUTTON_TITLE_IS_STRING
           + promptService.BUTTON_POS_1 * promptService.BUTTON_TITLE_IS_STRING
           + promptService.BUTTON_POS_2 * promptService.BUTTON_TITLE_IS_STRING;;
@@ -1896,11 +1904,15 @@ let styleEditor = {
         if (button == 0) {
           // Adding a xul namespace
           text = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n" + text;
+          this.namespace = NAMESPACE.xul;
         }
         else if (button == 1) {
           // Adding an xhtml namespace
           text = "@namespace url(http://www.w3.org/1999/xhtml);\n" + text;
+          this.namespace = NAMESPACE.xhtml;
         }
+        else
+          this.namespace = NAMESPACE.none;
       }
       this.setText(text);
       this.setCaretOffset(caret);
