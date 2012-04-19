@@ -1648,7 +1648,6 @@ StyleEditor.prototype = {
     // This is a syntax validator as of now.
     let text = this.getText();
     let origCaretPos = this.getCaretOffset();
-    let caret = 0;
     let error = false;
     let errorList = [];
     let warningList = [];
@@ -1915,10 +1914,14 @@ StyleEditor.prototype = {
       // checking if moz-url is there or not
       let mozDocURL = text.match(/[@]-moz-document[ ]+(url[\-prefix]{0,7}|domain|regexp)[ ]{0,}\(['"]?([^'"\)]+)['"]?\)[ ]/);
       if (mozDocURL != null) {
-        if (mozDocURL[2].search("chrome://") > -1)
+        if (mozDocURL[2].search("chrome://") > -1) {
           text = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n" + text;
-        else
+          origCaretPos += 88;
+        }
+        else {
           text = "@namespace url(http://www.w3.org/1999/xhtml);\n" + text;
+          origCaretPos += 46;
+        }
       }
       else if (this.namespace == null) {
         let flags = promptService.BUTTON_POS_0 * promptService.BUTTON_TITLE_IS_STRING
@@ -1931,17 +1934,19 @@ StyleEditor.prototype = {
           // Adding a xul namespace
           text = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n" + text;
           this.namespace = NAMESPACE.xul;
+          origCaretPos += ;
         }
         else if (button == 1) {
           // Adding an xhtml namespace
           text = "@namespace url(http://www.w3.org/1999/xhtml);\n" + text;
           this.namespace = NAMESPACE.xhtml;
+          origCaretPos += 46;
         }
         else
           this.namespace = NAMESPACE.none;
       }
       this.setText(text);
-      this.setCaretOffset(caret);
+      this.setCaretOffset(origCaretPos);
     }
     return true;
   },
