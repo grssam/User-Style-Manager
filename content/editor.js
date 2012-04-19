@@ -581,7 +581,7 @@ StyleEditor.prototype = {
         //colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation
         //,parentObj,parentXY,color,difPad,rSpeed,docBody,onColorSave,onColorChange)
         colorPicker(event, 'B', 3, false, null, null, null, panel, null, color,
-          null, null, panel, this.onColorPickerSave);
+          null, null, panel, this.onColorPickerSave.bind(this));
         let screen = this.getLocationAtOffset(currentPos - match[0].length);
         if (panel.state == "open")
           panel.moveTo(screen.x, screen.y + 15);
@@ -592,7 +592,7 @@ StyleEditor.prototype = {
           this.colorMatch = '';
           this.color = [];
           this.editor.focus();
-        });
+        }.bind(this));
       }
       else if ("(" == lastWord) {
         let textAfter = text.slice(currentPos);
@@ -866,7 +866,7 @@ StyleEditor.prototype = {
     if (match[1].search('hsl') > -1) // only rgb and hex values for now
       return;
     colorPicker(event, 'B', 3, false, null, null, null, panel, null, match[1].search('hsl') > -1? this.HSV2RGB(color): color,
-      null, null, panel, this.onColorPickerSave);
+      null, null, panel, this.onColorPickerSave.bind(this));
     if (panel.state == "open")
       panel.moveTo(event.screenX, event.screenY + 15);
     else
@@ -876,7 +876,7 @@ StyleEditor.prototype = {
       this.colorMatch = '';
       this.color = [];
       this.editor.focus();
-    });
+    }.bind(this));
   },
 
   HSV2RGB: function SE_HSV2RGB([x,y,z]) {
