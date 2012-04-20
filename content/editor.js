@@ -1934,7 +1934,7 @@ StyleEditor.prototype = {
           // Adding a xul namespace
           text = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n" + text;
           this.namespace = NAMESPACE.xul;
-          origCaretPos += ;
+          origCaretPos += 80;
         }
         else if (button == 1) {
           // Adding an xhtml namespace
