@@ -1070,7 +1070,7 @@ StyleEditor.prototype = {
       styleSheetList[this.index][0] = 'enabled';
       styleSheetList[this.index][2] = escape("tmpFile.css");
       loadStyleSheet(this.index);
-    });
+    }.bind(this));
   },
 
   /** Pass various options in the following format 
