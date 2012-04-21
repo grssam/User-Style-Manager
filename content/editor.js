@@ -1915,7 +1915,7 @@ StyleEditor.prototype = {
     if (text.search(/[@]namespace[ ]+url\([^\)]{1,}\)/) == -1 && this.namespace == null) {
       // checking if moz-url is there or not
       let mozDocURL = text.match(/[@]-moz-document[ ]+(url[\-prefix]{0,7}|domain|regexp)[ ]{0,}\(['"]?([^'"\)]+)['"]?\)[ ]/);
-      if (mozDocURL != null && mozDocURL[2].search("chrome://") = -1 && mozDocURL[2].search("about:") == -1) {
+      if (mozDocURL != null && mozDocURL[2].search("chrome://") == -1 && mozDocURL[2].search("about:") == -1) {
         text = "@namespace url(http://www.w3.org/1999/xhtml);\n" + text;
         origCaretPos += 46;
       }
