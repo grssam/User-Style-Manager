@@ -1015,10 +1015,12 @@ StyleEditor.prototype = {
   },
 
   exitButtonClick: function(aEvent) {
+    let caretOffset = this.getCaretOffset();
     let toClose = this.promptSave();
     // Cancel
     if (toClose == 1) {
       aEvent.preventDefault();
+      this.setCaretOffset(caretOffset);
       return;
     }
     // Save and exit
@@ -1910,20 +1912,14 @@ StyleEditor.prototype = {
       this.editor.focus();
 
     // No error found, now looking for url suffixes
-    if (text.search(/[@]namespace[ ]+url\([^\)]{1,}\)/) == -1) {
+    if (text.search(/[@]namespace[ ]+url\([^\)]{1,}\)/) == -1 && this.namespace == null) {
       // checking if moz-url is there or not
       let mozDocURL = text.match(/[@]-moz-document[ ]+(url[\-prefix]{0,7}|domain|regexp)[ ]{0,}\(['"]?([^'"\)]+)['"]?\)[ ]/);
-      if (mozDocURL != null) {
-        if (mozDocURL[2].search("chrome://") > -1) {
-          text = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n" + text;
-          origCaretPos += 88;
-        }
-        else {
-          text = "@namespace url(http://www.w3.org/1999/xhtml);\n" + text;
-          origCaretPos += 46;
-        }
+      if (mozDocURL != null && mozDocURL[2].search("chrome://") = -1 && mozDocURL[2].search("about:") == -1) {
+        text = "@namespace url(http://www.w3.org/1999/xhtml);\n" + text;
+        origCaretPos += 46;
       }
-      else if (this.namespace == null) {
+      else if (mozDocURL == null) {
         let flags = promptService.BUTTON_POS_0 * promptService.BUTTON_TITLE_IS_STRING
           + promptService.BUTTON_POS_1 * promptService.BUTTON_TITLE_IS_STRING
           + promptService.BUTTON_POS_2 * promptService.BUTTON_TITLE_IS_STRING;;
@@ -2028,9 +2024,11 @@ StyleEditor.prototype = {
   },
 
   onClose: function SE_onClose(aEvent) {
+    let caretOffset = this.getCaretOffset();
     let toClose = this.promptSave();
     if (toClose == 1) {
       aEvent.preventDefault();
+      this.setCaretOffset(caretOffset);
       return;
     }
     else {
