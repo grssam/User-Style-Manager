@@ -380,15 +380,35 @@ StyleEditor.prototype = {
   },
 
   preInputHelper: function SE_preInputHelper(event) {
+    if (event.keyCode != event.DOM_VK_DOWN && event.keyCode != event.DOM_VK_UP)
+      return;
+    let [start, end] = this.getSelectionPoints();
+    let text = this.getText();
     switch (event.keyCode) {
       case event.DOM_VK_DOWN:
         // move to end of line if at last line
-        let text = this.getText();
-        let offset = this.getCaretOffset();
-        if (text.slice(offset).indexOf("\n") == -1)
-          this.setCaretOffset(text.length);
-
+        if (text.slice(end).indexOf("\n") == -1) {
+          if (end > start && event.shiftKey && start > -1)
+            this.selectRange(start, text.length);
+          else if (event.shiftKey)
+            this.selectRange(end, text.length);
+          else
+            this.setCaretOffset(text.length);
+        }
+        if (this.$("USMColorPickerPanel").state == "open") {
+          this.$("USMColorPickerPanel").hidePopup();
+          return;
+        }
+        break;
       case event.DOM_VK_UP:
+        if (text.slice(0, start).indexOf("\n") == -1) {
+          if (end > start && event.shiftKey && start > -1)
+            this.selectRange(end, 0);
+          else if (event.shiftKey)
+            this.selectRange(start, 0);
+          else
+            this.setCaretOffset(0);
+        }
         if (this.$("USMColorPickerPanel").state == "open") {
           this.$("USMColorPickerPanel").hidePopup();
           return;
@@ -422,7 +442,6 @@ StyleEditor.prototype = {
             this.$("USMAutocompleteList").selectedIndex--;
           }
           this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
-          return;
         }
         return;
       case event.DOM_VK_DOWN:
@@ -434,8 +453,8 @@ StyleEditor.prototype = {
             this.$("USMAutocompleteList").selectedIndex++;
           }
           this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
-          return;
         }
+        return;
       case event.DOM_VK_LEFT:
       case event.DOM_VK_RIGHT:
       case event.DOM_VK_HOME:
@@ -1011,7 +1030,7 @@ StyleEditor.prototype = {
       // Close the editor on save if add a new file
       else if (this.openNew)
         this.exitButtonClick(aEvent);
-    });
+    }.bind(this));
   },
 
   exitButtonClick: function(aEvent) {
