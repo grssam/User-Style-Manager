@@ -426,6 +426,79 @@ function toggleStyleSheet(index, oldVal, newVal) {
   writeJSONPref();
 }
 
+function getCodeForStyle(styleId, callback) {
+  let xmlQuery = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
+  xmlQuery.open('GET', 'http://userstyles.org/styles/' + styleId + '.css', true);
+  xmlQuery.onreadystatechange = function(event) {
+		if (xmlQuery.readyState == 4) {
+			if (xmlQuery.status == 200) {
+				callback(xmlQuery.responseText);
+        callback = null;
+      }
+    }
+  };
+  xmlQuery.send(null);
+}
+
+function compareStyleVersion(installedIndex, styleId, callback) {
+  getCodeForStyle(styleId, function(code) {
+    let fileURI = getFileURI(unescape(styleSheetList[installedIndex][2]));
+    let styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
+    NetUtil.asyncFetch(styleSheetFile, function(inputStream, status) {
+      if (!Components.isSuccessCode(status))
+        return;
+      let data = "";
+      try {
+        data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+      } catch (ex) {
+        return;
+      }
+      if (data != code)
+        callback();
+      callback = null;
+    });
+  });
+}
+
+function checkAndDisplayProperOption(contentWindow, url) {
+  function $(id) contentWindow.document.getElementById(id);
+  function hideAllButtons() {
+    $("stylish-installed-style-installed").style.display = "none";
+    $("stylish-installed-style-not-installed").style.display = "none";
+    $("style-install-mozilla-no-stylish").style.display = "none";
+    $("stylish-installed-style-needs-update").style.display = "none";
+  }
+  let currentStyleId = parseInt(url.match(/org\/styles\/([0-9]*)\//i)[1]);
+  let installedID = -1;
+  for (let i = 0; i < styleSheetList.length; i++) {
+    let styleId;
+    if (styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)) {
+      styleId = parseInt(styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)[1]);
+      if (styleId == currentStyleId) {
+        hideAllButtons();
+        $("stylish-installed-style-installed").style.display = "";
+        installedID = i;
+        break;
+      }
+    }
+  }
+  if (installedID == -1) {
+    hideAllButtons();
+    let installStyleButton = $("stylish-installed-style-not-installed");
+    installStyleButton.innerHTML = installStyleButton.innerHTML.replace("Stylish", "User Styles Manager");
+    installStyleButton.style.display = "";
+  }
+  else {
+    compareStyleVersion(installedID, currentStyleId, function() {
+      hideAllButtons();
+      let updateInstallButton = $("stylish-installed-style-needs-update");
+      updateInstallButton.style.display = "";
+      updateInstallButton.innerHTML = updateInstallButton.innerHTML.replace("Stylish", "User Styles Manager");
+    });
+  }
+  contentWindow = null;
+}
+
 function getFileURI(path) {
   return path.indexOf("file") == 0? ios.newURI(path, null, null):
     getURIForFileInUserStyles(path.replace(/^(styles\/)/, ""));

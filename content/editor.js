@@ -208,6 +208,8 @@ StyleEditor.prototype = {
   openNew: false,
   styleSheetFile: null,
   index: -1,
+  styleName: "",
+  updateURL: "",
   previewShown: false,
   origPath: "",
   origEnabled: "",
@@ -968,7 +970,8 @@ StyleEditor.prototype = {
     if (!this.createNew && !this.openNew)
       unloadStyleSheet(this.index);
     if (this.createNew) {
-      styleSheetList[this.index][1] = escape(this.doc.getElementById("USMFileNameBox").value);
+      if (this.styleName.length == 0)
+        styleSheetList[this.index][1] = escape(this.doc.getElementById("USMFileNameBox").value);
       styleSheetList[this.index][2] = escape(this.doc.getElementById("USMFileNameBox")
         .value.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css");
       if (unescape(styleSheetList[this.index][2]) == ".css")
@@ -1102,7 +1105,9 @@ StyleEditor.prototype = {
    **   createNew, // bool , true if creating a new file.CANNOT be true if above true
    **   path, // string containing the path of the new file to open when openNew true
    **         // or when createNew, the initialText to be displayed in the editor window
-   **   callback // bool to tell whther to callback to open options window or not
+   **   callback, // bool to tell whther to callback to open options window or not
+   **   styleName, // New in version 0.9, name of style
+   **   updateURL  // New in version 0.9 , the update url of the style
    ** ]
    **/
   onLoad: function SE_onLoad(aEvent) {
@@ -1166,6 +1171,10 @@ StyleEditor.prototype = {
               .openDialog("chrome://userstylemanager/content/options.xul",
               "User Style Manager Options", "chrome,resizable,centerscreen");
         };
+      if (args[5] && this.styleName.length == 0)
+        this.styleName = escape(args[5]);
+      if (args[6])
+        this.updateURL = args[6];
     }
 
     if (this.sourceEditorEnabled)
@@ -1195,9 +1204,11 @@ StyleEditor.prototype = {
     readJSONPref(function() {
       if (this.createNew) {
         this.index = styleSheetList.length;
-        styleSheetList.push(['enabled', "User Created Style Sheet "
-          + this.index, escape("userCreatedStyleSheet" + this.index + ".css"), ""
-          , "", JSON.stringify(new Date()), ""]);
+        styleSheetList.push(['enabled', (this.styleName.length > 0?
+          this.styleName: "User Created Style Sheet " + this.index),
+          (this.styleName.length > 0? this.styleName + ".css":
+          escape("User Created Style Sheet " + this.index + ".css")), this.updateURL,
+          "", JSON.stringify(new Date()), ""]);
       }
       else if (this.openNew) {
         this.index = styleSheetList.length;
@@ -1237,7 +1248,6 @@ StyleEditor.prototype = {
     this.$("USMTextEditor").firstChild.addEventListener("keydown", this.preInputHelper, true);
 
     if (!this.createNew) {
-      this.setCaretOffset(0);
       if (this.styleName && !this.saved)
         this.onTextChanged();
       else if (this.styleName && this.saved)
@@ -1257,8 +1267,8 @@ StyleEditor.prototype = {
     }
     this.$("USMFileNameBox").value = unescape(styleSheetList[this.index][2].match(/[\\\/]?([^\\\/]{0,})\.css$/)[1]);
     this.$("USMButtonSave").onclick = this.saveButtonClick;
-    if (this.openNew)
-      this.$("USMButtonSave").label = "Add";
+    if (this.openNew || this.createNew)
+      this.$("USMButtonSave").label = this.STR("addLabel");
     this.$("USMButtonPreview").onclick = this.previewButtonClick;
     this.$("USMButtonExit").onclick = this.exitButtonClick;
     // Assigning the mouse move and mouse click handler
@@ -1267,6 +1277,7 @@ StyleEditor.prototype = {
       this.$("USMTextEditor").firstChild.addEventListener("click", this.onMouseClick);
       this.$("USMTextEditor").firstChild.addEventListener("dblclick", this.onDblClick);
     }
+    this.setCaretOffset(0);
   },
 
   getCaretOffset: function SE_getCaretOffset() {

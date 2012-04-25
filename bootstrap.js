@@ -552,6 +552,79 @@ function openOptions(window) {
     "User Style Manager Options","chrome,resizable,centerscreen").focus();
 }
 
+function addUserStyleHandler(window) {
+  function addToUSM(CSSText, name, url) {
+    let args = [false, styleSheetList.length, true, CSSText, false, name, url];
+    let editor = window.openDialog("chrome://userstylemanager/content/editor.xul",
+      "User Style Manager - Editor","chrome,resizable,height=600,width=800,top="
+      + (window.screen.height/2 - 300) + ",left="
+      + (window.screen.width/2 - 400), args);
+    editor.focus();
+    editor.onbeforeunload = function() {
+      if (window.gBrowser.selectedBrowser.currentURI.spec == url)
+        window.gBrowser.contentWindow.location.reload();
+    };
+  }
+  let installStylefromSite = function(event) {
+    let document = event.target;
+    let url = document.location.href;
+    let links = document.getElementsByTagName("link");
+    let name = null;
+    let code = null;
+    for (let i = 0; i < links.length; i++)
+      switch (links[i].rel) {
+        case "stylish-code":
+          let (id = links[i].getAttribute("href").replace("#", "")) {
+            let element = document.getElementById(id);
+            if (element)
+              code = element.textContent;
+          }
+          break;
+        case "stylish-description":
+          let (id = links[i].getAttribute("href").replace("#", "")) {
+            let element = document.getElementById(id);
+            if (element)
+              name = element.textContent;
+          }
+          break;
+      }
+    if (code == null) {
+      let styleId = url.match(/style\/([0-9]*)\//i)[1];
+      getCodeForStyle(styleId, function(code) {
+        addToUSM(code, name, url);
+      });
+    }
+    else
+      addToUSM(code, name, url);
+  };
+
+  let changeListener = {
+    handleInstall: function(event) {
+      installStylefromSite(event);
+    },
+    onLocationChange: function(aProgress, aRequest, aURI) {
+      let url = aURI.spec;
+      if (url.match(/^https?:\/\/(www.)?userstyles.org\/style/i)) {
+        let stylePage = window.gBrowser.contentDocument,
+          styleWindow = window.gBrowser.contentWindow;
+        listen(styleWindow, stylePage, "stylishInstall", changeListener.handleInstall);
+        if (stylePage.readyState != "complete")
+          styleWindow.addEventListener("load", function onLoad() {
+            styleWindow.removeEventListener("load", onLoad, true);
+            if (window.gBrowser.selectedBrowser.currentURI.spec == url)
+              checkAndDisplayProperOption(styleWindow, url);
+          });
+        else
+          checkAndDisplayProperOption(styleWindow, url);
+      }
+    }
+  };
+  window.gBrowser.addProgressListener(changeListener);
+  unload(function() {
+    window.gBrowser.removeProgressListener(changeListener);
+  }, window);
+}
+
 function disable(id) {
   AddonManager.getAddonByID(id, function(addon) {
     addon.userDisabled = true;
@@ -584,6 +657,7 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
 
     watchWindows(handleCustomization);
     watchWindows(addContextMenuEntry);
+    watchWindows(addUserStyleHandler);
     pref.observe(["createAppMenuButton", "createToolsMenuButton"], function() {
       watchWindows(addMenuItem);
     });
