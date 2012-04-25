@@ -590,7 +590,7 @@ function addUserStyleHandler(window) {
       }
     let options = getOptions(document.parentWindow, true);
     if (code == null) {
-      let styleId = url.match(/style\/([0-9]*)\//i)[1];
+      let styleId = url.match(/styles\/([0-9]*)\//i)[1];
       getCodeForStyle(styleId, options, function(code) {
         addToUSM(code, name, url, options);
       });
@@ -605,7 +605,7 @@ function addUserStyleHandler(window) {
     },
     onLocationChange: function(aProgress, aRequest, aURI) {
       let url = aURI.spec;
-      if (url.match(/^https?:\/\/(www.)?userstyles.org\/style\/[0-9]*/i)) {
+      if (url.match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
         let stylePage = window.gBrowser.contentDocument,
           styleWindow = window.gBrowser.contentWindow;
         listen(styleWindow, stylePage, "stylishInstall", changeListener.handleInstall);
