@@ -553,8 +553,8 @@ function openOptions(window) {
 }
 
 function addUserStyleHandler(window) {
-  function addToUSM(CSSText, name, url) {
-    let args = [false, styleSheetList.length, true, CSSText, false, name, url];
+  function addToUSM(CSSText, name, url, options) {
+    let args = [false, styleSheetList.length, true, CSSText, false, name, url, options];
     let editor = window.openDialog("chrome://userstylemanager/content/editor.xul",
       "User Style Manager - Editor","chrome,resizable,height=600,width=800,top="
       + (window.screen.height/2 - 300) + ",left="
@@ -588,14 +588,15 @@ function addUserStyleHandler(window) {
           }
           break;
       }
+    let options = getOptions(document.parentWindow, true);
     if (code == null) {
       let styleId = url.match(/style\/([0-9]*)\//i)[1];
-      getCodeForStyle(styleId, function(code) {
-        addToUSM(code, name, url);
+      getCodeForStyle(styleId, options, function(code) {
+        addToUSM(code, name, url, options);
       });
     }
     else
-      addToUSM(code, name, url);
+      addToUSM(code, name, url, options);
   };
 
   let changeListener = {
@@ -604,7 +605,7 @@ function addUserStyleHandler(window) {
     },
     onLocationChange: function(aProgress, aRequest, aURI) {
       let url = aURI.spec;
-      if (url.match(/^https?:\/\/(www.)?userstyles.org\/style/i)) {
+      if (url.match(/^https?:\/\/(www.)?userstyles.org\/style\/[0-9]*/i)) {
         let stylePage = window.gBrowser.contentDocument,
           styleWindow = window.gBrowser.contentWindow;
         listen(styleWindow, stylePage, "stylishInstall", changeListener.handleInstall);

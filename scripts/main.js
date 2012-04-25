@@ -426,13 +426,15 @@ function toggleStyleSheet(index, oldVal, newVal) {
   writeJSONPref();
 }
 
-function getCodeForStyle(styleId, callback) {
+function getCodeForStyle(styleId, options, callback) {
+  if (options == null)
+    return;
   let xmlQuery = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
-  xmlQuery.open('GET', 'http://userstyles.org/styles/' + styleId + '.css', true);
+  xmlQuery.open('GET', 'http://userstyles.org/styles/' + styleId + '.css' + (options == "" ? "" : "?" + options), true);
   xmlQuery.onreadystatechange = function(event) {
-		if (xmlQuery.readyState == 4) {
-			if (xmlQuery.status == 200) {
-				callback(xmlQuery.responseText);
+    if (xmlQuery.readyState == 4) {
+      if (xmlQuery.status == 200) {
+        callback(xmlQuery.responseText);
         callback = null;
       }
     }
@@ -440,23 +442,51 @@ function getCodeForStyle(styleId, callback) {
   xmlQuery.send(null);
 }
 
+function getOptions(contentWindow, promptOnIncomplete) {
+  let styleOptions = contentWindow.document.getElementById("style-options");
+  if (!styleOptions)
+    return "";
+  let selects = styleOptions.getElementsByTagName("select");
+  let params = [];
+  for (let i = 0; i < selects.length; i++)
+    params.push(selects[i].name + "=" + selects[i].value);
+
+  let missingSettings = [];
+  let inputs = styleOptions.getElementsByTagName("input");
+
+  for (let i = 0; i < inputs.length; i++)
+    if (inputs[i].value == "")
+      missingSettings.push(inputs[i]);
+    else
+      params.push(inputs[i].name + "=" + encodeURIComponent(inputs[i].value));
+
+  if (missingSettings.length > 0) {
+    if (promptOnIncomplete)
+      contentWindow.alert("Choose a value for every setting first.");
+    return null;
+  }
+
+  return params.join("&");
+}
+
 function compareStyleVersion(installedIndex, styleId, callback) {
-  getCodeForStyle(styleId, function(code) {
-    let fileURI = getFileURI(unescape(styleSheetList[installedIndex][2]));
-    let styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
-    NetUtil.asyncFetch(styleSheetFile, function(inputStream, status) {
-      if (!Components.isSuccessCode(status))
-        return;
-      let data = "";
-      try {
-        data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-      } catch (ex) {
-        return;
-      }
-      if (data != code)
-        callback();
-      callback = null;
-    });
+  getCodeForStyle(styleId, styleSheetList[installedIndex].length > 7?
+      styleSheetList[installedIndex][7]: "", function(code) {
+        let fileURI = getFileURI(unescape(styleSheetList[installedIndex][2]));
+        let styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
+        NetUtil.asyncFetch(styleSheetFile, function(inputStream, status) {
+          if (!Components.isSuccessCode(status))
+            return;
+          let data = "";
+          try {
+            data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+          } catch (ex) {
+            return;
+          }
+          if (data != code)
+            callback();
+          callback = null;
+        });
   });
 }
 
@@ -468,7 +498,11 @@ function checkAndDisplayProperOption(contentWindow, url) {
     $("style-install-mozilla-no-stylish").style.display = "none";
     $("stylish-installed-style-needs-update").style.display = "none";
   }
-  let currentStyleId = parseInt(url.match(/org\/styles\/([0-9]*)\//i)[1]);
+  let currentStyleId = url.match(/styles\/([0-9]*)/i);
+  if (!currentStyleId) {
+    currentStyleId = currentStyleId[1];
+    parseInt(currentStyleId);
+  }
   let installedID = -1;
   for (let i = 0; i < styleSheetList.length; i++) {
     let styleId;

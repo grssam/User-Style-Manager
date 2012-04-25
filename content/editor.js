@@ -210,6 +210,7 @@ StyleEditor.prototype = {
   index: -1,
   styleName: "",
   updateURL: "",
+  options: "",
   previewShown: false,
   origPath: "",
   origEnabled: "",
@@ -969,6 +970,8 @@ StyleEditor.prototype = {
       return;
     if (!this.createNew && !this.openNew)
       unloadStyleSheet(this.index);
+    if (this.options)
+      styleSheetList[this.index][7] = this.options;
     if (this.createNew) {
       if (this.styleName.length == 0)
         styleSheetList[this.index][1] = escape(this.doc.getElementById("USMFileNameBox").value);
@@ -1175,6 +1178,8 @@ StyleEditor.prototype = {
         this.styleName = escape(args[5]);
       if (args[6])
         this.updateURL = args[6];
+      if (args[7])
+        this.options = args[7];
     }
 
     if (this.sourceEditorEnabled)
