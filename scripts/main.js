@@ -450,7 +450,6 @@ function getOptions(contentWindow, promptOnIncomplete) {
   let params = [];
   for (let i = 0; i < selects.length; i++)
     params.push(selects[i].name + "=" + selects[i].value);
-
   let missingSettings = [];
   let inputs = styleOptions.getElementsByTagName("input");
 
@@ -459,34 +458,32 @@ function getOptions(contentWindow, promptOnIncomplete) {
       missingSettings.push(inputs[i]);
     else
       params.push(inputs[i].name + "=" + encodeURIComponent(inputs[i].value));
-
   if (missingSettings.length > 0) {
     if (promptOnIncomplete)
       contentWindow.alert("Choose a value for every setting first.");
     return null;
   }
-
   return params.join("&");
 }
 
 function compareStyleVersion(installedIndex, styleId, callback) {
-  getCodeForStyle(styleId, styleSheetList[installedIndex].length > 7?
-      styleSheetList[installedIndex][7]: "", function(code) {
-        let fileURI = getFileURI(unescape(styleSheetList[installedIndex][2]));
-        let styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
-        NetUtil.asyncFetch(styleSheetFile, function(inputStream, status) {
-          if (!Components.isSuccessCode(status))
-            return;
-          let data = "";
-          try {
-            data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-          } catch (ex) {
-            return;
-          }
-          if (data != code)
-            callback();
-          callback = null;
-        });
+  getCodeForStyle(styleId, (styleSheetList[installedIndex].length > 7?
+    styleSheetList[installedIndex][7]: ""), function(code) {
+      let fileURI = getFileURI(unescape(styleSheetList[installedIndex][2]));
+      let styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
+      NetUtil.asyncFetch(styleSheetFile, function(inputStream, status) {
+        if (!Components.isSuccessCode(status))
+          return;
+        let data = "";
+        try {
+          data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+        } catch (ex) {
+          return;
+        }
+        if (data != code)
+          callback();
+        callback = null;
+      });
   });
 }
 
@@ -498,10 +495,11 @@ function checkAndDisplayProperOption(contentWindow, url) {
     $("style-install-mozilla-no-stylish").style.display = "none";
     $("stylish-installed-style-needs-update").style.display = "none";
   }
-  let currentStyleId = url.match(/styles\/([0-9]*)/i);
-  if (!currentStyleId) {
+
+  let currentStyleId = url.match(/org\/styles\/([0-9]*)\//i);
+  if (currentStyleId) {
     currentStyleId = currentStyleId[1];
-    parseInt(currentStyleId);
+    currentStyleId = parseInt(currentStyleId);
   }
   let installedID = -1;
   for (let i = 0; i < styleSheetList.length; i++) {
@@ -516,6 +514,7 @@ function checkAndDisplayProperOption(contentWindow, url) {
       }
     }
   }
+
   if (installedID == -1) {
     hideAllButtons();
     let installStyleButton = $("stylish-installed-style-not-installed");

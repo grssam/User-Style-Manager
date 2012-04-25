@@ -588,7 +588,7 @@ function addUserStyleHandler(window) {
           }
           break;
       }
-    let options = getOptions(document.parentWindow, true);
+    let options = getOptions(document.defaultView, true);
     if (code == null) {
       let styleId = url.match(/styles\/([0-9]*)\//i)[1];
       getCodeForStyle(styleId, options, function(code) {
