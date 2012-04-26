@@ -480,8 +480,8 @@ function compareStyleVersion(installedIndex, styleId, callback) {
         } catch (ex) {
           return;
         }
-        if (data != code)
-          callback();
+        if (callback)
+          callback(data != code);
         callback = null;
       });
   });
@@ -507,8 +507,10 @@ function checkAndDisplayProperOption(contentWindow, url) {
     if (styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)) {
       styleId = parseInt(styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)[1]);
       if (styleId == currentStyleId) {
-        hideAllButtons();
-        $("stylish-installed-style-installed").style.display = "";
+        if ($("stylish-installed-style-needs-update").innerHTML.search(/user styles manager/i) < 0) {
+          hideAllButtons();
+          $("stylish-installed-style-installed").style.display = "";
+        }
         installedID = i;
         break;
       }
@@ -522,14 +524,24 @@ function checkAndDisplayProperOption(contentWindow, url) {
     installStyleButton.style.display = "";
   }
   else {
-    compareStyleVersion(installedID, currentStyleId, function() {
-      hideAllButtons();
-      let updateInstallButton = $("stylish-installed-style-needs-update");
-      updateInstallButton.style.display = "";
-      updateInstallButton.innerHTML = updateInstallButton.innerHTML.replace("Stylish", "User Styles Manager");
+    compareStyleVersion(installedID, currentStyleId, function(needsUpdate) {
+      if (needsUpdate && $("stylish-installed-style-needs-update").style.display != "none" &&
+        $("stylish-installed-style-needs-update").innerHTML.search(/user style manager/i) > 0) {
+          $("stylish-installed-style-installed").style.display = "none";
+          return;
+      }
+      else if (needsUpdate) {
+        hideAllButtons();
+        let updateInstallButton = $("stylish-installed-style-needs-update");
+        updateInstallButton.style.display = "";
+        updateInstallButton.innerHTML = updateInstallButton.innerHTML.replace("Stylish", "User Styles Manager");
+      }
+      else {
+        hideAllButtons();
+        $("stylish-installed-style-installed").style.display = "";
+      }
     });
   }
-  contentWindow = null;
 }
 
 function getFileURI(path) {

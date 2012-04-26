@@ -565,7 +565,37 @@ function addUserStyleHandler(window) {
         window.gBrowser.contentWindow.location.reload();
     };
   }
-  let installStylefromSite = function(event) {
+  function updateInUSM(aStyleId, CSSText, name, url, options, aCallback) {
+    for (let i = 0; i < styleSheetList.length; i++) {
+      let styleId;
+      if (styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)) {
+        styleId = parseInt(styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)[1]);
+        if (styleId == aStyleId) {
+          unloadStyleSheet(i);
+          let ostream = FileUtils.openSafeFileOutputStream(
+            getFileURI(unescape(styleSheetList[i][2])).QueryInterface(Ci.nsIFileURL).file);
+          let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+            .createInstance(Ci.nsIScriptableUnicodeConverter);
+          converter.charset = "UTF-8";
+          let istream = converter.convertToInputStream(CSSText);
+          NetUtil.asyncCopy(istream, ostream, function(status) {
+            loadStyleSheet(i);
+            if (!Components.isSuccessCode(status))
+              return;
+            styleSheetList[i][1] = name;
+            styleSheetList[i][3] = url;
+            styleSheetList[i][6] = JSON.stringify(new Date());
+            styleSheetList[i][7] = options;
+            writeJSONPref();
+            if (aCallback)
+              aCallback();
+          });
+          return
+        }
+      }
+    }
+  }
+  function installStyleFromSite(event) {
     let document = event.target;
     let url = document.location.href;
     let links = document.getElementsByTagName("link");
@@ -597,11 +627,48 @@ function addUserStyleHandler(window) {
     }
     else
       addToUSM(code, name, url, options);
-  };
+  }
+
+  function updateStyleFromSite(event) {
+    let document = event.target;
+    let url = document.location.href;
+    let links = document.getElementsByTagName("link");
+    let name = null;
+    let code = null;
+    for (let i = 0; i < links.length; i++)
+      switch (links[i].rel) {
+        case "stylish-code":
+          let (id = links[i].getAttribute("href").replace("#", "")) {
+            let element = document.getElementById(id);
+            if (element)
+              code = element.textContent;
+          }
+          break;
+        case "stylish-description":
+          let (id = links[i].getAttribute("href").replace("#", "")) {
+            let element = document.getElementById(id);
+            if (element)
+              name = element.textContent;
+          }
+          break;
+      }
+
+    let options = getOptions(document.defaultView, true);
+    let styleId = url.match(/styles\/([0-9]*)\//i)[1];
+    if (code == null)
+      getCodeForStyle(styleId, options, function(code) {
+        updateInUSM(styleId, code, name, url, options, document.location.reload);
+      });
+    else
+      updateInUSM(styleId, code, name, url, options, document.location.reload);
+  }
 
   let changeListener = {
     handleInstall: function(event) {
-      installStylefromSite(event);
+      installStyleFromSite(event);
+    },
+    handleUpdate: function(event) {
+      updateStyleFromSite(event);
     },
     onLocationChange: function(aProgress, aRequest, aURI) {
       let url = aURI.spec;
@@ -609,6 +676,7 @@ function addUserStyleHandler(window) {
         let stylePage = window.gBrowser.contentDocument,
           styleWindow = window.gBrowser.contentWindow;
         listen(styleWindow, stylePage, "stylishInstall", changeListener.handleInstall);
+        listen(styleWindow, stylePage, "stylishUpdate", changeListener.handleUpdate);
         if (stylePage.readyState != "complete")
           styleWindow.addEventListener("load", function onLoad() {
             styleWindow.removeEventListener("load", onLoad, true);
