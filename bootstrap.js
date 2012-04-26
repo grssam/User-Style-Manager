@@ -565,36 +565,6 @@ function addUserStyleHandler(window) {
         window.gBrowser.contentWindow.location.reload();
     };
   }
-  function updateInUSM(aStyleId, CSSText, name, url, options, aCallback) {
-    for (let i = 0; i < styleSheetList.length; i++) {
-      let styleId;
-      if (styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)) {
-        styleId = parseInt(styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)[1]);
-        if (styleId == aStyleId) {
-          unloadStyleSheet(i);
-          let ostream = FileUtils.openSafeFileOutputStream(
-            getFileURI(unescape(styleSheetList[i][2])).QueryInterface(Ci.nsIFileURL).file);
-          let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-            .createInstance(Ci.nsIScriptableUnicodeConverter);
-          converter.charset = "UTF-8";
-          let istream = converter.convertToInputStream(CSSText);
-          NetUtil.asyncCopy(istream, ostream, function(status) {
-            loadStyleSheet(i);
-            if (!Components.isSuccessCode(status))
-              return;
-            styleSheetList[i][1] = name;
-            styleSheetList[i][3] = url;
-            styleSheetList[i][6] = JSON.stringify(new Date());
-            styleSheetList[i][7] = options;
-            writeJSONPref();
-            if (aCallback)
-              aCallback();
-          });
-          return
-        }
-      }
-    }
-  }
   function installStyleFromSite(event) {
     let document = event.target;
     let url = document.location.href;

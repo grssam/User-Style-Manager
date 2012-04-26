@@ -90,9 +90,9 @@
           <treechildren id="styleSheetList" flex="1"/>
         </tree>
         <hbox style="margin:5px;">
-          <button id="updateStyleSheet" label="&updateBtn.label;" disabled="true"
+          <button id="updateStyleSheet" label="&updateBtn.label;" onclick="optionsWindow.updateStyle();"
             accesskey="&updateBtn.accesskey;" tooltiptext="&updateBtn.tooltip;"/>
-          <button id="updateAllStyleSheet" label="&updateAllBtn.label;" disabled="true"
+          <button id="updateAllStyleSheet" label="&updateAllBtn.label;" onclick="optionsWindow.updateAllStyle();"
             accesskey="&updateAllBtn.accesskey;" tooltiptext="&updateAllBtn.tooltip;"/>
           <spacer flex="1"/>
           <button id="moreInfo" label="&infoBtn.label;" onclick="optionsWindow.showMoreInfo();"

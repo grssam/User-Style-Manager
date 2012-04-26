@@ -466,9 +466,8 @@ function getOptions(contentWindow, promptOnIncomplete) {
   return params.join("&");
 }
 
-function compareStyleVersion(installedIndex, styleId, callback) {
-  getCodeForStyle(styleId, (styleSheetList[installedIndex].length > 7?
-    styleSheetList[installedIndex][7]: ""), function(code) {
+function compareStyleVersion(installedIndex, styleId, code, callback) {
+  function updateNow(code) {
       let fileURI = getFileURI(unescape(styleSheetList[installedIndex][2]));
       let styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
       NetUtil.asyncFetch(styleSheetFile, function(inputStream, status) {
@@ -484,7 +483,64 @@ function compareStyleVersion(installedIndex, styleId, callback) {
           callback(data != code);
         callback = null;
       });
-  });
+  }
+  if (code == null)
+    getCodeForStyle(styleId, (styleSheetList[installedIndex].length > 7?
+      styleSheetList[installedIndex][7]: ""), updateNow);
+  else
+    updateNow(code);
+}
+
+function updateInUSM(aStyleId, CSSText, name, url, options, aCallback) {
+  for (let i = 0; i < styleSheetList.length; i++) {
+    let styleId;
+    if (styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)) {
+      styleId = parseInt(styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)[1]);
+      if (styleId == aStyleId) {
+        unloadStyleSheet(i);
+        let ostream = FileUtils.openSafeFileOutputStream(
+          getFileURI(unescape(styleSheetList[i][2])).QueryInterface(Ci.nsIFileURL).file);
+        let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+          .createInstance(Ci.nsIScriptableUnicodeConverter);
+        converter.charset = "UTF-8";
+        let istream = converter.convertToInputStream(CSSText);
+        NetUtil.asyncCopy(istream, ostream, function(status) {
+          loadStyleSheet(i);
+          if (!Components.isSuccessCode(status))
+            return;
+          styleSheetList[i][1] = name;
+          styleSheetList[i][3] = url;
+          styleSheetList[i][6] = JSON.stringify(new Date());
+          styleSheetList[i][7] = options;
+          writeJSONPref();
+          if (aCallback)
+            aCallback();
+        });
+        return
+      }
+    }
+  }
+}
+
+function updateStyle(index, callback) {
+  if (styleSheetList[index][3].match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
+    let styleId = styleSheetList[index][3].match(/styles\/([0-9]*)\//i)[1];
+    getCodeForStyle(styleId, styleSheetList[index][7], function(code) {
+      compareStyleVersion(index, styleId, code, function(needsUpdate) {
+        if (needsUpdate)
+          updateInUSM(styleId, code, styleSheetList[index][1],
+            styleSheetList[index][3], styleSheetList[index][7], callback);
+        else {
+          Services.prompt.confirm(null, "", escape(styleSheetList[index][1]) +
+            " does not needs update");
+          if (callback)
+            callback();
+        }
+      });
+    });
+  }
+  else if (callback)
+    callback();
 }
 
 function checkAndDisplayProperOption(contentWindow, url) {
@@ -524,7 +580,7 @@ function checkAndDisplayProperOption(contentWindow, url) {
     installStyleButton.style.display = "";
   }
   else {
-    compareStyleVersion(installedID, currentStyleId, function(needsUpdate) {
+    compareStyleVersion(installedID, currentStyleId, null, function(needsUpdate) {
       if (needsUpdate && $("stylish-installed-style-needs-update").style.display != "none" &&
         $("stylish-installed-style-needs-update").innerHTML.search(/user style manager/i) > 0) {
           $("stylish-installed-style-installed").style.display = "none";

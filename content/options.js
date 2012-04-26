@@ -248,8 +248,9 @@ let optionsWindow = {
     this.initialized = true;
     readJSONPref(function() {
       optionsWindow.populateStyles();
-      $("moreInfo").disabled = $("editStyleSheet").disabled = $("deleteStyleSheet").disabled
-        = optionsWindow.tree.view.selection.getRangeCount() == 0;
+      $("updateStyleSheet").disabled = $("moreInfo").disabled =
+        $("editStyleSheet").disabled = $("deleteStyleSheet").disabled =
+        optionsWindow.tree.view.selection.getRangeCount() == 0;
     });
     listen(window, window, "focus", function() {
       if (!pref("hideOptionsWhileEditing") && optionsWindow.editorOpened) {
@@ -391,6 +392,31 @@ let optionsWindow = {
     }
   },
 
+  updateStyle: function OW_updateStyle() {
+    let numRanges = this.tree.view.selection.getRangeCount();
+    if (numRanges < 1)
+      return;
+    let start = new Object();
+    let end = new Object();
+    for (let t = 0; t < numRanges; t++){
+      this.tree.view.selection.getRangeAt(t, start, end);
+      for (let i = start.value; i <= end.value; i++) {
+        let index = this.treeView.list[i][7];
+        updateStyle(index);
+      }
+    }
+  },
+
+  updateAllStyle: function OW_updateAllStyle(index) {
+    if (index == null)
+      index = 0;
+    else if (index == styleSheetList.length)
+      return;
+    updateStyle(index, function() {
+      this.updateAllStyle(index + 1);
+    }.bind(this));
+  },
+
   onTreeKeypress: function OW_onTreeKeypress(event) {
     switch(event.keyCode) {
       case event.DOM_VK_DELETE:
@@ -409,8 +435,8 @@ let optionsWindow = {
     try {
       disabled = optionsWindow.tree.view.selection.getRangeCount() == 0;
     } catch (ex) {}
-    $("moreInfo").disabled = $("editStyleSheet").disabled
-      = $("deleteStyleSheet").disabled = disabled;
+    $("updateStyleSheet").disabled = $("moreInfo").disabled =
+      $("editStyleSheet").disabled = $("deleteStyleSheet").disabled = disabled;
   },
 
   showMoreInfo: function OW_showMoreInfo() {
