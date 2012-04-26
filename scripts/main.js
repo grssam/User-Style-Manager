@@ -531,7 +531,7 @@ function updateStyle(index, callback) {
           updateInUSM(styleId, code, styleSheetList[index][1],
             styleSheetList[index][3], styleSheetList[index][7], callback);
         else {
-          Services.prompt.confirm(null, "", escape(styleSheetList[index][1]) +
+          Services.prompt.confirm(null, "", unescape(styleSheetList[index][1]) +
             " does not needs update");
           if (callback)
             callback();
