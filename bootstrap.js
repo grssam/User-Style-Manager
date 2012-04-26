@@ -220,6 +220,37 @@ function populateMenuPopupList(window, id, event) {
       }
       menupop.appendChild(createMenu);
     }
+    // Adding menu to search for styles related to current page/domain or even blank
+    let (createMenu = window.document.createElementNS(XUL, "menu")) {
+      createMenu.setAttribute("label", l10n("find.label"));
+      createMenu.setAttribute("accesskey", l10n("find.accesskey"));
+      createMenu.setAttribute("tooltiptext", l10n("find.tooltip"));
+      let (createMenupop = window.document.createElementNS(XUL, "menupopup")) {
+        createMenupop.setAttribute("class", "popup-internal-box");
+        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+          createItem.setAttribute("label", l10n("find.url.label"));
+          createItem.setAttribute("accesskey", l10n("find.url.accesskey"));
+          createItem.setAttribute("tooltiptext", l10n("find.url.tooltip") + " " + getURL(window));
+          listen(window, createItem, "command", function() {
+            window.openUILinkIn("http://userstyles.org/styles/browse/" +
+              encodeURIComponent(getDomain(window).replace(/\.[a-z]{2,4}/i, "")) +
+              "?sort=popularity&sort_direction=desc", "tab");
+          });
+          createMenupop.appendChild(createItem);
+        }
+        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+          createItem.setAttribute("label", l10n("find.fx.label"));
+          createItem.setAttribute("accesskey", l10n("find.fx.accesskey"));
+          createItem.setAttribute("tooltiptext", l10n("find.fx.tooltip"));
+          listen(window, createItem, "command", function() {
+            window.openUILinkIn("http://userstyles.org/styles/browse/app?sort=popularity&sort_direction=desc", "tab");
+          });
+          createMenupop.appendChild(createItem);
+        }
+        createMenu.appendChild(createMenupop);
+      }
+      menupop.appendChild(createMenu);
+    }
     // Adding the menu containing sorted stylesheets
     let (sortedMenu = window.document.createElementNS(XUL, "menu")) {
       sortedMenu.setAttribute("label", l10n("sortedMenu.label"));
