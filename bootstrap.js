@@ -232,9 +232,12 @@ function populateMenuPopupList(window, id, event) {
           createItem.setAttribute("accesskey", l10n("find.url.accesskey"));
           createItem.setAttribute("tooltiptext", l10n("find.url.tooltip") + " " + getURL(window));
           listen(window, createItem, "command", function() {
-            window.openUILinkIn("http://userstyles.org/styles/browse/" +
-              encodeURIComponent(getDomain(window).replace(/\.[^\.]{2,4}$/i, "")) +
-              "?sort=popularity&sort_direction=desc", "tab");
+            let domain = getDomain(window);
+            if (domain == "mail.google.com")
+              domain = "google mail";
+            window.openUILinkIn("http://userstyles.org/styles/browse_r?search_terms=" +
+              encodeURIComponent(domain) +
+              "&category=site&sort=popularity&sort_direction=desc&per_page=10", "tab");
           });
           createMenupop.appendChild(createItem);
         }
