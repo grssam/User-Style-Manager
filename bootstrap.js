@@ -233,7 +233,7 @@ function populateMenuPopupList(window, id, event) {
           createItem.setAttribute("tooltiptext", l10n("find.url.tooltip") + " " + getURL(window));
           listen(window, createItem, "command", function() {
             window.openUILinkIn("http://userstyles.org/styles/browse/" +
-              encodeURIComponent(getDomain(window).replace(/\.[a-z]{2,4}/i, "")) +
+              encodeURIComponent(getDomain(window).replace(/\.[^\.]{2,4}$/i, "")) +
               "?sort=popularity&sort_direction=desc", "tab");
           });
           createMenupop.appendChild(createItem);
