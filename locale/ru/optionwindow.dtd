@@ -43,18 +43,18 @@
 
 <!ENTITY hideWindow.label             "Скрывать окно настроек когда открывается окно редактора стилей">
 <!ENTITY hideWindow.accesskey         "С">
-<!ENTITY hideWindow.tooltip           "При открытии окна редактора - окно "Управление стилями" будет скрываться. В момент закрытия окна редактора - окно "Управление стилями" откроется заново.">
+<!ENTITY hideWindow.tooltip           "При открытии окна редактора - окно &quot;Управление стилями&quot; будет скрываться. В момент закрытия окна редактора - окно &quot;Управление стилями&quot; откроется заново.">
 
 <!ENTITY deleteFromDisk.label         "Удалять файлы стилей с диска при удалении их отсюда">
-<!ENTITY deleteFromDisk.tooltip       "ВНИМАНИЕ: Включение этой настройки повлечёт за собой удаление с диска файлов стилей, при удалении их из окна "Управление стилями"">
+<!ENTITY deleteFromDisk.tooltip       "ВНИМАНИЕ: Включение этой настройки повлечёт за собой удаление с диска файлов стилей, при удалении их из окна &quot;Управление стилями&quot;">
 
 <!ENTITY appMenu.label                "Пункт в меню AppButton (Firefox button)">
 <!ENTITY appMenu.accesskey            "А">
 <!ENTITY appMenu.tooltip              "Добавить/скрыть пункт для вызова окна управления стилями в меню кнопки AppButton (также известной как Firefox button)">
 
-<!ENTITY toolsMenu.label              "Пункт в меню "Инструменты"">
+<!ENTITY toolsMenu.label              "Пункт в меню &quot;Инструменты&quot;">
 <!ENTITY toolsMenu.accesskey          "И">
-<!ENTITY toolsMenu.tooltip            "Добавить/скрыть пункт для вызова окна управления стилями в меню "Инструменты"">
+<!ENTITY toolsMenu.tooltip            "Добавить/скрыть пункт для вызова окна управления стилями в меню &quot;Инструменты&quot;">
 
 <!ENTITY button.label                 "Кнопка на панели">
 <!ENTITY button.accesskey             "К">
@@ -62,7 +62,7 @@
 
 <!ENTITY contextMenu.label            "Пункт в контекстном меню">
 <!ENTITY contextMenu.accesskey        "К">
-<!ENTITY contextMenu.tooltip          "Добавить/скрыть пункт "Вставить текст в новый стиль" в контекстном меню">
+<!ENTITY contextMenu.tooltip          "Добавить/скрыть пункт &quot;Вставить текст в новый стиль&quot; в контекстном меню">
 
 <!ENTITY hotkey.label                 "Использовать сочетание клавиш для быстрого вызова этого окна">
 <!ENTITY hotkey.accesskey             "И">
