@@ -1,64 +1,83 @@
-<!ENTITY window.title  "Управление стилями">
-<!ENTITY styleSheet.list.caption  "Список стилей">
-<!ENTITY styleHeader.enabled  "Включено">
-<!ENTITY styleHeader.name  "имя">
-<!ENTITY styleHeader.affects  "Применяется на">
-<!ENTITY styleHeader.dateAdded  "Добавлено">
-<!ENTITY styleHeader.dateModified  "Дата изменения">
-<!ENTITY updateBtn.label  "Проверить обновления">
-<!ENTITY updateBtn.accesskey  "П">
-<!ENTITY updateBtn.tooltip  "Проверяет и обновляет отдельные таблицы стилей">
-<!ENTITY updateAllBtn.label  "Обновить все">
-<!ENTITY updateAllBtn.accesskey  "в">
-<!ENTITY updateAllBtn.tooltip  "Проверки и обновления для новой версии таблиц стилей">
-<!ENTITY infoBtn.label  "Больше информации.">
-<!ENTITY infoBtn.accesskey  "Б">
-<!ENTITY infoBtn.tooltip  "Дополнительная информация о выбранном стиле">
-<!ENTITY editBtn.label  "Редактировать таблицы стилей">
-<!ENTITY editBtn.accesskey  "т">
-<!ENTITY editBtn.tooltip  "Изменение содержания отдельных таблиц стилей">
-<!ENTITY deleteBtn.label  "Удаление стилей">
-<!ENTITY deleteBtn.accesskey  "л">
-<!ENTITY deleteBtn.tooltip  "Удаление здесь не будет удалить файл с жесткого диска">
-<!ENTITY settings.caption  "Настройки стилей">
-<!ENTITY backupMenu.label  "Резервное копирование">
-<!ENTITY backupMenu.accesskey  "к">
-<!ENTITY entryMenu.label  "Пункт меню">
-<!ENTITY entryMenu.accesskey  "у">
-<!ENTITY backup.label  "Поддерживать резервного">
-<!ENTITY backup.accesskey  "р">
-<!ENTITY backup.tooltip  "Поддерживать периодического резервного копирования стилей">
-<!ENTITY fallback.label  "Отступить от Резервная копия таблицы стилей">
-<!ENTITY fallback.accesskey  "О">
-<!ENTITY fallback.tooltip  "Загрузка стилей из резервной копии, если не присутствовал на прежнее место">
-<!ENTITY hideWindow.label  "Скрыть параметры окна при редактировании стилей">
-<!ENTITY hideWindow.accesskey  "С">
-<!ENTITY hideWindow.tooltip  "Скрывает окно настроек при редактировании таблиц стилей. Это позволяет изменить вкладок и окон.">
-<!ENTITY deleteFromDisk.label  "Кроме того, удалите файл стилей с жесткого диска при удалении здесь">
-<!ENTITY deleteFromDisk.tooltip  "ПРЕДУПРЕЖДЕНИЕ: Включение этой функции приведет к удалению соответствующих файлов с жесткого диска при удалении стиля из менеджером пользовательских стилей">
-<!ENTITY appMenu.label  "Меню приложения">
-<!ENTITY appMenu.accesskey  "М">
-<!ENTITY appMenu.tooltip  "Создает запись в меню приложения легко получать доступ к Окно и быстро включить / выключить стиль">
-<!ENTITY toolsMenu.label  "Меню Сервис">
-<!ENTITY toolsMenu.accesskey  "е">
-<!ENTITY toolsMenu.tooltip  "Создает запись в меню Сервис легко получать доступ к Окно и быстро включить / выключить стиль">
-<!ENTITY button.label  "кнопки панели инструментов">
-<!ENTITY button.accesskey  "и">
-<!ENTITY button.tooltip  "Создает кнопку на панели инструментов, которые можно разместить в любом месте легко получить доступ к окно настроек и стилей">
-<!ENTITY hotkey.tooltip  "Создает настраиваемые ключевые ярлык, чтобы открыть это окно настроек">
-<!ENTITY hotkey.label  "Создание сочетания клавиш">
-<!ENTITY hotkey.accesskey  "з">
-<!ENTITY contextMenu.tooltip  "Добавляет опцию в контекстном меню, чтобы быстро преобразовать выделенный текст в стиле пользователя.">
-<!ENTITY contextMenu.label  "Контекстное меню">
-<!ENTITY contextMenu.accesskey  "ю">
-<!ENTITY combination.label  "Сочетание клавиш:">
-<!ENTITY combination.accesskey  "ш">
-<!ENTITY combination.tooltip  "Щелкните в текстовом поле и нажмите нужную комбинацию">
-<!ENTITY addBtn.label  "просматривать…">
-<!ENTITY addBtn.label.label  "Добавить новую таблицу стилей:">
-<!ENTITY addBtn.label.tooltip  "Нажмите на кнопку, чтобы добавить новую таблицу стилей">
-<!ENTITY addBtn.accesskey  "Д">
-<!ENTITY addBtn.tooltip  "просматривать стилей с вашего жесткого диска">
-<!ENTITY createBtn.label  "Создать новый">
-<!ENTITY createBtn.accesskey  "н">
-<!ENTITY createBtn.tooltip  "Создать новую таблицу стилей">
+<!ENTITY window.title                 "Управление стилями">
+<!ENTITY styleSheet.list.caption      "Список стилей">
+<!ENTITY styleHeader.enabled          "Включён">
+<!ENTITY styleHeader.name             "Название">
+<!ENTITY styleHeader.affects          "Применяется к">
+<!ENTITY styleHeader.dateAdded        "Дата создания">
+<!ENTITY styleHeader.dateModified     "Дата последней правки">
+
+<!ENTITY updateBtn.label              "Проверить обновления">
+<!ENTITY updateBtn.accesskey          "О">
+<!ENTITY updateBtn.tooltip            "Обновить выделенный(ые) стиль(и)">
+
+<!ENTITY updateAllBtn.label           "Обновить все">
+<!ENTITY updateAllBtn.accesskey       "В">
+<!ENTITY updateAllBtn.tooltip         "Проверить обновления всех стилей сразу">
+
+<!ENTITY infoBtn.label                "Подробно">
+<!ENTITY infoBtn.accesskey            "П">
+<!ENTITY infoBtn.tooltip              "Открыть окно(а) с подробной информацией о выбранном(ых) стиле(ях)">
+
+<!ENTITY editBtn.label                "Редактировать">
+<!ENTITY editBtn.accesskey            "Р">
+<!ENTITY editBtn.tooltip              "Редактировать стиль">
+
+<!ENTITY deleteBtn.label              "Удалить">
+<!ENTITY deleteBtn.accesskey          "У">
+<!ENTITY deleteBtn.tooltip            "Удалить стиль из списка. Нажатие этой кнопки не удалит сам файл стиля на диске, если соответствующая настройка не включена.">
+
+<!ENTITY settings.caption             "Настройки">
+
+<!ENTITY backupMenu.label             "Резервное копирование">
+<!ENTITY backupMenu.accesskey         "Р">
+<!ENTITY entryMenu.label              "Отключение меню">
+<!ENTITY entryMenu.accesskey          "М">
+
+<!ENTITY backup.label                 "Осуществлять резервное копирование">
+<!ENTITY backup.accesskey             "Р">
+<!ENTITY backup.tooltip               "Периодически создавать резервные копии ваших стилей">
+
+<!ENTITY fallback.label               "Восстанавливать стили из резервных копий">
+<!ENTITY fallback.accesskey           "В">
+<!ENTITY fallback.tooltip             "Если стиль отсутствует на своём месте - восстанавливать его из резервных копий">
+
+<!ENTITY hideWindow.label             "Скрывать окно настроек когда открывается окно редактора стилей">
+<!ENTITY hideWindow.accesskey         "С">
+<!ENTITY hideWindow.tooltip           "При открытии окна редактора - окно "Управление стилями" будет скрываться. В момент закрытия окна редактора - окно "Управление стилями" откроется заново.">
+
+<!ENTITY deleteFromDisk.label         "Удалять файлы стилей с диска при удалении их отсюда">
+<!ENTITY deleteFromDisk.tooltip       "ВНИМАНИЕ: Включение этой настройки повлечёт за собой удаление с диска файлов стилей, при удалении их из окна "Управление стилями"">
+
+<!ENTITY appMenu.label                "Пункт в меню AppButton (Firefox button)">
+<!ENTITY appMenu.accesskey            "А">
+<!ENTITY appMenu.tooltip              "Добавить/скрыть пункт для вызова окна управления стилями в меню кнопки AppButton (также известной как Firefox button)">
+
+<!ENTITY toolsMenu.label              "Пункт в меню "Инструменты"">
+<!ENTITY toolsMenu.accesskey          "И">
+<!ENTITY toolsMenu.tooltip            "Добавить/скрыть пункт для вызова окна управления стилями в меню "Инструменты"">
+
+<!ENTITY button.label                 "Кнопка на панели">
+<!ENTITY button.accesskey             "К">
+<!ENTITY button.tooltip               "Добавить/скрыть кнопку User Style Manager на панели. По умолчанию, она появляется на Панели Навигации, но оттуда её можно штатным методом перетащить куда-угодно.">
+
+<!ENTITY contextMenu.label            "Пункт в контекстном меню">
+<!ENTITY contextMenu.accesskey        "К">
+<!ENTITY contextMenu.tooltip          "Добавить/скрыть пункт "Вставить текст в новый стиль" в контекстном меню">
+
+<!ENTITY hotkey.label                 "Использовать сочетание клавиш для быстрого вызова этого окна">
+<!ENTITY hotkey.accesskey             "И">
+<!ENTITY hotkey.tooltip               "Можно включить/отключить выбранное сочетание клавиш для открытия окна управления стилями">
+
+<!ENTITY combination.label            "Выберите комбинацию клавиш:">
+<!ENTITY combination.accesskey        "К">
+<!ENTITY combination.tooltip          "Кликните в текстовое поле и нажмите желаемую комбинацию клавиш">
+
+<!ENTITY addBtn.label.label           "Добавить стиль:">
+<!ENTITY addBtn.tooltip               "Нажмите кнопку, чтобы указать на файл стиля на диске">
+<!ENTITY addBtn.label                 "С диска">
+<!ENTITY addBtn.label.tooltip         "Выберите один из двух вариантов добавления нового стиля">
+<!ENTITY addBtn.accesskey             "У">
+
+<!ENTITY createBtn.label              "Создать новый">
+<!ENTITY createBtn.accesskey          "Н">
+<!ENTITY createBtn.tooltip            "Создать новый стиль">
