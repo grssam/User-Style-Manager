@@ -72,7 +72,8 @@ pref.defaults = {
   createHotKey: true,
   buttonParentID: "",
   buttonNextSiblingID: "",
-  deleteFromDisk: false
+  deleteFromDisk: false,
+  stylesEnabled: true
 };
 
 pref.observe = function(prefs, callback) {

@@ -326,6 +326,8 @@ function addDefaultStyles() {
    If called with proper path, will load a single stylesheet
 */
 function loadStyleSheet(index) {
+  if (!pref("stylesEnabled"))
+    return;
   if (index == null) {
     styleSheetList.forEach(function([enabled, fileName, filePath,
       fileURL, appliesOn, fileAdded, fileModified], index) {

@@ -346,35 +346,30 @@ function populateMenuPopupList(window, id, event) {
     let (sep = window.document.createElementNS(XUL, "menuseparator")) {
       menupop.appendChild(sep);
     }
-    let (enableAll = window.document.createElementNS(XUL, "menuitem")) {
-      enableAll.setAttribute("label", l10n("enableAll.label"));
-      enableAll.setAttribute("accesskey", l10n("enableAll.accesskey"));
-      enableAll.setAttribute("tooltiptext", l10n("enableAll.tooltip"));
-      listen(window, enableAll, "command", function() {
-        for (let i = 0; i < styleSheetList.length; i++) {
-          if (styleSheetList[i][0] == 'enabled')
-            continue;
-          styleSheetList[i][0] = 'enabled';
-          loadStyleSheet(i);
-        }
-        writeJSONPref();
+    let (enabled = window.document.createElementNS(XUL, "menuitem")) {
+      enabled.setAttribute("label", l10n("enabled.label"));
+      enabled.setAttribute("accesskey", l10n("enabled.accesskey"));
+      enabled.setAttribute("tooltiptext", l10n("enabled.tooltip"));
+      enabled.setAttribute("type", "radio");
+      enabled.setAttribute("name", "enabledDisabledRadio");
+      enabled.setAttribute("checked", pref("stylesEnabled"));
+      listen(window, enabled, "command", function() {
+        pref("stylesEnabled", true);
       });
-      menupop.appendChild(enableAll);
+      menupop.appendChild(enabled);
     }
-    let (disableAll = window.document.createElementNS(XUL, "menuitem")) {
-      disableAll.setAttribute("label", l10n("disableAll.label"));
-      disableAll.setAttribute("accesskey", l10n("disableAll.accesskey"));
-      disableAll.setAttribute("tooltiptext", l10n("disableAll.tooltip"));
-      listen(window, disableAll, "command", function() {
-        for (let i = 0; i < styleSheetList.length; i++) {
-          if (styleSheetList[i][0] == 'disabled')
-            continue;
-          unloadStyleSheet(i);
-          styleSheetList[i][0] = 'disabled';
-        }
-        writeJSONPref();
+    let (disabled = window.document.createElementNS(XUL, "menuitem")) {
+      disabled.setAttribute("label", l10n("disabled.label"));
+      disabled.setAttribute("accesskey", l10n("disabled.accesskey"));
+      disabled.setAttribute("tooltiptext", l10n("disabled.tooltip"));
+      disabled.setAttribute("tooltiptext", l10n("disabled.tooltip"));
+      disabled.setAttribute("type", "radio");
+      disabled.setAttribute("name", "enabledDisabledRadio");
+      disabled.setAttribute("checked", !pref("stylesEnabled"));
+      listen(window, disabled, "command", function() {
+        pref("stylesEnabled", false);
       });
-      menupop.appendChild(disableAll);
+      menupop.appendChild(disabled);
     }
     let (sep = window.document.createElementNS(XUL, "menuseparator")) {
       menupop.appendChild(sep);
@@ -718,7 +713,7 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     // Reading the JSON variable containing paths to style sheets
     readJSONPref(function() {
       updateSortedList();
-      if (updateStyleSheetList())
+      if (updateStyleSheetList() && pref("stylesEnabled"))
         // Load the style sheets as they have not been loaded by addDefaultStyles
         loadStyleSheet();
       unload(unloadStyleSheet);
@@ -742,6 +737,11 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     });
     pref.observe(["createContextMenuEntry"], function() {
       watchWindows(addContextMenuEntry);
+    });
+    pref.observe(["stylesEnabled"], function() {
+      unloadStyleSheet();
+      if (pref("stylesEnabled"))
+        loadStyleSheet();
     });
     // observer to track and keep in sync any changes in styleSheetList
     pref.observe(["userStyleList"], function() {
