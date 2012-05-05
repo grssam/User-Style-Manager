@@ -1282,7 +1282,10 @@ StyleEditor.prototype = {
       this.$("USMTextEditor").firstChild.addEventListener("click", this.onMouseClick);
       this.$("USMTextEditor").firstChild.addEventListener("dblclick", this.onDblClick);
     }
-    this.setCaretOffset(0);
+    if (this.getText() == this.STR("placeholder.text"))
+      this.selectRange(0, this.getText().length);
+    else
+      this.setCaretOffset(0);
   },
 
   getCaretOffset: function SE_getCaretOffset() {
