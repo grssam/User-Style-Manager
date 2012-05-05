@@ -730,7 +730,7 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     watchWindows(addUserStyleHandler);
     watchWindows(function(window) {
       if (openSite) {
-        window.openUILinkIn("http://grssam.wordpress.com/addons/user-styles-manager/", "tab");
+        window.openUILinkIn("http://grssam.wordpress.com/addons/user-style-manager/", "tab");
         openSite = false;
       }
     });
