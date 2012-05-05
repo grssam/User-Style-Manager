@@ -502,6 +502,7 @@ function addToolbarButton(window) {
   toolbarButton.setAttribute("label", l10n("USM.label"));
   toolbarButton.setAttribute("tooltiptext", l10n("USM.tooltip"));
   toolbarButton.setAttribute("type", "menu");
+  toolbarButton.setAttribute("orient", "horizontal");
   listen(window, toolbarButton, "click", function(event) {
     if (event.target.id == toolbarButtonID && event.button == 1)
       openOptions(window);
