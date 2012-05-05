@@ -707,6 +707,7 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     let fileURI = addon.getResourceURI("scripts/" + fileName + ".js");
     Services.scriptloader.loadSubScript(fileURI.spec, global);
   });
+  let openSite = false;
   if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0)
     Components.manager.addBootstrappedManifestLocation(data.installPath);
   function initiate() {
@@ -727,6 +728,12 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     watchWindows(handleCustomization);
     watchWindows(addContextMenuEntry);
     watchWindows(addUserStyleHandler);
+    watchWindows(function(window) {
+      if (openSite) {
+        window.openUILinkIn("http://grssam.wordpress.com/addons/user-styles-manager/", "tab");
+        openSite = false;
+      }
+    });
     pref.observe(["createAppMenuButton", "createToolsMenuButton"], function() {
       watchWindows(addMenuItem);
     });
@@ -766,8 +773,8 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     unloadStyleSheet();
     loadStyleSheet();
   };
-  if (data.version == "0.8" && (reason == 7 || reason == 5))
-    updateAffectedInfo = true;
+  if (reason == 7 || reason == 5)
+    openSite = true;
   initiate();
 });
 
