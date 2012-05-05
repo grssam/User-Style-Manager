@@ -12,6 +12,18 @@
     <description>Easiest way to Add and Manage Custom User Styles in Firefox</description>
     <optionsType>1</optionsType>
     <optionsURL>chrome://UserStyleManager/content/options.xul</optionsURL>
+    <translator>Drugoy (ru)</translator>
+    <contributor>Drugoy (extreme testing, feedback and bug reporting)</contributor>
+
+    <localized>
+      <Description>
+        <locale>ru</locale>
+        <homepageURL>https://addons.mozilla.org/ru/firefox/addon/user-style-manager/</homepageURL>
+        <description>Самый простой способ добавить и управление Пользовательские стили пользователей в Firefox</description>
+        <name>User Style Manager</name>
+        <translator>Drugoy</translator>
+      </Description>
+    </localized>
 
     <targetApplication>
       <r:Description>
