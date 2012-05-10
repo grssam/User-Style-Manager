@@ -2062,20 +2062,7 @@ StyleEditor.prototype = {
   },
 
   onClose: function SE_onClose(aEvent) {
-    let caretOffset = this.getCaretOffset();
-    let toClose = this.promptSave();
-    if (toClose == 1) {
-      aEvent.preventDefault();
-      this.setCaretOffset(caretOffset);
-      return;
-    }
-    else {
-      if ((this.createNew || this.openNew) && !this.savedOnce)
-        styleSheetList.splice(this.index, 1);
-      this.resetVariables();
-    }
-    if (this.callback)
-      this.callback();
+    this.exitButtonClick(aEvent);
   },
 
   close: function SE_close() {
