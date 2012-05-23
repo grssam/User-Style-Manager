@@ -335,7 +335,7 @@ function loadStyleSheet(index) {
           return;
         let fileURI = getFileURI(unescape(filePath));
         try {
-          sss.loadAndRegisterSheet(fileURI, sss.USER_SHEET);
+          sss.loadAndRegisterSheet(fileURI, sss.AGENT_SHEET);
           backUpLoaded[index] = false;
         } catch (ex) {
           // Seems like file does not exists
@@ -343,7 +343,7 @@ function loadStyleSheet(index) {
           if (pref("fallBack")) {
             let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index + ".css");
             try {
-              sss.loadAndRegisterSheet(bckpFileURI, sss.USER_SHEET);
+              sss.loadAndRegisterSheet(bckpFileURI, sss.AGENT_SHEET);
               backUpLoaded[index] = true;
             } catch (ex) {backUpLoaded[index] = false;}
           }
@@ -355,7 +355,7 @@ function loadStyleSheet(index) {
       return;
     let fileURI = getFileURI(unescape(styleSheetList[index][2]));
     try {
-      sss.loadAndRegisterSheet(fileURI, sss.USER_SHEET);
+      sss.loadAndRegisterSheet(fileURI, sss.AGENT_SHEET);
       backUpLoaded[index] = false;
     } catch (ex) {
       // Seems like file does not exists
@@ -363,7 +363,7 @@ function loadStyleSheet(index) {
       if (pref("fallBack")) {
         let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index + ".css");
         try {
-          sss.loadAndRegisterSheet(bckpFileURI, sss.USER_SHEET);
+          sss.loadAndRegisterSheet(bckpFileURI, sss.AGENT_SHEET);
           backUpLoaded[index] = true;
         } catch (ex) {backUpLoaded[index] = false;}
       }
@@ -382,12 +382,12 @@ function unloadStyleSheet(index) {
         if (!origFile.exists() || backUpLoaded[index]) {
           let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index + ".css");
           try {
-            sss.unregisterSheet(bckpFileURI, sss.USER_SHEET);
+            sss.unregisterSheet(bckpFileURI, sss.AGENT_SHEET);
           } catch (ex) {}
         }
         else {
           try {
-            sss.unregisterSheet(fileURI, sss.USER_SHEET);
+            sss.unregisterSheet(fileURI, sss.AGENT_SHEET);
           } catch (ex) {}
         }
     });
@@ -399,12 +399,12 @@ function unloadStyleSheet(index) {
     if (!origFile.exists()) {
       let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index + ".css");
       try {
-        sss.unregisterSheet(bckpFileURI, sss.USER_SHEET);
+        sss.unregisterSheet(bckpFileURI, sss.AGENT_SHEET);
       } catch (ex) {}
     }
     else {
       try {
-        sss.unregisterSheet(fileURI, sss.USER_SHEET);
+        sss.unregisterSheet(fileURI, sss.AGENT_SHEET);
       } catch (ex) {}
     }
   }
