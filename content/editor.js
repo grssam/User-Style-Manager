@@ -1209,8 +1209,7 @@ StyleEditor.prototype = {
     readJSONPref(function() {
       if (this.createNew) {
         this.index = styleSheetList.length;
-        styleSheetList.push(['enabled', (this.styleName.length > 0?
-          this.styleName: "User Created Style Sheet " + this.index),
+        styleSheetList.push(['enabled', "",
           (this.styleName.length > 0? this.styleName + ".css":
           escape("User Created Style Sheet " + this.index + ".css")), this.updateURL,
           "", JSON.stringify(new Date()), ""]);
