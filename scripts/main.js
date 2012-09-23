@@ -167,7 +167,6 @@ function updateStyleSheetList() {
     // If an upgrade, json pref overrides the values.
     styleSheetList = JSON.parse(pref("userStyleList"));
     if (styleSheetList.length == 0) {
-      addDefaultStyles();
       return false;
     }
     else {
@@ -274,51 +273,6 @@ function doRestore(index, callback) {
     }
   }
   callback && callback();
-}
-
-// Function to add default Style Sheets to the list
-function addDefaultStyles() {
-  // Add the default styles only once
-  if (!pref("firstRun"))
-    return;
-  // Add AwesomeBar Popup
-  styleSheetList.push(['enabled', "AwesomeBar Popup", escape("AwesomeBar_Popup.css"),
-    "http://userstyles.org/styles/19308/awesomebar-popup",
-    "chrome://", JSON.stringify(new Date()), ""]);
-  // Add Sleek Dialog boxes
-  styleSheetList.push(['enabled', "Sleek Dialog boxes", escape("Sleek_Dialog_Box.css"),
-    "http://userstyles.org/styles/46249/firefox-4-sleek-dialog-boxes",
-    "chrome://", JSON.stringify(new Date()), ""]);
-  // Add Cleanest Add-on Manager
-  styleSheetList.push(['enabled', "Cleanest Add-on Manager", escape("cam.css"),
-    "http://userstyles.org/styles/46642/xff4-cleanest-addon-manager-use-addon-instead",
-    "chrome://mozapps/content/extensions/extensions.xul,about:addons", JSON.stringify(new Date()), ""]);
-  let styleDirectory = getURIForFileInUserStyles("/").QueryInterface(Ci.nsIFileURL).file;
-  if (!styleDirectory.exists())
-    styleDirectory.create(1, parseInt('0777', 8));
-  styleSheetList.forEach(function([enabled, name, path, url, appliesOn, added, modified], index) {
-    let origFileURI = Services.io.newURI("chrome://userstylemanager-styles/content/" + unescape(path), null, null);
-    NetUtil.asyncFetch(origFileURI, function(inputStream, status) {
-      if (!Components.isSuccessCode(status))
-        return;
-      let data = "";
-      try {
-        data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-      } catch (ex) {
-        data = "";
-      }
-      let styleFile = getURIForFileInUserStyles(unescape(path)).QueryInterface(Ci.nsIFileURL).file;
-      if (!styleFile.exists())
-        styleFile.create(0, parseInt('0666', 8));
-      let ostream = FileUtils.openSafeFileOutputStream(styleFile);
-      let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-        .createInstance(Ci.nsIScriptableUnicodeConverter);
-      converter.charset = "UTF-8";
-      NetUtil.asyncCopy(converter.convertToInputStream(data), ostream, function() loadStyleSheet(index));
-    });
-  });
-  // Update the pref
-  writeJSONPref();
 }
 
 /* Function to load the style sheet
