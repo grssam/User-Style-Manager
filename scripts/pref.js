@@ -73,7 +73,11 @@ pref.defaults = {
   buttonParentID: "",
   buttonNextSiblingID: "",
   deleteFromDisk: false,
-  stylesEnabled: true
+  stylesEnabled: true,
+  updateAutomatically: true,
+  updateOverwritesLocalChanges: false,
+  lastUpdatedOn: 0,
+  updateTimeoutActive: false,
 };
 
 pref.observe = function(prefs, callback) {

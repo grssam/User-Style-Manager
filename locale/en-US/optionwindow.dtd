@@ -32,6 +32,8 @@
 <!ENTITY backupMenu.accesskey         "B">
 <!ENTITY entryMenu.label              "Menu Entry">
 <!ENTITY entryMenu.accesskey          "N">
+<!ENTITY updateMenu.label             "Update">
+<!ENTITY updateMenu.accesskey         "P">
 
 <!ENTITY backup.label                 "Maintain Backup">
 <!ENTITY backup.accesskey             "M">
@@ -59,6 +61,14 @@
 <!ENTITY button.label                 "Toolbar Button">
 <!ENTITY button.accesskey             "B">
 <!ENTITY button.tooltip               "Creates a toolbar button that can be placed anywhere to easily access the Options Window or the Style Sheets">
+
+<!ENTITY updateAutomatically.label     "Automatically">
+<!ENTITY updateAutomatically.accesskey "A">
+<!ENTITY updateAutomatically.tooltip   "Periodically check for update of a style from its source of installation.">
+
+<!ENTITY updateOverwritesLocalChanges.label      "Overwrite local changes">
+<!ENTITY updateOverwritesLocalChanges.accesskey  "O">
+<!ENTITY updateOverwritesLocalChanges.tooltip    "If this is checked, any local changes to a style will be overwritten at the time of update.">
 
 <!ENTITY hotkey.tooltip               "Creates a customizable Shortcut Key to open this Options Window">
 <!ENTITY hotkey.label                 "Create a Keyboard Shortcut">

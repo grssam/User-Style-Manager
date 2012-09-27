@@ -968,8 +968,10 @@ StyleEditor.prototype = {
     }
     if (this.getText() == "")
       return;
-    if (!this.createNew && !this.openNew)
+    if (!this.createNew && !this.openNew) {
+      styleSheetList[this.index][8] = true;
       unloadStyleSheet(this.index);
+    }
     if (this.options)
       styleSheetList[this.index][7] = this.options;
     if (this.createNew) {

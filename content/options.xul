@@ -44,7 +44,7 @@
       <preference id="deleteFromDisk" name="extensions.UserStyleManager.deleteFromDisk" type="bool"/>
     </preferences>
     <vbox flex="1">
-      <menubar id="optionsMenubar" style="margin: 0px; border: solid black; border-width:0px 0px 1px 0px; !important" flex="1">
+      <menubar id="optionsMenubar" style="margin: 0px; border: solid black; border-width:0px 0px 1px 0px !important" flex="1">
         <menu id="backupMenu" label="&backupMenu.label;" accesskey="&backupMenu.accesskey;">
           <menupopup id="backupMenuPopup" onpopupshowing="optionsWindow.backupMenuPopupShowing();">
             <menuitem type="checkbox" id="maintainBackupMenuitem" tooltiptext="&backup.tooltip;"
@@ -63,6 +63,18 @@
               accesskey="&toolsMenu.accesskey;" label="&toolsMenu.label;" oncommand="optionsWindow.togglePref('createToolsMenuButton');"/>
             <menuitem type="checkbox" id="createContextMenuMenuitem" tooltiptext="&contextMenu.tooltip;"
               accesskey="&contextMenu.accesskey;" label="&contextMenu.label;" oncommand="optionsWindow.togglePref('createContextMenuEntry');"/>
+          </menupopup>
+        </menu>
+        <menu id="updateMenu" label="&updateMenu.label;" accesskey="&updateMenu.accesskey;">
+          <menupopup id="updateMenuPopup" onpopupshowing="optionsWindow.updateMenuPopupShowing();">
+            <menuitem type="checkbox" id="updateAutomatically" tooltiptext="&updateAutomatically.tooltip;"
+              accesskey="&updateAutomatically.accesskey;" label="&updateAutomatically.label;"
+              oncommand="optionsWindow.togglePref('updateAutomatically');"/>
+            <menuitem type="checkbox" id="updateOverwritesLocalChanges"
+              tooltiptext="&updateOverwritesLocalChanges.tooltip;"
+              accesskey="&updateOverwritesLocalChanges.accesskey;"
+              label="&updateOverwritesLocalChanges.label;"
+              oncommand="optionsWindow.togglePref('updateOverwritesLocalChanges');"/>
           </menupopup>
         </menu>
       </menubar>

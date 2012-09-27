@@ -67,6 +67,54 @@ function handleCustomization(window) {
   });
 }
 
+function setupUpdates(window) {
+  function updateAllStyleAndDo(index, callback) {
+    if (index == null)
+      index = 0;
+    else if (index == styleSheetList.length)
+      callback();
+    updateStyle(index, function() {
+      updateAllStyleAndDo(index + 1, callback);
+    });
+  }
+
+  function checkAndDoUpdate() {
+    // leave early and check again after 24 hours
+    if (!pref("updateAutomatically") ||
+        (Date.now() - pref("lastUpdatedOn")*1) < 24*60*60*1000) {
+      updateTimeout = window.setTimeout(checkAndDoUpdate,
+        Math.max(Math.min(Date.now() - pref("lastUpdatedOn")*1, 24*60*60*1000), 60*1000));
+      return;
+    }
+    updateAllStyleAndDo(0, function() {
+      pref("lastUpdatedOn", Date.now());
+      updateTimeout = window.setTimeout(checkAndDoUpdate, 24*60*60*1000);
+    });
+  }
+
+  let updateTimeout = null;
+
+  if (!pref("updateTimeoutActive")) {
+    updateTimeout = window.setTimeout(checkAndDoUpdate, 60*1000);
+    pref("updateTimeoutActive", true);
+    // If the pref is turned off by user, remove the timer from this window,
+    // as it will be anyways applied again :)
+    pref.observe(["updateTimeoutActive"], function() {
+      if (!pref("updateTimeoutActive") && updateTimeout) {
+        window.clearTimeout(updateTimeout);
+        updateTimeout = null;
+      }
+    });
+    unload(function() {
+      if (updateTimeout) {
+        window.clearTimeout(updateTimeout);
+        updateTimeout = null;
+      }
+      pref("updateTimeoutActive", false);
+    }, window);
+  }
+}
+
 function addContextMenuEntry(window) {
   function $(id) window.document.getElementById(id);
   function browserContextShowing() {}
@@ -755,6 +803,18 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     pref.observe(["userStyleList"], function() {
       styleSheetList = JSON.parse(pref("userStyleList"));
       updateSortedList();
+    });
+    // Setup the updating mechanism
+    watchWindows(setupUpdates);
+    pref.observe(["updateTimeoutActive"], function() {
+      if (!pref("updateTimeoutActive")) {
+        let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
+        let enumerator = wm.getEnumerator("navigator:browser");
+        if (enumerator.hasMoreElements()) {
+          let win = enumerator.getNext();
+          setupUpdates(win);
+        }
+      }
     });
     // Adding an unload funtion to close any opened options window
     unload(function() {

@@ -473,6 +473,14 @@ let optionsWindow = {
       $("createContextMenuMenuitem").setAttribute("checked", true);
   },
 
+  updateMenuPopupShowing: function OW_updateMenuPopupShowing() {
+    function $(id) document.getElementById(id);
+    if (pref("updateAutomatically"))
+      $("updateAutomatically").setAttribute("checked", true);
+    if (pref("updateOverwritesLocalChanges"))
+      $("updateOverwritesLocalChanges").setAttribute("checked", true);
+  },
+
   togglePref: function OW_togglePref(prefName) {
     pref(prefName, !pref(prefName));
   },

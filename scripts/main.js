@@ -27,7 +27,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 // Global Variable to store the style sheet data
-// Format : [status, name, path, url, applies on, date added, date modified]
+// Format : [status, name, path, url, applies on, date added, date modified, style options, local changes ?]
 let styleSheetList = [], backUpLoaded = [], sortedStyleSheet = [];
 // variable to be enabled only once to ensure that stylesheets data is properly set
 let updateAffectedInfo = false;
@@ -468,6 +468,7 @@ function updateInUSM(aStyleId, CSSText, name, url, options, aCallback) {
           styleSheetList[i][3] = url;
           styleSheetList[i][6] = JSON.stringify(new Date());
           styleSheetList[i][7] = options;
+          styleSheetList[i][8] = false;
           writeJSONPref();
           if (aCallback)
             aCallback();
@@ -483,15 +484,11 @@ function updateStyle(index, callback) {
     let styleId = styleSheetList[index][3].match(/styles\/([0-9]*)\//i)[1];
     getCodeForStyle(styleId, styleSheetList[index][7], function(code) {
       compareStyleVersion(index, styleId, code, function(needsUpdate) {
-        if (needsUpdate)
+        if (needsUpdate && (!pref("updateOverwritesLocalChanges") || !styleSheetList[index][8]))
           updateInUSM(styleId, code, styleSheetList[index][1],
             styleSheetList[index][3], styleSheetList[index][7], callback);
-        else {
-          Services.prompt.confirm(null, "", unescape(styleSheetList[index][1]) +
-            " does not needs update");
-          if (callback)
+        else if (callback)
             callback();
-        }
       });
     });
   }
