@@ -383,8 +383,11 @@ function toggleStyleSheet(index, oldVal, newVal) {
 }
 
 function getCodeForStyle(styleId, options, callback) {
-  if (options == null)
+  if (styleId == null) {
+    if (callback)
+      callback();
     return;
+  }
   let xmlQuery = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
   xmlQuery.open('GET', 'http://userstyles.org/styles/' + styleId + '.css' + (options == "" ? "" : "?" + options), true);
   xmlQuery.onreadystatechange = function(event) {

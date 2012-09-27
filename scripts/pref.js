@@ -76,7 +76,7 @@ pref.defaults = {
   stylesEnabled: true,
   updateAutomatically: true,
   updateOverwritesLocalChanges: false,
-  lastUpdatedOn: 0,
+  lastUpdatedOn: "0",
   updateTimeoutActive: false,
 };
 

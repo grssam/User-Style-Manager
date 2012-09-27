@@ -71,8 +71,10 @@ function setupUpdates(window) {
   function updateAllStyleAndDo(index, callback) {
     if (index == null)
       index = 0;
-    else if (index == styleSheetList.length)
+    else if (index == styleSheetList.length) {
       callback();
+      return;
+    }
     updateStyle(index, function() {
       updateAllStyleAndDo(index + 1, callback);
     });
@@ -87,7 +89,7 @@ function setupUpdates(window) {
       return;
     }
     updateAllStyleAndDo(0, function() {
-      pref("lastUpdatedOn", Date.now());
+      pref("lastUpdatedOn", "" + Date.now());
       updateTimeout = window.setTimeout(checkAndDoUpdate, 24*60*60*1000);
     });
   }
@@ -95,7 +97,7 @@ function setupUpdates(window) {
   let updateTimeout = null;
 
   if (!pref("updateTimeoutActive")) {
-    updateTimeout = window.setTimeout(checkAndDoUpdate, 60*1000);
+    updateTimeout = window.setTimeout(checkAndDoUpdate, 30*1000);
     pref("updateTimeoutActive", true);
     // If the pref is turned off by user, remove the timer from this window,
     // as it will be anyways applied again :)
@@ -759,6 +761,8 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
   if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0)
     Components.manager.addBootstrappedManifestLocation(data.installPath);
   function initiate() {
+    // setting the pref to be false
+    pref("updateTimeoutActive", false);
     styleSheetList = [];
     // Reading the JSON variable containing paths to style sheets
     readJSONPref(function() {
