@@ -34,6 +34,8 @@
 <!ENTITY entryMenu.accesskey          "N">
 <!ENTITY updateMenu.label             "Update">
 <!ENTITY updateMenu.accesskey         "P">
+<!ENTITY syncMenu.label               "Sync">
+<!ENTITY syncMenu.accesskey           "Y">
 
 <!ENTITY backup.label                 "Maintain Backup">
 <!ENTITY backup.accesskey             "M">
@@ -69,6 +71,14 @@
 <!ENTITY updateOverwritesLocalChanges.label      "Overwrite local changes">
 <!ENTITY updateOverwritesLocalChanges.accesskey  "O">
 <!ENTITY updateOverwritesLocalChanges.tooltip    "If this is checked, any local changes to a style will be overwritten at the time of update.">
+
+<!ENTITY syncStyles.label              "Sync styles">
+<!ENTITY syncStyles.accesskey          "S">
+<!ENTITY syncStyles.tooltip            "This will enable syncing of styles that have a proper source of installation.">
+
+<!ENTITY keepDeletedOnSync.label       "Keep deleted styles">
+<!ENTITY keepDeletedOnSync.accesskey   "D">
+<!ENTITY keepDeletedOnSync.tooltip     "Keep the styles removed by your other machine.\nThis will inturn add back the style to your other machine.">
 
 <!ENTITY hotkey.tooltip               "Creates a customizable Shortcut Key to open this Options Window">
 <!ENTITY hotkey.label                 "Create a Keyboard Shortcut">

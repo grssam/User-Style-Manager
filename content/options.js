@@ -260,6 +260,9 @@ let optionsWindow = {
         });
       }
     });
+    if (!Services.prefs.getBoolPref("services.sync.engine.prefs")) {
+      $("syncMenu").disabled = true;
+    }
     // Displaying the shortcut 
     this.shortcutTextBox = document.getElementById("shortcutTextBox");
     if (window.navigator.oscpu.toLowerCase().indexOf("window") >= 0)
@@ -355,15 +358,7 @@ let optionsWindow = {
         this.STR("remove.preText") + " " + unescape(styleSheetList[index][1]) + " " + this.STR("remove.postText"));
       if (finalAnswer) {
         // Unload the stylesheet if enabled
-        if (styleSheetList[index][0] == 'enabled')
-          unloadStyleSheet(index);
-        let deletedStyle = styleSheetList.splice(index, 1);
-        if (pref("deleteFromDisk")) {
-          let deletedFile = getFileURI(unescape(deletedStyle[0][2])).QueryInterface(Ci.nsIFileURL).file;
-          if (deletedFile.exists())
-            deletedFile.remove(false);
-        }
-        writeJSONPref();
+        deleteStylesFromUSM([index]);
         this.populateStyles();
       }
     }
@@ -372,22 +367,14 @@ let optionsWindow = {
         this.STR("remove.preText") + " " + count + " " + this.STR("remove.postText"));
       if (!finalAnswer)
         return;
+      let indexes = [];
       for (let t = 0; t < numRanges; t++) {
         this.tree.view.selection.getRangeAt(t, start, end);
         for (let i = start.value; i <= end.value; i++) {
-          let index = optionsWindow.treeView.list[i][7];
-          // Unload the stylesheet if enabled
-          if (styleSheetList[index][0] == 'enabled')
-            unloadStyleSheet(index);
-          let deletedStyle = styleSheetList.splice(index, 1);
-          if (pref("deleteFromDisk")) {
-            let deletedFile = getFileURI(unescape(deletedStyle[0][2])).QueryInterface(Ci.nsIFileURL).file;
-            if (deletedFile.exists())
-              deletedFile.remove(false);
-          }
+          indexes.push(optionsWindow.treeView.list[i][7]);
         }
       }
-      writeJSONPref();
+      deleteStylesFromUSM(indexes);
       this.populateStyles();
     }
   },
@@ -461,7 +448,7 @@ let optionsWindow = {
       $("fallBackMenuitem").setAttribute("checked", true);
   },
 
-   entryMenuPopupShowing: function OW_entryMenuPopupShowing() {
+  entryMenuPopupShowing: function OW_entryMenuPopupShowing() {
     function $(id) document.getElementById(id);
     if (pref("createToolsMenuButton"))
       $("createToolsMenuMenuitem").setAttribute("checked", true);
@@ -479,6 +466,14 @@ let optionsWindow = {
       $("updateAutomatically").setAttribute("checked", true);
     if (pref("updateOverwritesLocalChanges"))
       $("updateOverwritesLocalChanges").setAttribute("checked", true);
+  },
+
+  syncMenuPopupShowing: function OW_syncMenuPopupShowing() {
+    function $(id) document.getElementById(id);
+    if (pref("syncStyles"))
+      $("syncStyles").setAttribute("checked", true);
+    if (pref("keepDeletedOnSync"))
+      $("keepDeletedOnSync").setAttribute("checked", true);
   },
 
   togglePref: function OW_togglePref(prefName) {

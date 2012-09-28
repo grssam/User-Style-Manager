@@ -77,6 +77,18 @@
               oncommand="optionsWindow.togglePref('updateOverwritesLocalChanges');"/>
           </menupopup>
         </menu>
+        <menu id="syncMenu" label="&syncMenu.label;" accesskey="&syncMenu.accesskey;">
+          <menupopup id="syncMenuPopup" onpopupshowing="optionsWindow.syncMenuPopupShowing();">
+            <menuitem type="checkbox" id="syncStyles" tooltiptext="&syncStyles.tooltip;"
+              accesskey="&syncStyles.accesskey;" label="&syncStyles.label;"
+              oncommand="optionsWindow.togglePref('syncStyles');"/>
+            <menuitem type="checkbox" id="keepDeletedOnSync"
+              tooltiptext="&keepDeletedOnSync.tooltip;"
+              accesskey="&keepDeletedOnSync.accesskey;"
+              label="&keepDeletedOnSync.label;"
+              oncommand="optionsWindow.togglePref('keepDeletedOnSync');"/>
+          </menupopup>
+        </menu>
       </menubar>
       <groupbox id="syleSheetListContainer" flex="1">
         <caption label="&styleSheet.list.caption;" style="font-size:14px;"/>

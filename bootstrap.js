@@ -808,6 +808,39 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
       styleSheetList = JSON.parse(pref("userStyleList"));
       updateSortedList();
     });
+    // Update the synced list on startup if it is empty
+    if (pref("syncedStyleList") == "[]") {
+      if (!syncUpdateTimer) {
+        syncUpdateTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+        syncUpdateTimer.initWithCallback(updateSyncedList,10000, Ci.nsITimer.TYPE_ONE_SHOT);
+      }
+      else {
+        syncUpdateTimer.initWithCallback(updateSyncedList,10000, Ci.nsITimer.TYPE_ONE_SHOT);
+      }
+    }
+    // observer to track and keep in sync any changes in styleSheetList
+    pref.observe(["syncedStyleList"], function() {
+      if (pref("syncStyles")) {
+        updateFromSync();
+      }
+    });
+
+    // Setting the sync pref to toggle sync
+    if (pref("syncStyles")) {
+      Services.prefs.setBoolPref("services.sync.prefs.sync.extensions.UserStyleManager.syncedStyleList", true);
+    }
+    else {
+      Services.prefs.clearUserPref("services.sync.prefs.sync.extensions.UserStyleManager.syncedStyleList");
+    }
+    pref.observe(["syncStyles"], function() {
+      if (pref("syncStyles")) {
+        Services.prefs.setBoolPref("services.sync.prefs.sync.extensions.UserStyleManager.syncedStyleList", true);
+      }
+      else {
+        Services.prefs.clearUserPref("services.sync.prefs.sync.extensions.UserStyleManager.syncedStyleList");
+      }
+    });
+
     // Setup the updating mechanism
     watchWindows(setupUpdates);
     pref.observe(["updateTimeoutActive"], function() {
@@ -820,6 +853,7 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
         }
       }
     });
+
     // Adding an unload funtion to close any opened options window
     unload(function() {
       let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);

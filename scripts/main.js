@@ -39,7 +39,7 @@ let ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 // Global prompt service
 let promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
   .getService(Ci.nsIPromptService);
-
+let syncUpdateTimer = null;
 const XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 const HTML = "http://www.w3.org/1999/xhtml";
 // Function to read the preferences
@@ -79,6 +79,13 @@ function readJSONPref(callback) {
 // Function to write the preferences
 function writeJSONPref(callback) {
   pref("userStyleList", JSON.stringify(styleSheetList));
+  if (!syncUpdateTimer) {
+    syncUpdateTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+    syncUpdateTimer.initWithCallback(updateSyncedList,10000, Ci.nsITimer.TYPE_ONE_SHOT);
+  }
+  else {
+    syncUpdateTimer.initWithCallback(updateSyncedList,10000, Ci.nsITimer.TYPE_ONE_SHOT);
+  }
   let JSONFile = getURIForFileInUserStyles("Preferences/usm.pref").QueryInterface(Ci.nsIFileURL).file;
   let ostream = FileUtils.openSafeFileOutputStream(JSONFile);
   let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
@@ -456,7 +463,10 @@ function updateInUSM(aStyleId, CSSText, name, url, options, aCallback) {
     if (styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)) {
       styleId = parseInt(styleSheetList[i][3].match(/org\/styles\/([0-9]*)\//i)[1]);
       if (styleId == aStyleId) {
-        unloadStyleSheet(i);
+        try {
+          unloadStyleSheet(i);
+        }
+        catch(ex) {}
         let ostream = FileUtils.openSafeFileOutputStream(
           getFileURI(unescape(styleSheetList[i][2])).QueryInterface(Ci.nsIFileURL).file);
         let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
@@ -555,6 +565,109 @@ function checkAndDisplayProperOption(contentWindow, url) {
     });
   }
 }
+
+function updateFromSync() {
+  let remoteStyleSheetList = JSON.parse(pref("syncedStyleList"));
+  let tempStyleSheetList = JSON.parse(JSON.stringify(styleSheetList));
+  let newStyles = [], deletedStyle = [], found = false, i = 0;
+  remoteStyleSheetList.forEach(function([enabled, name, path, url, appOn, added,
+                                         modified, options, localChanges]) {
+    found = false;
+    for each (let style in tempStyleSheetList) {
+      if (style[3] == url) {
+        found = true;
+        break;
+      }
+      i++;
+    }
+    if (found) {
+      if (tempStyleSheetList[i][0] != enabled) {
+        enabled? loadStyleSheet(i): unloadStyleSheet(i);
+      }
+      tempStyleSheetList[i][0] = enabled;
+      tempStyleSheetList[i][1] = name;
+      tempStyleSheetList[i][4] = appOn;
+      tempStyleSheetList[i][6] = modified;
+      tempStyleSheetList[i][7] = options;
+      tempStyleSheetList[i][8] = localChanges;
+    }
+    else {
+      i = tempStyleSheetList.length;
+      tempStyleSheetList.push([enabled, name, path, url, appOn, added,
+                               modified, options, false]);
+      newStyles.push(i)
+    }
+  });
+  styleSheetList = tempStyleSheetList;
+  if (!pref("keepDeletedOnSync")) {
+    tempStyleSheetList.forEach(function([enabled, name, path, url], index) {
+      if (!url.match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i))
+        return;
+      found = false;
+      for each (let style in remoteStyleSheetList) {
+        if (style[3] == url) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        deletedStyle.push(index);
+      }
+    });
+    deleteStylesFromUSM(deletedStyle);
+  }
+  else {
+    writeJSONPref();
+  }
+  addNewStylesFromSync(newStyles);
+}
+
+function addNewStylesFromSync(aStyles, aIndex) {
+  if (aIndex == null)
+    aIndex = 0;
+  else if (aIndex == aStyles.length)
+    return;
+
+  let index = aStyles[aIndex++];
+  if (styleSheetList[index][3].match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
+    let styleId = styleSheetList[index][3].match(/styles\/([0-9]*)\//i)[1];
+    getCodeForStyle(styleId, styleSheetList[index][7], function(code) {
+      updateInUSM(styleId, code, styleSheetList[index][1],
+        styleSheetList[index][3], styleSheetList[index][7], function() {
+          addNewStylesFromSync(aStyles, aIndex);
+        });
+    });
+  }
+  else
+    addNewStylesFromSync(aStyles, aIndex);
+}
+
+function deleteStylesFromUSM(aStyleSheetList) {
+  for each (let index in aStyleSheetList) {
+    // Unload the stylesheet if enabled
+    if (styleSheetList[index][0] == 'enabled')
+      unloadStyleSheet(index);
+    let deletedStyle = styleSheetList.splice(index, 1);
+    if (pref("deleteFromDisk")) {
+      let deletedFile = getFileURI(unescape(deletedStyle[0][2])).QueryInterface(Ci.nsIFileURL).file;
+      if (deletedFile.exists())
+        deletedFile.remove(false);
+    }
+  }
+  writeJSONPref();
+}
+
+let updateSyncedList = {
+  notify: function() {
+    let syncedStyleList = styleSheetList.filter(function ([e,i,p,u]) {
+      return u && u.length > 0;
+    });
+    pref("syncStyles", false)
+    pref("syncedStyleList", JSON.stringify(syncedStyleList));
+    pref("syncStyles", true)
+    syncUpdateTimer = null;
+  }
+};
 
 function getFileURI(path) {
   return path.indexOf("file") == 0? ios.newURI(path, null, null):

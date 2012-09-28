@@ -78,6 +78,9 @@ pref.defaults = {
   updateOverwritesLocalChanges: false,
   lastUpdatedOn: "0",
   updateTimeoutActive: false,
+  syncedStyleList: "[]",
+  syncStyles: true,
+  keepDeletedOnSync: false,
 };
 
 pref.observe = function(prefs, callback) {
