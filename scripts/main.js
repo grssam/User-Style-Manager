@@ -569,7 +569,7 @@ function checkAndDisplayProperOption(contentWindow, url) {
 function updateFromSync() {
   let remoteStyleSheetList = JSON.parse(pref("syncedStyleList"));
   let tempStyleSheetList = JSON.parse(JSON.stringify(styleSheetList));
-  let newStyles = [], deletedStyle = [], found = false, i = 0;
+  let newStyles = [], deletedStyle = [], found = false, i = 0, haveChanges = false;
   remoteStyleSheetList.forEach(function([enabled, name, styleId, options]) {
     enabled = (enabled?"enabled":"disabled");
     found = false;
@@ -587,13 +587,16 @@ function updateFromSync() {
       }
       if (tempStyleSheetList[i][0] != enabled ||
           tempStyleSheetList[i][1] != name ||
-          tempStyleSheetList[i][7] != options)
+          tempStyleSheetList[i][7] != options) {
         tempStyleSheetList[i][6] = JSON.stringify(new Date());
+        haveChanges = true;
+      }
       tempStyleSheetList[i][0] = enabled;
       tempStyleSheetList[i][1] = name;
       tempStyleSheetList[i][7] = options;
     }
     else {
+      haveChanges = true;
       i = tempStyleSheetList.length;
       newStyles.push(i*1)
       let path = escape(name.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css");
@@ -605,30 +608,37 @@ function updateFromSync() {
                                JSON.stringify(new Date()), options, false]);
     }
   });
-  styleSheetList = tempStyleSheetList;
-  addNewStylesFromSync(newStyles, 0, function() {
-    if (!pref("keepDeletedOnSync")) {
-      tempStyleSheetList.forEach(function([enabled, name, path, url], index) {
-        if (!url.match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i))
-          return;
-        found = false;
-        for each (let style in remoteStyleSheetList) {
-          if (style[3] == url) {
-            found = true;
-            break;
+  if (haveChanges) {
+    styleSheetList = tempStyleSheetList;
+    addNewStylesFromSync(newStyles, 0, function() {
+      if (!pref("keepDeletedOnSync")) {
+        tempStyleSheetList.forEach(function([enabled, name, path, url], index) {
+          if (!url.match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i))
+            return;
+          found = false;
+          for each (let style in remoteStyleSheetList) {
+            if (style[3] == url) {
+              found = true;
+              break;
+            }
           }
-        }
-        if (!found) {
-          deletedStyle.push(index);
-        }
-      });
-      deleteStylesFromUSM(deletedStyle);
-    }
-    updateAffectedContents();
-  });
+          if (!found) {
+            deletedStyle.push(index);
+          }
+        });
+        deleteStylesFromUSM(deletedStyle);
+      }
+      updateAffectedContents();
+    });
+  }
 }
 
 function addNewStylesFromSync(aStyles, aIndex, aCallback) {
+  if (aStyles.length == 0) {
+    aCallback && aCallback();
+    return;
+  }
+
   if (aIndex == null)
     aIndex = 0;
   else if (aIndex >= aStyles.length) {
@@ -679,9 +689,7 @@ let updateSyncedList = {
     syncedStyleList = styleSheetList.map(function ([e,n,p,u,a,da,dm,o,l]) {
       return [e?1:0,n, u.match(/styles\/([0-9]*)\//i)[1],o];
     });
-    pref("syncStyles", false)
     pref("syncedStyleList", JSON.stringify(syncedStyleList));
-    pref("syncStyles", true)
     syncUpdateTimer = null;
   }
 };
