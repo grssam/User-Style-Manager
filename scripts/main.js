@@ -570,8 +570,8 @@ function updateFromSync() {
   let remoteStyleSheetList = JSON.parse(pref("syncedStyleList"));
   let tempStyleSheetList = JSON.parse(JSON.stringify(styleSheetList));
   let newStyles = [], deletedStyle = [], found = false, i = 0;
-  remoteStyleSheetList.forEach(function([enabled, name, path, url, appOn, added,
-                                         modified, options, localChanges]) {
+  remoteStyleSheetList.forEach(function([enabled, name, url, options]) {
+    enabled = (enabled?"enabled":"disabled");
     found = false;
     for each (let style in tempStyleSheetList) {
       if (style[3] == url) {
@@ -586,60 +586,63 @@ function updateFromSync() {
       }
       tempStyleSheetList[i][0] = enabled;
       tempStyleSheetList[i][1] = name;
-      tempStyleSheetList[i][4] = appOn;
-      tempStyleSheetList[i][6] = modified;
+      tempStyleSheetList[i][6] = JSON.stringify(new Date());
       tempStyleSheetList[i][7] = options;
-      tempStyleSheetList[i][8] = localChanges;
     }
     else {
       i = tempStyleSheetList.length;
-      tempStyleSheetList.push([enabled, name, path, url, appOn, added,
-                               modified, options, false]);
-      newStyles.push(i)
+      newStyles.push(i*1)
+      tempStyleSheetList.push([enabled, name, escape(name.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css"),
+                               url, "", JSON.stringify(new Date()),
+                               JSON.stringify(new Date()), options, false]);
     }
   });
   styleSheetList = tempStyleSheetList;
-  if (!pref("keepDeletedOnSync")) {
-    tempStyleSheetList.forEach(function([enabled, name, path, url], index) {
-      if (!url.match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i))
-        return;
-      found = false;
-      for each (let style in remoteStyleSheetList) {
-        if (style[3] == url) {
-          found = true;
-          break;
+  addNewStylesFromSync(newStyles, 0, function() {
+    if (!pref("keepDeletedOnSync")) {
+      tempStyleSheetList.forEach(function([enabled, name, path, url], index) {
+        if (!url.match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i))
+          return;
+        found = false;
+        for each (let style in remoteStyleSheetList) {
+          if (style[3] == url) {
+            found = true;
+            break;
+          }
         }
-      }
-      if (!found) {
-        deletedStyle.push(index);
-      }
-    });
-    deleteStylesFromUSM(deletedStyle);
-  }
-  else {
-    writeJSONPref();
-  }
-  addNewStylesFromSync(newStyles);
+        if (!found) {
+          deletedStyle.push(index);
+        }
+      });
+      deleteStylesFromUSM(deletedStyle);
+    }
+    updateAffectedContents();
+  });
 }
 
-function addNewStylesFromSync(aStyles, aIndex) {
+function addNewStylesFromSync(aStyles, aIndex, aCallback) {
   if (aIndex == null)
     aIndex = 0;
-  else if (aIndex == aStyles.length)
+  else if (aIndex >= aStyles.length) {
+    aCallback && aCallback();
     return;
+  }
 
   let index = aStyles[aIndex++];
-  if (styleSheetList[index][3].match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
-    let styleId = styleSheetList[index][3].match(/styles\/([0-9]*)\//i)[1];
-    getCodeForStyle(styleId, styleSheetList[index][7], function(code) {
-      updateInUSM(styleId, code, styleSheetList[index][1],
-        styleSheetList[index][3], styleSheetList[index][7], function() {
-          addNewStylesFromSync(aStyles, aIndex);
-        });
-    });
+  try {
+    if (styleSheetList[index][3].match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
+      let styleId = styleSheetList[index][3].match(/styles\/([0-9]*)\//i)[1];
+      getCodeForStyle(styleId, styleSheetList[index][7], function(code) {
+        updateInUSM(styleId, code, styleSheetList[index][1],
+          styleSheetList[index][3], styleSheetList[index][7], function() {
+            addNewStylesFromSync(aStyles, aIndex, aCallback);
+          });
+      });
+    }
+    else
+      addNewStylesFromSync(aStyles, aIndex, aCallback);
   }
-  else
-    addNewStylesFromSync(aStyles, aIndex);
+  catch (ex) {}
 }
 
 function deleteStylesFromUSM(aStyleSheetList) {
@@ -659,8 +662,12 @@ function deleteStylesFromUSM(aStyleSheetList) {
 
 let updateSyncedList = {
   notify: function() {
-    let syncedStyleList = styleSheetList.filter(function ([e,i,p,u]) {
+    let syncedStyleList = styleSheetList.filter(function ([e,n,p,u]) {
       return u && u.length > 0;
+    });
+    // trimming down the synced pref
+    syncedStyleList = styleSheetList.map(function ([e,n,p,u,a,da,dm,o,l]) {
+      return [e?1:0,n,u,o];
     });
     pref("syncStyles", false)
     pref("syncedStyleList", JSON.stringify(syncedStyleList));
