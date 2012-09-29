@@ -835,6 +835,13 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     pref.observe(["syncStyles"], function() {
       if (pref("syncStyles")) {
         Services.prefs.setBoolPref("services.sync.prefs.sync.extensions.UserStyleManager.syncedStyleList", true);
+        if (!syncUpdateTimer) {
+          syncUpdateTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+          syncUpdateTimer.initWithCallback(updateSyncedList,10000, Ci.nsITimer.TYPE_ONE_SHOT);
+        }
+        else {
+          syncUpdateTimer.initWithCallback(updateSyncedList,10000, Ci.nsITimer.TYPE_ONE_SHOT);
+        }
       }
       else {
         Services.prefs.clearUserPref("services.sync.prefs.sync.extensions.UserStyleManager.syncedStyleList");

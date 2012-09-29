@@ -570,11 +570,11 @@ function updateFromSync() {
   let remoteStyleSheetList = JSON.parse(pref("syncedStyleList"));
   let tempStyleSheetList = JSON.parse(JSON.stringify(styleSheetList));
   let newStyles = [], deletedStyle = [], found = false, i = 0;
-  remoteStyleSheetList.forEach(function([enabled, name, url, options]) {
+  remoteStyleSheetList.forEach(function([enabled, name, styleId, options]) {
     enabled = (enabled?"enabled":"disabled");
     found = false;
     for each (let style in tempStyleSheetList) {
-      if (style[3] == url) {
+      if (style[3].match(/styles\/([0-9]*)\//i)[1] == styleId) {
         found = true;
         break;
       }
@@ -593,7 +593,8 @@ function updateFromSync() {
       i = tempStyleSheetList.length;
       newStyles.push(i*1)
       tempStyleSheetList.push([enabled, name, escape(name.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css"),
-                               url, "", JSON.stringify(new Date()),
+                               "http://userstyles.org/styles/" + styleId + "/",
+                               "", JSON.stringify(new Date()),
                                JSON.stringify(new Date()), options, false]);
     }
   });
@@ -667,7 +668,7 @@ let updateSyncedList = {
     });
     // trimming down the synced pref
     syncedStyleList = styleSheetList.map(function ([e,n,p,u,a,da,dm,o,l]) {
-      return [e?1:0,n,u,o];
+      return [e?1:0,n, u.match(/styles\/([0-9]*)\//i)[1],o];
     });
     pref("syncStyles", false)
     pref("syncedStyleList", JSON.stringify(syncedStyleList));
