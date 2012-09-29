@@ -584,9 +584,12 @@ function updateFromSync() {
       if (tempStyleSheetList[i][0] != enabled) {
         enabled? loadStyleSheet(i): unloadStyleSheet(i);
       }
+      if (tempStyleSheetList[i][0] != enabled ||
+          tempStyleSheetList[i][1] != name ||
+          tempStyleSheetList[i][7] != options)
+        tempStyleSheetList[i][6] = JSON.stringify(new Date());
       tempStyleSheetList[i][0] = enabled;
       tempStyleSheetList[i][1] = name;
-      tempStyleSheetList[i][6] = JSON.stringify(new Date());
       tempStyleSheetList[i][7] = options;
     }
     else {
