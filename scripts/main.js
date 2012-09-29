@@ -574,7 +574,8 @@ function updateFromSync() {
     enabled = (enabled?"enabled":"disabled");
     found = false;
     for each (let style in tempStyleSheetList) {
-      if (style[3].match(/styles\/([0-9]*)\//i)[1] == styleId) {
+      if (style[3].match(/styles\/([0-9]*)\//i) &&
+          style[3].match(/styles\/([0-9]*)\//i)[1] == styleId) {
         found = true;
         break;
       }
@@ -672,7 +673,7 @@ function deleteStylesFromUSM(aStyleSheetList) {
 let updateSyncedList = {
   notify: function() {
     let syncedStyleList = styleSheetList.filter(function ([e,n,p,u]) {
-      return u && u.length > 0;
+      return u && u.match(/styles\/([0-9]*)\//i);
     });
     // trimming down the synced pref
     syncedStyleList = styleSheetList.map(function ([e,n,p,u,a,da,dm,o,l]) {
