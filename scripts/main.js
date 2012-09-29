@@ -592,7 +592,10 @@ function updateFromSync() {
     else {
       i = tempStyleSheetList.length;
       newStyles.push(i*1)
-      tempStyleSheetList.push([enabled, name, escape(name.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css"),
+      let path = escape(name.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css");
+      if (path == ".css")
+        path = "User Synced Style Sheet " + i + ".css";
+      tempStyleSheetList.push([enabled, name, path,
                                "http://userstyles.org/styles/" + styleId + "/",
                                "", JSON.stringify(new Date()),
                                JSON.stringify(new Date()), options, false]);
@@ -643,7 +646,9 @@ function addNewStylesFromSync(aStyles, aIndex, aCallback) {
     else
       addNewStylesFromSync(aStyles, aIndex, aCallback);
   }
-  catch (ex) {}
+  catch (ex) {
+    addNewStylesFromSync(aStyles, aIndex, aCallback);
+  }
 }
 
 function deleteStylesFromUSM(aStyleSheetList) {
