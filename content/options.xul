@@ -1,27 +1,9 @@
 <?xml version="1.0"?>
 <!-- ***** BEGIN LICENSE BLOCK *****
- - Version: MIT/X11 License
- - 
- - Copyright (c) 2011 Girish Sharma
- - 
- - Permission is hereby granted, free of charge, to any person obtaining copy
- - of this software and associated documentation files (the "Software"), to deal
- - in the Software without restriction, including without limitation the rights
- - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- - copies of the Software, and to permit persons to whom the Software is
- - furnished to do so, subject to the following conditions:
- - 
- - The above copyright notice and this permission notice shall be included in
- - all copies or substantial portions of the Software.
- - 
- - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- - THE SOFTWARE.
  -
+ - This Source Code Form is subject to the terms of the Mozilla Public
+ - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ - You can obtain one at http://mozilla.org/MPL/2.0/.
  - Creator:
  -   Girish Sharma <scrapmachines@gmail.com>
  -
@@ -29,102 +11,210 @@
 <!DOCTYPE window SYSTEM "chrome://userstylemanager/locale/optionwindow.dtd">
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="options.css" type="text/css"?>
-<prefwindow id="USMOptionsWindow" title="&window.title;"
-  minwidth="800" minheight="600" flex="1"
-  buttons="accept,cancel" ondialogaccept="optionsWindow.saveChanges();"
-  persist="sizemode width height"
-  onload="optionsWindow.onLoad()" onunload="optionsWindow.onUnload()"
-  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<prefwindow id="USMOptionsWindow"
+            flex="1"
+            title="&window.title;"
+            xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+            onload="optionsWindow.onLoad()"
+            buttons="accept,cancel"
+            persist="sizemode width height"
+            minwidth="800"
+            minheight="600"
+            onunload="optionsWindow.onUnload()"
+            ondialogaccept="optionsWindow.saveChanges();">
   <script type="application/x-javascript" src="options.js"/>
   <notificationbox id="changeNotificationBox" flex="1"/>
   <prefpane id="USMOptionsPane">
     <preferences>
-      <preference id="hideWindow" name="extensions.UserStyleManager.hideOptionsWhileEditing" type="bool"/>
-      <preference id="createHotKey" name="extensions.UserStyleManager.createHotKey" type="bool"/>
-      <preference id="deleteFromDisk" name="extensions.UserStyleManager.deleteFromDisk" type="bool"/>
+      <preference id="hideWindow"
+                  name="extensions.UserStyleManager.hideOptionsWhileEditing"
+                  type="bool"/>
+      <preference id="createHotKey"
+                  name="extensions.UserStyleManager.createHotKey"
+                  type="bool"/>
+      <preference id="deleteFromDisk"
+                  name="extensions.UserStyleManager.deleteFromDisk"
+                  type="bool"/>
     </preferences>
     <vbox flex="1">
-      <menubar id="optionsMenubar" style="margin: 0px; border: solid black; border-width:0px 0px 1px 0px !important" flex="1">
-        <menu id="backupMenu" label="&backupMenu.label;" accesskey="&backupMenu.accesskey;">
-          <menupopup id="backupMenuPopup" onpopupshowing="optionsWindow.backupMenuPopupShowing();">
-            <menuitem type="checkbox" id="maintainBackupMenuitem" tooltiptext="&backup.tooltip;"
-              label="&backup.label;" accesskey="&backup.accesskey;" oncommand="optionsWindow.togglePref('maintainBackup');"/>
-            <menuitem type="checkbox" id="fallBackMenuitem" tooltiptext="&fallback.tooltip;"
-              accesskey="&fallback.accesskey;" label="&fallback.label;" oncommand="optionsWindow.togglePref('fallBack');"/>
+      <menubar id="optionsMenubar"
+               flex="1"
+               style="margin: 0px; border: solid black; border-width:0px 0px 1px 0px !important">
+        <menu id="backupMenu"
+              label="&backupMenu.label;"
+              accesskey="&backupMenu.accesskey;">
+          <menupopup id="backupMenuPopup"
+                     onpopupshowing="optionsWindow.backupMenuPopupShowing();">
+            <menuitem id="maintainBackupMenuitem"
+                      type="checkbox"
+                      label="&backup.label;"
+                      accesskey="&backup.accesskey;"
+                      oncommand="optionsWindow.togglePref('maintainBackup');"
+                      tooltiptext="&backup.tooltip;"/>
+            <menuitem id="fallBackMenuitem"
+                      type="checkbox"
+                      label="&fallback.label;"
+                      accesskey="&fallback.accesskey;"
+                      oncommand="optionsWindow.togglePref('fallBack');"
+                      tooltiptext="&fallback.tooltip;"/>
           </menupopup>
         </menu>
-        <menu id="entryMenu" label="&entryMenu.label;" accesskey="&entryMenu.accesskey;">
-          <menupopup id="entryMenuPopup" onpopupshowing="optionsWindow.entryMenuPopupShowing();">
-            <menuitem type="checkbox" id="createAppMenuMenuitem" tooltiptext="&appMenu.tooltip;"
-              accesskey="&appMenu.accesskey;" label="&appMenu.label;" oncommand="optionsWindow.togglePref('createAppMenuButton');"/>
-            <menuitem type="checkbox" id="createToolbarButtonMenuitem" tooltiptext="&button.tooltip;"
-              accesskey="&button.accesskey;" label="&button.label;" oncommand="optionsWindow.togglePref('createToolbarButton');"/>
-            <menuitem type="checkbox" id="createToolsMenuMenuitem" tooltiptext="&toolsMenu.tooltip;"
-              accesskey="&toolsMenu.accesskey;" label="&toolsMenu.label;" oncommand="optionsWindow.togglePref('createToolsMenuButton');"/>
-            <menuitem type="checkbox" id="createContextMenuMenuitem" tooltiptext="&contextMenu.tooltip;"
-              accesskey="&contextMenu.accesskey;" label="&contextMenu.label;" oncommand="optionsWindow.togglePref('createContextMenuEntry');"/>
+        <menu id="entryMenu"
+              label="&entryMenu.label;"
+              accesskey="&entryMenu.accesskey;">
+          <menupopup id="entryMenuPopup"
+                     onpopupshowing="optionsWindow.entryMenuPopupShowing();">
+            <menuitem id="createAppMenuMenuitem"
+                      type="checkbox"
+                      label="&appMenu.label;"
+                      accesskey="&appMenu.accesskey;"
+                      oncommand="optionsWindow.togglePref('createAppMenuButton');"
+                      tooltiptext="&appMenu.tooltip;"/>
+            <menuitem id="createToolbarButtonMenuitem"
+                      type="checkbox"
+                      label="&button.label;"
+                      accesskey="&button.accesskey;"
+                      oncommand="optionsWindow.togglePref('createToolbarButton');"
+                      tooltiptext="&button.tooltip;"/>
+            <menuitem id="createToolsMenuMenuitem"
+                      type="checkbox"
+                      label="&toolsMenu.label;"
+                      accesskey="&toolsMenu.accesskey;"
+                      oncommand="optionsWindow.togglePref('createToolsMenuButton');"
+                      tooltiptext="&toolsMenu.tooltip;"/>
+            <menuitem id="createContextMenuMenuitem"
+                      type="checkbox"
+                      label="&contextMenu.label;"
+                      accesskey="&contextMenu.accesskey;"
+                      oncommand="optionsWindow.togglePref('createContextMenuEntry');"
+                      tooltiptext="&contextMenu.tooltip;"/>
           </menupopup>
         </menu>
-        <menu id="updateMenu" label="&updateMenu.label;" accesskey="&updateMenu.accesskey;">
-          <menupopup id="updateMenuPopup" onpopupshowing="optionsWindow.updateMenuPopupShowing();">
-            <menuitem type="checkbox" id="updateAutomatically" tooltiptext="&updateAutomatically.tooltip;"
-              accesskey="&updateAutomatically.accesskey;" label="&updateAutomatically.label;"
-              oncommand="optionsWindow.togglePref('updateAutomatically');"/>
-            <menuitem type="checkbox" id="updateOverwritesLocalChanges"
-              tooltiptext="&updateOverwritesLocalChanges.tooltip;"
-              accesskey="&updateOverwritesLocalChanges.accesskey;"
-              label="&updateOverwritesLocalChanges.label;"
-              oncommand="optionsWindow.togglePref('updateOverwritesLocalChanges');"/>
+        <menu id="updateMenu"
+              label="&updateMenu.label;"
+              accesskey="&updateMenu.accesskey;">
+          <menupopup id="updateMenuPopup"
+                     onpopupshowing="optionsWindow.updateMenuPopupShowing();">
+            <menuitem id="updateAutomatically"
+                      type="checkbox"
+                      label="&updateAutomatically.label;"
+                      accesskey="&updateAutomatically.accesskey;"
+                      oncommand="optionsWindow.togglePref('updateAutomatically');"
+                      tooltiptext="&updateAutomatically.tooltip;"/>
+            <menuitem id="updateOverwritesLocalChanges"
+                      type="checkbox"
+                      label="&updateOverwritesLocalChanges.label;"
+                      accesskey="&updateOverwritesLocalChanges.accesskey;"
+                      oncommand="optionsWindow.togglePref('updateOverwritesLocalChanges');"
+                      tooltiptext="&updateOverwritesLocalChanges.tooltip;"/>
           </menupopup>
         </menu>
-        <menu id="syncMenu" label="&syncMenu.label;" accesskey="&syncMenu.accesskey;">
-          <menupopup id="syncMenuPopup" onpopupshowing="optionsWindow.syncMenuPopupShowing();">
-            <menuitem type="checkbox" id="syncStyles" tooltiptext="&syncStyles.tooltip;"
-              accesskey="&syncStyles.accesskey;" label="&syncStyles.label;"
-              oncommand="optionsWindow.togglePref('syncStyles');"/>
-            <menuitem type="checkbox" id="keepDeletedOnSync"
-              tooltiptext="&keepDeletedOnSync.tooltip;"
-              accesskey="&keepDeletedOnSync.accesskey;"
-              label="&keepDeletedOnSync.label;"
-              oncommand="optionsWindow.togglePref('keepDeletedOnSync');"/>
+        <menu id="syncMenu"
+              label="&syncMenu.label;"
+              accesskey="&syncMenu.accesskey;">
+          <menupopup id="syncMenuPopup"
+                     onpopupshowing="optionsWindow.syncMenuPopupShowing();">
+            <menuitem id="syncStyles"
+                      type="checkbox"
+                      label="&syncStyles.label;"
+                      oncommand="optionsWindow.togglePref('syncStyles');"
+                      accesskey="&syncStyles.accesskey;"
+                      tooltiptext="&syncStyles.tooltip;"/>
+            <menuitem id="keepDeletedOnSync"
+                      type="checkbox"
+                      label="&keepDeletedOnSync.label;"
+                      accesskey="&keepDeletedOnSync.accesskey;"
+                      oncommand="optionsWindow.togglePref('keepDeletedOnSync');"
+                      tooltiptext="&keepDeletedOnSync.tooltip;"/>
           </menupopup>
         </menu>
       </menubar>
-      <groupbox id="syleSheetListContainer" flex="1">
-        <caption label="&styleSheet.list.caption;" style="font-size:14px;"/>
-        <tree id="styleSheetTree" flex="1" hidecolumnpicker="false" onselect="optionsWindow.onTreeClick();"
-          class="tree" rows="10" editable="true" onkeypress="optionsWindow.onTreeKeypress(event);">
-
+      <groupbox id="syleSheetListContainer"
+                flex="1">
+        <caption label="&styleSheet.list.caption;"
+                 style="font-size:14px;"/>
+        <tree id="styleSheetTree"
+              flex="1"
+              rows="10"
+              class="tree"
+              onselect="optionsWindow.onTreeClick();"
+              editable="true"
+              onkeypress="optionsWindow.onTreeKeypress(event);"
+              hidecolumnpicker="false">
           <treecols>
-            <treecol id="styleSheetStateCol" primary="true" flex="0" label=""
-              ordinal="1" type="checkbox" editable="true" minwidth="50" maxwidth="50"/>
-            <splitter class="tree-splitter" ordinal="2"/>
-            <treecol id="styleSheetNameCol" flex="1" label="&styleHeader.name;"
-              persist="width ordinal" ordinal="3" editable="true"/>
-            <splitter class="tree-splitter" ordinal="4"/>
-            <treecol id="styleSheetAppliesOnCol" flex="1" label="&styleHeader.affects;"
-              persist="width ordinal hidden" ordinal="5" editable="false" crop="center"/>
-            <splitter class="tree-splitter" ordinal="6"/>
-            <treecol id="styleSheetDateAdded" flex="1" label="&styleHeader.dateAdded;"
-              persist="width ordinal hidden" ordinal="7" editable="false"/>
-            <splitter class="tree-splitter" ordinal="8"/>
-            <treecol id="styleSheetDateModified" flex="1" label="&styleHeader.dateModified;"
-              persist="width ordinal hidden" ordinal="9" editable="false"/>
+            <treecol id="styleSheetStateCol"
+                     flex="0"
+                     type="checkbox"
+                     label=""
+                     ordinal="1"
+                     editable="true"
+                     minwidth="50"
+                     maxwidth="50"
+                     primary="true"/>
+            <splitter class="tree-splitter"
+                      ordinal="2"/>
+            <treecol id="styleSheetNameCol"
+                     flex="1"
+                     label="&styleHeader.name;"
+                     persist="width ordinal"
+                     ordinal="3"
+                     editable="true"/>
+            <splitter class="tree-splitter"
+                      ordinal="4"/>
+            <treecol id="styleSheetAppliesOnCol"
+                     crop="center"
+                     flex="1"
+                     label="&styleHeader.affects;"
+                     persist="width ordinal hidden"
+                     ordinal="5"
+                     editable="false"/>
+            <splitter class="tree-splitter"
+                      ordinal="6"/>
+            <treecol id="styleSheetDateAdded"
+                     flex="1"
+                     label="&styleHeader.dateAdded;"
+                     persist="width ordinal hidden"
+                     ordinal="7"
+                     editable="false"/>
+            <splitter class="tree-splitter"
+                      ordinal="8"/>
+            <treecol id="styleSheetDateModified"
+                     flex="1"
+                     label="&styleHeader.dateModified;"
+                     persist="width ordinal hidden"
+                     ordinal="9"
+                     editable="false"/>
           </treecols>
-          <treechildren id="styleSheetList" flex="1"/>
+          <treechildren id="styleSheetList"
+                        flex="1"/>
         </tree>
         <hbox style="margin:5px;">
-          <button id="updateStyleSheet" label="&updateBtn.label;" onclick="optionsWindow.updateStyle();"
-            accesskey="&updateBtn.accesskey;" tooltiptext="&updateBtn.tooltip;"/>
-          <button id="updateAllStyleSheet" label="&updateAllBtn.label;" onclick="optionsWindow.updateAllStyle();"
-            accesskey="&updateAllBtn.accesskey;" tooltiptext="&updateAllBtn.tooltip;"/>
+          <button id="updateStyleSheet"
+                  label="&updateBtn.label;"
+                  onclick="optionsWindow.updateStyle();"
+                  accesskey="&updateBtn.accesskey;"
+                  tooltiptext="&updateBtn.tooltip;"/>
+          <button id="updateAllStyleSheet"
+                  label="&updateAllBtn.label;"
+                  onclick="optionsWindow.updateAllStyle();"
+                  accesskey="&updateAllBtn.accesskey;"
+                  tooltiptext="&updateAllBtn.tooltip;"/>
           <spacer flex="1"/>
-          <button id="moreInfo" label="&infoBtn.label;" onclick="optionsWindow.showMoreInfo();"
-            tooltiptext="&infoBtn.tooltip;" accesskey="&infoBtn.accesskey;"/>
-          <button id="editStyleSheet" label="&editBtn.label;" onclick="optionsWindow.editStyleSheet();"
-            tooltiptext="&editBtn.tooltip;" accesskey="&editBtn.accesskey;"/>
-          <button id="deleteStyleSheet" label="&deleteBtn.label;" onclick="optionsWindow.deleteStyleSheet();"
-            tooltiptext="&deleteBtn.tooltip;" accesskey="&deleteBtn.accesskey;"/>
+          <button id="moreInfo"
+                  label="&infoBtn.label;"
+                  onclick="optionsWindow.showMoreInfo();"
+                  accesskey="&infoBtn.accesskey;"
+                  tooltiptext="&infoBtn.tooltip;"/>
+          <button id="editStyleSheet"
+                  label="&editBtn.label;"
+                  onclick="optionsWindow.editStyleSheet();"
+                  accesskey="&editBtn.accesskey;"
+                  tooltiptext="&editBtn.tooltip;"/>
+          <button id="deleteStyleSheet"
+                  label="&deleteBtn.label;"
+                  onclick="optionsWindow.deleteStyleSheet();"
+                  accesskey="&deleteBtn.accesskey;"
+                  tooltiptext="&deleteBtn.tooltip;"/>
         </hbox>
       </groupbox>
       <hbox>
@@ -133,12 +223,19 @@
           <grid>
             <rows>
               <row>
-                <checkbox id="hideWindowCheckBox" preference="hideWindow" onclick="optionsWindow.notifyChange()"
-                  tooltiptext="&hideWindow.tooltip;" accesskey="&hideWindow.accesskey;" label="&hideWindow.label;" />
+                <checkbox id="hideWindowCheckBox"
+                          label="&hideWindow.label;"
+                          onclick="optionsWindow.notifyChange()"
+                          accesskey="&hideWindow.accesskey;"
+                          preference="hideWindow"
+                          tooltiptext="&hideWindow.tooltip;"/>
               </row>
               <row>
-                <checkbox id="deleteFromDiskCheckBox" preference="deleteFromDisk" onclick="optionsWindow.notifyChange()"
-                  tooltiptext="&deleteFromDisk.tooltip;" label="&deleteFromDisk.label;" />
+                <checkbox id="deleteFromDiskCheckBox"
+                          label="&deleteFromDisk.label;"
+                          onclick="optionsWindow.notifyChange()"
+                          preference="deleteFromDisk"
+                          tooltiptext="&deleteFromDisk.tooltip;"/>
               </row>
             </rows>
           </grid>
@@ -147,24 +244,44 @@
         <vbox>
           <hbox>
             <spacer flex="1"/>
-            <checkbox id="createHotKeyCheckBox" preference="createHotKey" onclick="optionsWindow.notifyChange()"
-              tooltiptext="&hotkey.tooltip;" accesskey="&hotkey.accesskey;" label="&hotkey.label;" />
+            <checkbox id="createHotKeyCheckBox"
+                      label="&hotkey.label;"
+                      onclick="optionsWindow.notifyChange()"
+                      accesskey="&hotkey.accesskey;"
+                      preference="createHotKey"
+                      tooltiptext="&hotkey.tooltip;"/>
           </hbox>
           <hbox>
-            <label id="shortcutLabel" value="&combination.label;"
-              accesskey="&combination.accesskey;" control="shortcutTextBox" style="padding: 5px 0px;"/>
-            <textbox flex="1" id="shortcutTextBox" value="" width="120px" style="margin-right:5px;"
-              onkeyup="optionsWindow.notifyChange(this.value);" tooltiptext="&combination.tooltip;"/>
+            <label id="shortcutLabel"
+                   style="padding: 5px 0px;"
+                   value="&combination.label;"
+                   control="shortcutTextBox"
+                   accesskey="&combination.accesskey;"/>
+            <textbox id="shortcutTextBox"
+                     flex="1"
+                     style="margin-right:5px;"
+                     value=""
+                     width="120px"
+                     onkeyup="optionsWindow.notifyChange(this.value);"
+                     tooltiptext="&combination.tooltip;"/>
           </hbox>
           <spacer flex="1"/>
           <hbox>
             <spacer flex="1"/>
-            <label accesskey="&addBtn.accesskey;" control="addStyleSheetButton" style="padding:5px 0px;"
-              tooltiptext="&addBtn.label.tooltip;">&addBtn.label.label;</label>
-            <button id="addStyleSheetButton" label="&addBtn.label;" onclick="optionsWindow.openFile();"
-              tooltiptext="&addBtn.tooltip;"/>
-            <button id="createStyleSheet" label="&createBtn.label;" onclick="optionsWindow.createStyleSheet();"
-              tooltiptext="&createBtn.tooltip;" accesskey="&createBtn.accesskey;" style="margin-right:5px;"/>
+            <label style="padding:5px 0px;"
+                   control="addStyleSheetButton"
+                   accesskey="&addBtn.accesskey;"
+                   tooltiptext="&addBtn.label.tooltip;">&addBtn.label.label;</label>
+            <button id="addStyleSheetButton"
+                    label="&addBtn.label;"
+                    onclick="optionsWindow.openFile();"
+                    tooltiptext="&addBtn.tooltip;"/>
+            <button id="createStyleSheet"
+                    label="&createBtn.label;"
+                    style="margin-right:5px;"
+                    onclick="optionsWindow.createStyleSheet();"
+                    accesskey="&createBtn.accesskey;"
+                    tooltiptext="&createBtn.tooltip;"/>
           </hbox>
         </vbox>
       </hbox>

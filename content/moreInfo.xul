@@ -1,12 +1,15 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<dialog
-  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-  id="moreInfoDialog" title=""
-  buttons="accept" ondialogaccept="window.close();"
-  buttonpack="center"
-  onload="onLoad();" width="400" height="250"
-  windowtype="styleSheetInfoDialogBox">
+<dialog id="moreInfoDialog"
+        title=""
+        width="400"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        height="250"
+        onload="onLoad();"
+        buttons="accept"
+        buttonpack="center"
+        windowtype="styleSheetInfoDialogBox"
+        ondialogaccept="window.close();">
   <script type="text/javascript">
     function toDateString(dateString) {
       let date = new Date(JSON.parse(dateString));
@@ -33,13 +36,43 @@
   <grid flex="1">
     <columns><column flex="1"/><column flex="1"/></columns>
     <rows>
-      <row align="center"><label style="text-align:right;" value="User Style Name :"/><label id="name" value="" flex="1" crop="center"/></row>
-      <row align="center"><label style="text-align:right;" value="Style Added on :"/><label id="added" value="" flex="1" crop="center"/></row>
-      <row align="center"><label style="text-align:right;" value="Last Modified on :"/><label id="modified" value="" flex="1" crop="center"/></row>
-      <row align="center"><label style="text-align:right;" value="Style Sheet Affects :"/><label id="affects" value="" flex="1" crop="center"/></row>
+      <row align="center">
+        <label style="text-align:right;"
+               value="User Style Name :"/>
+        <label id="name"
+               crop="center"
+               flex="1"
+               value=""/>
+      </row>
+      <row align="center">
+        <label style="text-align:right;" value="Style Added on :"/>
+        <label id="added" value="" flex="1" crop="center"/>
+      </row>
+      <row align="center">
+        <label style="text-align:right;"
+               value="Last Modified on :"/>
+        <label id="modified"
+               crop="center"
+               flex="1"
+               value=""/>
+      </row>
+      <row align="center">
+        <label style="text-align:right;"
+               value="Style Sheet Affects :"/>
+        <label id="affects"
+               crop="center"
+               flex="1"
+               value=""/>
+      </row>
     </rows>
   </grid>
-  <hbox flex="1" pack="center">
-    <label style="text-align:center;font-size:16px;" value="Home Page" id="homeLink" href="" class="text-link" flex="1"/>
-  </hbox>
+  <hbox flex="1"
+        pack="center">
+    <label id="homeLink"
+           flex="1"
+           href=""
+           class="text-link"
+           style="text-align:center;font-size:16px;"
+           value="Home Page"/>
+    </hbox>
 </dialog>
