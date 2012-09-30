@@ -42,6 +42,8 @@ let promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 let syncUpdateTimer = null;
 const XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 const HTML = "http://www.w3.org/1999/xhtml";
+const EDITOR_WINDOW_FEATURES = "chrome,resizable,dialog=no,centerscreen,titlebar",
+      EDITOR_WINDOW_URL = "chrome://userstylemanager/content/editor.xul";
 // Function to read the preferences
 function readJSONPref(callback) {
   let JSONFile = getURIForFileInUserStyles("Preferences/usm.pref").QueryInterface(Ci.nsIFileURL).file;
@@ -387,6 +389,15 @@ function toggleStyleSheet(index, oldVal, newVal) {
     loadStyleSheet(index);
   }
   writeJSONPref();
+}
+
+function openUserStyleEditor(name, params) {
+  let args = Cc["@mozilla.org/embedcomp/dialogparam;1"]
+               .createInstance(Ci.nsIDialogParamBlock);
+  args.SetNumberStrings(1);
+  args.SetString(0, JSON.stringify(params));
+  return Services.ww.openWindow(null, EDITOR_WINDOW_URL, name,
+    EDITOR_WINDOW_FEATURES, args);
 }
 
 function getCodeForStyle(styleId, options, callback) {

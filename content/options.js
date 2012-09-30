@@ -60,11 +60,7 @@ let optionsWindow = {
     fp.appendFilter("Style Sheets","*.css;");
     if (fp.show() != Ci.nsIFilePicker.returnCancel) {
       let args = [true, styleSheetList.length, false, escape(fp.file.path), true];
-      Services.wm.getMostRecentWindow("navigator:browser")
-        .openDialog("chrome://userstylemanager/content/editor.xul",
-        "User Style Manager - Editor - Open File","chrome,resizable,height=600,width=800,top="
-        + (window.screen.height/2 - 300) + ",left="
-        + (window.screen.width/2 - 400), args);
+      openUserStyleEditor("User Style Manager - Editor - Open File", args).focus();
       this.editorOpened = true;
       if (pref("hideOptionsWhileEditing"))
         window.close();
@@ -317,11 +313,7 @@ let optionsWindow = {
       this.tree.view.selection.getRangeAt(t, start, end);
       for (let i = start.value; i <= end.value; i++) {
         let args = [false, this.treeView.list[i][20], false, "", true];
-        Services.wm.getMostRecentWindow("navigator:browser")
-          .openDialog("chrome://userstylemanager/content/editor.xul",
-          "User Style Manager - Editor " + i, "chrome,resizable,height=600,width=800,top="
-          + (window.screen.height/2 - 300) + ",left="
-          + (window.screen.width/2 - 400), args).focus();
+        openUserStyleEditor("User Style Manager - Editor " + i, args).focus();
       }
     }
     this.editorOpened = true;
@@ -331,11 +323,7 @@ let optionsWindow = {
 
   createStyleSheet: function OW_editStyleSheet() {
     let args = [false, styleSheetList.length, true, "", true];
-    Services.wm.getMostRecentWindow("navigator:browser")
-      .openDialog("chrome://userstylemanager/content/editor.xul",
-      "User Style Manager - Editor - New","chrome,resizable,height=600,width=800,top="
-      + (window.screen.height/2 - 300) + ",left="
-      + (window.screen.width/2 - 400), args).focus();
+    openUserStyleEditor("User Style Manager - Editor - New", args).focus();
     this.editorOpened = true;
     if (pref("hideOptionsWhileEditing"))
       window.close();

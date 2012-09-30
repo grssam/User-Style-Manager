@@ -1157,6 +1157,9 @@ StyleEditor.prototype = {
     // Check if the window was opened with any arguments called
     if (this.win.arguments[0]) {
       let args = this.win.arguments[0];
+      if (args instanceof Ci.nsIDialogParamBlock) {
+        args = JSON.parse(args.GetString(0));
+      }
       if (args[0]) {
         // open a new file
         this.openNew = true;

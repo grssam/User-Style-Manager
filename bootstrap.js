@@ -161,10 +161,7 @@ function addContextMenuEntry(window) {
                   Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize"))
               });
     let args = [false, styleSheetList.length, true, CSSText, false];
-    window.openDialog("chrome://userstylemanager/content/editor.xul",
-      "User Style Manager - Editor","chrome,resizable,height=600,width=800,top="
-      + (window.screen.height/2 - 300) + ",left="
-      + (window.screen.width/2 - 400), args).focus();
+    openUserStyleEditor("User Style Manager - Editor", args).focus();
   }
   if (!$(contextMenuEntryID) && pref("createContextMenuEntry")) {
     browserContextShowing = function () {
@@ -232,11 +229,7 @@ function createNew(window, type) {
                 + l10n("writeStyleHere") + "\n}";
       break;
   }
-  Services.wm.getMostRecentWindow("navigator:browser")
-    .openDialog("chrome://userstylemanager/content/editor.xul",
-    "User Style Manager - Editor - Create New","chrome,resizable,height=600,width=800,top="
-    + (window.screen.height/2 - 300) + ",left="
-    + (window.screen.width/2 - 400), args).focus();
+  openUserStyleEditor("User Style Manager - Editor - Create New", args).focus();
 }
 
 function populateMenuPopupList(window, id, event) {
@@ -394,11 +387,7 @@ function populateMenuPopupList(window, id, event) {
                 event.preventDefault();
                 let args = [false, index, false, "", false, styleSheetList[index][1],
                             styleSheetList[index][3], styleSheetList[index][7]];
-                Services.wm.getMostRecentWindow("navigator:browser")
-                  .openDialog("chrome://userstylemanager/content/editor.xul",
-                  "User Style Manager - Editor " + index, "chrome,resizable,height=600,width=800,top="
-                  + (window.screen.height/2 - 300) + ",left="
-                  + (window.screen.width/2 - 400), args).focus();
+                openUserStyleEditor("User Style Manager - Editor " + index, args).focus();
                 return;
               }
               event.preventDefault();
@@ -467,11 +456,7 @@ function populateMenuPopupList(window, id, event) {
           event.target.parentNode.hidePopup();
           event.preventDefault();
           let args = [false, index, false, "", false];
-          Services.wm.getMostRecentWindow("navigator:browser")
-            .openDialog("chrome://userstylemanager/content/editor.xul",
-            "User Style Manager - Editor " + index, "chrome,resizable,height=600,width=800,top="
-            + (window.screen.height/2 - 300) + ",left="
-            + (window.screen.width/2 - 400), args).focus();
+          openUserStyleEditor("User Style Manager - Editor " + index, args).focus();
           return;
         }
         event.preventDefault();
@@ -663,10 +648,7 @@ function openOptions(window) {
 function addUserStyleHandler(window) {
   function addToUSM(CSSText, name, url, options) {
     let args = [false, styleSheetList.length, true, CSSText, false, name, url, options];
-    let editor = window.openDialog("chrome://userstylemanager/content/editor.xul",
-      "User Style Manager - Editor","chrome,resizable,height=600,width=800,top="
-      + (window.screen.height/2 - 300) + ",left="
-      + (window.screen.width/2 - 400), args);
+    let editor = openUserStyleEditor("User Style Manager - Editor", args);
     editor.focus();
     editor.onbeforeunload = function() {
       if (window.gBrowser.selectedBrowser.currentURI.spec == url)
