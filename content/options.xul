@@ -100,16 +100,16 @@
               ordinal="1" type="checkbox" editable="true" minwidth="50" maxwidth="50"/>
             <splitter class="tree-splitter" ordinal="2"/>
             <treecol id="styleSheetNameCol" flex="1" label="&styleHeader.name;"
-              persist="width" ordinal="3" editable="true"/>
+              persist="width ordinal" ordinal="3" editable="true"/>
             <splitter class="tree-splitter" ordinal="4"/>
             <treecol id="styleSheetAppliesOnCol" flex="1" label="&styleHeader.affects;"
-              persist="width" ordinal="5" editable="false" crop="center"/>
+              persist="width ordinal hidden" ordinal="5" editable="false" crop="center"/>
             <splitter class="tree-splitter" ordinal="6"/>
             <treecol id="styleSheetDateAdded" flex="1" label="&styleHeader.dateAdded;"
-              persist="width" ordinal="7" editable="false"/>
+              persist="width ordinal hidden" ordinal="7" editable="false"/>
             <splitter class="tree-splitter" ordinal="8"/>
             <treecol id="styleSheetDateModified" flex="1" label="&styleHeader.dateModified;"
-              persist="width" ordinal="9" editable="false"/>
+              persist="width ordinal hidden" ordinal="9" editable="false"/>
           </treecols>
           <treechildren id="styleSheetList" flex="1"/>
         </tree>

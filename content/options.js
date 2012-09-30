@@ -393,6 +393,9 @@ let optionsWindow = {
   },
 
   onTreeKeypress: function OW_onTreeKeypress(event) {
+    if (this.tree && this.tree.editingRow > -1) {
+      return;
+    }
     switch(event.keyCode) {
       case event.DOM_VK_DELETE:
         optionsWindow.deleteStyleSheet();
