@@ -84,7 +84,7 @@ let optionsWindow = {
     let sortColumn = pref("sortColumn");
     let sortOrder = pref("sortOrder");
     if (sortColumn < 0 || sortOrder == 0)
-      return a[7] - b[7];
+      return a[20] - b[20];
     else {
       let aa = a[sortColumn].toLowerCase();
       let bb = b[sortColumn].toLowerCase();
@@ -97,9 +97,9 @@ let optionsWindow = {
   },
 
   getSortedList: function OW_getSortedList() {
-    let tempList = styleSheetList.slice(0);
+    let tempList = JSON.parse(JSON.stringify(styleSheetList));
     for (let i = 0; i < tempList.length; i++)
-      tempList[i][7] = i;
+      tempList[i][20] = i;
     tempList.sort(optionsWindow.sorter);
     return tempList;
   },
@@ -141,7 +141,7 @@ let optionsWindow = {
       setCellText : function(row, column, value) {
         switch (column.id) {
           case "styleSheetNameCol" :
-            this.origList[this.list[row][7]][1] = this.list[row][1] = escape(value);
+            this.origList[this.list[row][20]][1] = this.list[row][1] = escape(value);
             optionsWindow.notifyChange();
             break;
           default:
@@ -150,8 +150,8 @@ let optionsWindow = {
       },
       setCellValue : function(row, column, value) {
         if (column.id == "styleSheetStateCol") {
-          toggleStyleSheet(this.list[row][7], this.list[row][0], value == "true"? 'enabled': 'disabled');
-          this.origList[this.list[row][7]][0] = this.list[row][0] = (value == "true"? 'enabled': 'disabled');
+          toggleStyleSheet(this.list[row][20], this.list[row][0], value == "true"? 'enabled': 'disabled');
+          this.origList[this.list[row][20]][0] = this.list[row][0] = (value == "true"? 'enabled': 'disabled');
         }
       },
       setTree: function(treebox){ this.treebox = treebox;},
@@ -316,7 +316,7 @@ let optionsWindow = {
     for (let t = 0; t < numRanges; t++){
       this.tree.view.selection.getRangeAt(t, start, end);
       for (let i = start.value; i <= end.value; i++) {
-        let args = [false, this.treeView.list[i][7], false, "", true];
+        let args = [false, this.treeView.list[i][20], false, "", true];
         Services.wm.getMostRecentWindow("navigator:browser")
           .openDialog("chrome://userstylemanager/content/editor.xul",
           "User Style Manager - Editor " + i, "chrome,resizable,height=600,width=800,top="
@@ -353,7 +353,7 @@ let optionsWindow = {
       count += (end.value - start.value + 1);
     }
     if (count == 1) {
-      let index = this.treeView.list[this.tree.currentIndex][7];
+      let index = this.treeView.list[this.tree.currentIndex][20];
       let finalAnswer = promptService.confirm(null, this.STR("confirm.pls"),
         this.STR("remove.preText") + " " + unescape(styleSheetList[index][1]) + " " + this.STR("remove.postText"));
       if (finalAnswer) {
@@ -371,7 +371,7 @@ let optionsWindow = {
       for (let t = 0; t < numRanges; t++) {
         this.tree.view.selection.getRangeAt(t, start, end);
         for (let i = start.value; i <= end.value; i++) {
-          indexes.push(optionsWindow.treeView.list[i][7]);
+          indexes.push(optionsWindow.treeView.list[i][20]);
         }
       }
       deleteStylesFromUSM(indexes);
@@ -388,7 +388,7 @@ let optionsWindow = {
     for (let t = 0; t < numRanges; t++){
       this.tree.view.selection.getRangeAt(t, start, end);
       for (let i = start.value; i <= end.value; i++) {
-        let index = this.treeView.list[i][7];
+        let index = this.treeView.list[i][20];
         updateStyle(index);
       }
     }
@@ -436,7 +436,7 @@ let optionsWindow = {
       this.tree.view.selection.getRangeAt(t, start, end);
       for (let i = start.value; i <= end.value; i++)
         window.openDialog("chrome://UserStyleManager/content/moreInfo.xul", "More Information - User Style Manager " + i,
-          "centerscreen, chrome, resizable=yes", styleSheetList[this.treeView.list[i][7]]).focus();
+          "centerscreen, chrome, resizable=yes", styleSheetList[this.treeView.list[i][20]]).focus();
     }
   },
 

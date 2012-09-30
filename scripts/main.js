@@ -477,7 +477,6 @@ function updateInUSM(aStyleId, CSSText, name, url, options, aCallback) {
           loadStyleSheet(i);
           if (!Components.isSuccessCode(status))
             return;
-          styleSheetList[i][1] = name;
           styleSheetList[i][3] = url;
           styleSheetList[i][6] = JSON.stringify(new Date());
           styleSheetList[i][7] = options;
@@ -593,12 +592,15 @@ function updateFromSync() {
       }
       tempStyleSheetList[i][0] = enabled;
       tempStyleSheetList[i][1] = name;
+      if (tempStyleSheetList[i][7] != options) {
+        newStyles.push(i*1);
+      }
       tempStyleSheetList[i][7] = options;
     }
     else {
       haveChanges = true;
       i = tempStyleSheetList.length;
-      newStyles.push(i*1)
+      newStyles.push(i*1);
       let path = escape(name.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css");
       if (path == ".css")
         path = "User Synced Style Sheet " + i + ".css";
