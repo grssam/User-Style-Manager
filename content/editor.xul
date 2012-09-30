@@ -342,13 +342,13 @@
   </vbox>
   <popupset id="USMStyleEditorPopups">
     <menupopup id="USMStyleEditorContextMenu"
-      onpopupshowing="styleEditor.onContextMenuShowing()">
-        <menuitem id="menu_cut"/>
-        <menuitem id="menu_copy"/>
-        <menuitem id="menu_paste"/>
-        <menuitem id="menu_delete"/>
+      onpopupshowing="goUpdateSourceEditorMenuItems()">
+        <menuitem id="se-cMenu-cut"/>
+        <menuitem id="se-cMenu-copy"/>
+        <menuitem id="se-cMenu-paste"/>
+        <menuitem id="se-cMenu-delete"/>
         <menuseparator/>
-        <menuitem id="menu_selectAll"/>
+        <menuitem id="se-cMenu-selectAll"/>
         <menuitem id="menu_beautify"
                   label="&beautifyCmd.label;"
                   key="key_beautify"

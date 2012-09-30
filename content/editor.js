@@ -158,7 +158,6 @@ function StyleEditor() {
   this.win = window;
   this.doc = document;
   // Bindings
-  this.onContextMenu = this.onContextMenu.bind(this);
   this.inputHelper = this.inputHelper.bind(this);
   this.postInputHelper = this.postInputHelper.bind(this);
   this.preInputHelper = this.preInputHelper.bind(this);
@@ -184,7 +183,6 @@ function StyleEditor() {
   this.addMozURL = this.addMozURL.bind(this);
   this.addMozPreURL = this.addMozPreURL.bind(this);
   this.addMozDomain = this.addMozDomain.bind(this);
-  this.onContextMenuShowing = this.onContextMenuShowing.bind(this);
   this.onToolsMenuShowing = this.onToolsMenuShowing.bind(this);
   this.onToolsMenuHiding = this.onToolsMenuHiding.bind(this);
   this.onSearchFocus = this.onSearchFocus.bind(this);
@@ -831,6 +829,9 @@ StyleEditor.prototype = {
   },
 
   onMouseClick: function SE_onMouseClick(event) {
+    if (event.button == 2) {
+      return;
+    }
     if (this.$("USMPreviewPanel").state == "open")
       this.$("USMPreviewPanel").hidePopup();
     let offset = this.getOffsetAtLocation(event.screenX, event.screenY);
@@ -1202,7 +1203,8 @@ StyleEditor.prototype = {
       mode: this.sourceEditorEnabled? SourceEditor.MODES.CSS: null,
       showLineNumbers: true,
       placeholderText: this.initialText.length > 0? this.initialText: this.STR("placeholder.text"),
-      initialText: this.initialText.length > 0? this.initialText: this.STR("placeholder.text")
+      initialText: this.initialText.length > 0? this.initialText: this.STR("placeholder.text"),
+      contextMenu: "USMStyleEditorContextMenu",
     };
     let editorPlaceholder = this.doc.getElementById("USMTextEditor");
     this.previewShown = false;
@@ -1247,8 +1249,6 @@ StyleEditor.prototype = {
   onEditorLoad: function SE_onEditorLoad() {
     this.editor.focus();
     this.initialized = true;
-    if (this.sourceEditorEnabled)
-      this.editor.addEventListener(SourceEditor.EVENTS.CONTEXT_MENU, this.onContextMenu);
     this.$("USMTextEditor").firstChild.addEventListener("keypress", this.inputHelper, true);
     this.$("USMTextEditor").firstChild.addEventListener("keyup", this.postInputHelper, true);
     this.$("USMTextEditor").firstChild.addEventListener("keydown", this.preInputHelper, true);
@@ -1301,25 +1301,6 @@ StyleEditor.prototype = {
       this.editor.setCaretOffset(aOffset);
     else
       this.editor.setSelectionRange(aOffset, aOffset);
-  },
-
-  onContextMenu: function SE_onContextMenu(aEvent) {
-    if (!this.sourceEditorEnabled)
-      return;
-    let menu = this.doc.getElementById("USMStyleEditorContextMenu");
-    if (menu.state == "closed")
-      menu.openPopupAtScreen(aEvent.screenX, aEvent.screenY, true);
-  },
-
-  onContextMenuShowing: function SE_onContextMenuShowing() {
-    goUpdateGlobalEditMenuItems();
-    if (!this.sourceEditorEnabled)
-      return;
-    let undo = this.doc.getElementById("se-cmd-undo");
-    undo.setAttribute("disabled", !this.editor.canUndo());
-
-    let redo = this.doc.getElementById("se-cmd-redo");
-    redo.setAttribute("disabled", !this.editor.canRedo());
   },
 
   onToolsMenuShowing: function SE_onToolsMenuShowing() {
@@ -2035,7 +2016,6 @@ StyleEditor.prototype = {
 
     this.resetVariables();
     if (this.sourceEditorEnabled) {
-      this.editor.removeEventListener(SourceEditor.EVENTS.CONTEXT_MENU, this.onContextMenu);
       this.editor.removeEventListener(SourceEditor.EVENTS.MOUSE_MOVE, this.onMouseMove);
       this.doc.getElementById("USMTextEditor").firstChild.removeEventListener("click", this.onMouseClick);
       this.doc.getElementById("USMTextEditor").firstChild.removeEventListener("dblclick", this.onDblClick);
