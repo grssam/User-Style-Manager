@@ -117,6 +117,33 @@ function setupUpdates(window) {
   }
 }
 
+function addSyncOption(window) {
+  function $(id) window.document.getElementById(id);
+  try {
+    if ($("syncEnginesList")) {
+      let preference = window.document.createElementNS(XUL, "preference");
+      preference.setAttribute("id", "engine.USMstyles");
+      preference.setAttribute("name", "extensions.UserStyleManager.syncStyles");
+      preference.setAttribute("type", "bool");
+      $("paneSync").getElementsByTagName("preferences")[0].appendChild(preference);
+      let lastItem = $("syncEnginesList").lastChild.cloneNode(true);
+      lastItem.firstChild.setAttribute("label", l10n("userStyles.label"));
+      lastItem.firstChild.setAttribute("preference", "engine.USMstyles");
+      lastItem.firstChild.setAttribute("accesskey", l10n("userStyles.accesskey"));
+      if (pref("syncStyles")) {
+        lastItem.setAttribute("checked", true);
+      }
+      else {
+        try {
+          lastItem.removeAttribute("checked");
+        } catch(ex) {}
+      }
+      $("syncEnginesList").appendChild(lastItem);
+    }
+  }
+  catch (ex) {}
+}
+
 function addContextMenuEntry(window) {
   function $(id) window.document.getElementById(id);
   function browserContextShowing() {}
@@ -781,6 +808,7 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     watchWindows(handleCustomization);
     watchWindows(addContextMenuEntry);
     watchWindows(addUserStyleHandler);
+    watchWindows(addSyncOption, "Browser:Preferences");
     watchWindows(function(window) {
       if (openSite) {
         window.openUILinkIn("http://grssam.wordpress.com/addons/user-style-manager/", "tab");

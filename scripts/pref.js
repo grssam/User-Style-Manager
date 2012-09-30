@@ -80,7 +80,7 @@ pref.defaults = {
   updateTimeoutActive: false,
   syncedStyleList: "[]",
   syncStyles: true,
-  keepDeletedOnSync: false,
+  keepDeletedOnSync: true,
 };
 
 pref.observe = function(prefs, callback) {

@@ -85,16 +85,20 @@ function unload(callback, container) {
   return removeUnloader;
 }
 
-function watchWindows(callback) {
+function watchWindows(callback, windowType) {
+  if (!windowType) {
+    windowType = "navigator:browser";
+  }
+
   var unloaded = false;
   unload(function() unloaded = true);
 
   // Wrap the callback in a function that ignores failures
   function watcher(window) {
     try {
-      // Now that the window has loaded, only handle browser windows
+      // Now that the window has loaded, only handle windows of |windowType|
       let {documentElement} = window.document;
-      if (documentElement.getAttribute("windowtype") == "navigator:browser")
+      if (documentElement.getAttribute("windowtype") == windowType)
         callback(window);
     }
     catch(ex) {}
