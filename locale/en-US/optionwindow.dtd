@@ -6,24 +6,24 @@
 <!ENTITY styleHeader.dateAdded        "Date Added">
 <!ENTITY styleHeader.dateModified     "Date Modified">
 
-<!ENTITY updateBtn.label              "Check for Update">
-<!ENTITY updateBtn.accesskey          "U">
+<!ENTITY updateBtn.label              "">
+<!ENTITY updateBtn.accesskey          "">
 <!ENTITY updateBtn.tooltip            "Checks and updates the Selected Style Sheet">
 
-<!ENTITY updateAllBtn.label           "Update All">
-<!ENTITY updateAllBtn.accesskey       "L">
+<!ENTITY updateAllBtn.label           "">
+<!ENTITY updateAllBtn.accesskey       "">
 <!ENTITY updateAllBtn.tooltip         "Checks and Updates for a newer version of Style Sheet">
 
-<!ENTITY infoBtn.label                "More Info.">
-<!ENTITY infoBtn.accesskey            "I">
+<!ENTITY infoBtn.label                "">
+<!ENTITY infoBtn.accesskey            "">
 <!ENTITY infoBtn.tooltip              "More Information about the selected Style">
 
-<!ENTITY editBtn.label                "Edit Style Sheet">
-<!ENTITY editBtn.accesskey            "E">
+<!ENTITY editBtn.label                "">
+<!ENTITY editBtn.accesskey            "">
 <!ENTITY editBtn.tooltip              "Modify the content of the Selected Style Sheet">
 
-<!ENTITY deleteBtn.label              "Delete Style Sheet">
-<!ENTITY deleteBtn.accesskey          "D">
+<!ENTITY deleteBtn.label              "">
+<!ENTITY deleteBtn.accesskey          "">
 <!ENTITY deleteBtn.tooltip            "Deleting here will not remove the file from Hard Disk">
 
 <!ENTITY settings.caption             "Style Sheet Settings">
@@ -92,12 +92,12 @@
 <!ENTITY combination.accesskey        "K">
 <!ENTITY combination.tooltip          "Click in the text box and press the desired combination">
 
-<!ENTITY addBtn.label                 "Browse…">
+<!ENTITY addBtn.label                 "">
 <!ENTITY addBtn.label.label           "Add a new Style Sheet:">
 <!ENTITY addBtn.label.tooltip         "Click on the button to add a new Style Sheet">
-<!ENTITY addBtn.accesskey             "A">
+<!ENTITY addBtn.accesskey             "">
 <!ENTITY addBtn.tooltip               "Browse the Style Sheet from your Hard Disk">
 
-<!ENTITY createBtn.label              "Create New">
-<!ENTITY createBtn.accesskey          "N">
+<!ENTITY createBtn.label              "">
+<!ENTITY createBtn.accesskey          "">
 <!ENTITY createBtn.tooltip            "Create A new Style Sheet">
