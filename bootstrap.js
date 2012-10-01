@@ -110,11 +110,11 @@ function addSyncOption(window) {
       lastItem.firstChild.setAttribute("preference", "engine.USMstyles");
       lastItem.firstChild.setAttribute("accesskey", l10n("userStyles.accesskey"));
       if (pref("syncStyles")) {
-        lastItem.setAttribute("checked", true);
+        lastItem.firstChild.setAttribute("checked", true);
       }
       else {
         try {
-          lastItem.removeAttribute("checked");
+          lastItem.firstChild.removeAttribute("checked");
         } catch(ex) {}
       }
       $("syncEnginesList").appendChild(lastItem);
