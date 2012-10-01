@@ -41,8 +41,9 @@ let optionsWindow = {
       let args = [true, styleSheetList.length, false, escape(fp.file.path), true];
       openUserStyleEditor("User Style Manager - Editor - Open File", args).focus();
       this.editorOpened = true;
-      if (pref("hideOptionsWhileEditing"))
+      if (pref("hideOptionsWhileEditing")) {
         window.close();
+      }
     }
   },
 
@@ -52,29 +53,36 @@ let optionsWindow = {
 
   toDateString: function OW_toDateString(dateString) {
     let date = new Date(JSON.parse(dateString));
-    return date.toLocaleString().split(", ").filter(function(part) part.indexOf("day") > 0? false: true).join(", ");
+    return date.toLocaleString()
+               .split(", ")
+               .filter(function(part) part.indexOf("day") > 0? false: true)
+               .join(", ");
   },
 
   sorter: function OW_sorter(a, b) {
     let sortColumn = pref("sortColumn");
     let sortOrder = pref("sortOrder");
-    if (sortColumn < 0 || sortOrder == 0)
+    if (sortColumn < 0 || sortOrder == 0) {
       return a[20] - b[20];
+    }
     else {
       let aa = a[sortColumn].toLowerCase();
       let bb = b[sortColumn].toLowerCase();
-      if (aa < bb)
+      if (aa < bb) {
         return -1*sortOrder
-      else if (aa > bb)
+      }
+      else if (aa > bb) {
         return sortOrder;
+      }
       return 0;
     }
   },
 
   getSortedList: function OW_getSortedList() {
     let tempList = JSON.parse(JSON.stringify(styleSheetList));
-    for (let i = 0; i < tempList.length; i++)
+    for (let i = 0; i < tempList.length; i++) {
       tempList[i][20] = i;
+    }
     tempList.sort(optionsWindow.sorter);
     return tempList;
   },
@@ -91,12 +99,15 @@ let optionsWindow = {
           case "styleSheetNameCol" :
             return unescape(this.list[row][1]);
           case "styleSheetAppliesOnCol" :
-            if (this.list[row][4].length == 0)
+            if (this.list[row][4].length == 0) {
               return optionsWindow.STR("unknown");
+            }
             return this.list[row][4].split(",").map(function(val) {
               if (val.indexOf("chrome://") == 0) {
-                if (val.match(/\/[^.\/]+\.[^.\/]+$/))
-                  return optionsWindow.STR("fx") + ", " + val.match(/\/([^.\/]+\.[^.\/]+)$/)[1];
+                if (val.match(/\/[^.\/]+\.[^.\/]+$/)) {
+                  return optionsWindow.STR("fx") + ", " +
+                         val.match(/\/([^.\/]+\.[^.\/]+)$/)[1];
+                }
                 return optionsWindow.STR("fx");
               }
               return val.replace(/^https?:\/\//, "");
@@ -104,14 +115,15 @@ let optionsWindow = {
           case "styleSheetDateAdded" :
             return optionsWindow.toDateString(this.list[row][5]);
           case "styleSheetDateModified" :
-            return this.list[row][6].length > 0?
-              optionsWindow.toDateString(this.list[row][6]):
-              optionsWindow.toDateString(this.list[row][5]);
+            return this.list[row][6].length > 0
+                     ? optionsWindow.toDateString(this.list[row][6])
+                     : optionsWindow.toDateString(this.list[row][5]);
         }
       },
       getCellValue : function(row, column) {
-        if (column.id == "styleSheetStateCol")
+        if (column.id == "styleSheetStateCol") {
           return this.list[row][0] == "enabled"? true: false;
+        }
       },
       setCellText : function(row, column, value) {
         switch (column.id) {
@@ -125,8 +137,10 @@ let optionsWindow = {
       },
       setCellValue : function(row, column, value) {
         if (column.id == "styleSheetStateCol") {
-          toggleStyleSheet(this.list[row][20], this.list[row][0], value == "true"? 'enabled': 'disabled');
-          this.origList[this.list[row][20]][0] = this.list[row][0] = (value == "true"? 'enabled': 'disabled');
+          toggleStyleSheet(this.list[row][20], this.list[row][0],
+                           value == "true"? 'enabled': 'disabled');
+          this.origList[this.list[row][20]][0] = this.list[row][0] =
+            (value == "true"? 'enabled': 'disabled');
         }
       },
       setTree: function(treebox){ this.treebox = treebox;},
@@ -134,10 +148,11 @@ let optionsWindow = {
       isSeparator: function(row){ return false;},
       isSorted: function(){ return false;},
       isEditable: function(idx, column) {
-        if (column.id == "styleSheetNameCol" || column.id == "styleSheetStateCol")
+        if (column.id == "styleSheetNameCol" ||
+            column.id == "styleSheetStateCol") {
           return true;
-        else
-          return false;
+        }
+        return false;
       },
       cycleHeader: function(column) {
         let col = -1;
@@ -158,33 +173,41 @@ let optionsWindow = {
             col = -1;
         }
         let cols = document.getElementsByTagName("treecol");
-        for (let i = 0; i < cols.length; i++)
+        for (let i = 0; i < cols.length; i++) {
           cols[i].removeAttribute("sortDirection");
+        }
         if (col < 0) {
           pref("sortColumn", -1);
           return;
         }
-        if (pref("sortColumn") == col)
+        if (pref("sortColumn") == col) {
           pref("sortOrder", (pref("sortOrder") + 2)%3 - 1);
+        }
         else {
           pref("sortColumn", col);
           pref("sortOrder", 1);
         }
-        if (pref("sortOrder") != 0)
-          document.getElementById(column.id).setAttribute("sortDirection", pref("sortOrder") != 1 ? "ascending" : "descending");
+        if (pref("sortOrder") != 0) {
+          document.getElementById(column.id)
+                  .setAttribute("sortDirection", pref("sortOrder") != 1
+                                                 ? "ascending"
+                                                 : "descending");
+        }
         optionsWindow.populateStyles();
       },
       getLevel: function(row) {return 0;},
       getImageSrc: function(row,col) {return null;},
       getRowProperties: function(row, properties) {
-        let atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+        let atomService = Cc["@mozilla.org/atom-service;1"]
+                            .getService(Ci.nsIAtomService);
         if (this.list[row][0] == 'disabled') {
           let atom = atomService.getAtom("disabled");
           properties.AppendElement(atom);
         }
       },
       getCellProperties: function(row,col,props) {
-        let atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+        let atomService = Cc["@mozilla.org/atom-service;1"]
+                            .getService(Ci.nsIAtomService);
         if (this.list[row][0] == 'disabled' && col.id != "styleSheetStateCol") {
           let atom = atomService.getAtom("disabledText");
           props.AppendElement(atom);
@@ -211,14 +234,18 @@ let optionsWindow = {
           default:
             return;
         }
-      document.getElementById(id).setAttribute("sortDirection", pref("sortOrder") != 1 ? "ascending" : "descending");
+      document.getElementById(id)
+              .setAttribute("sortDirection", pref("sortOrder") != 1
+                                             ? "ascending"
+                                             : "descending");
     }
   },
 
   onLoad: function OW_onLoad() {
     function $(id) document.getElementById(id);
-    if (window.navigator.oscpu.search(/^mac/i) == 0)
+    if (window.navigator.oscpu.search(/^mac/i) == 0) {
       $("createAppMenuMenuitem").disabled = $("createAppMenuMenuitem").hidden = true;
+    }
     this.tree = document.getElementById("styleSheetTree");
     this.initialized = true;
     readJSONPref(function() {
@@ -240,13 +267,17 @@ let optionsWindow = {
     }
     // Displaying the shortcut 
     this.shortcutTextBox = document.getElementById("shortcutTextBox");
-    if (window.navigator.oscpu.toLowerCase().indexOf("window") >= 0)
-      optionsWindow.shortcutModifiers = optionsWindow.shortcutModifiers.replace("accel", "ctrl");
-    this.shortcutTextBox.value = this.shortcutModifiers.replace(",", " +") + " + " + this.shortcutKey;
+    if (window.navigator.oscpu.toLowerCase().indexOf("window") >= 0) {
+      optionsWindow.shortcutModifiers =
+        optionsWindow.shortcutModifiers.replace("accel", "ctrl");
+    }
+    this.shortcutTextBox.value = this.shortcutModifiers.replace(",", " +") +
+                                 " + " + this.shortcutKey;
     this.shortcutTextBox.onclick = function() {
       optionsWindow.shortcutTextBox.setSelectionRange(0, optionsWindow.shortcutTextBox.value.length);
     };
-    listen(window, optionsWindow.shortcutTextBox, "keydown", optionsWindow.handleShortcutChange);
+    listen(window, optionsWindow.shortcutTextBox, "keydown",
+           optionsWindow.handleShortcutChange);
     let win = document.getElementById("USMOptionsWindow");
     let rects = document.getElementById("createStyleSheet").getBoundingClientRect();
     win.setAttribute("width", Math.max(rects.right + 50, win.width));
@@ -267,25 +298,33 @@ let optionsWindow = {
 
   handleShortcutChange: function OW_handleShortcutChange(event) {
     let value = "";
-    if (event.ctrlKey)
+    if (event.ctrlKey) {
       value += "Ctrl + ";
-    if (event.shiftKey)
+    }
+    if (event.shiftKey) {
       value += "Shift + ";
-    if (event.altKey)
+    }
+    if (event.altKey) {
       value += "Alt + ";
-    if (event.metaKey)
+    }
+    if (event.metaKey) {
       value += "Command + ";
-    if (event.keyCode > 64 && event.keyCode < 91)
+    }
+    if (event.keyCode > 64 && event.keyCode < 91) {
       value += String.fromCharCode(event.keyCode);
-    else
-      value = optionsWindow.shortcutModifiers.replace(",", " +") + " + " + optionsWindow.shortcutKey;
+    }
+    else {
+      value = optionsWindow.shortcutModifiers.replace(",", " +") + " + " +
+              optionsWindow.shortcutKey;
+    }
     optionsWindow.shortcutTextBox.value = value;
   },
 
   editStyleSheet: function OW_editStyleSheet() {
     let numRanges = this.tree.view.selection.getRangeCount();
-    if (numRanges < 1)
+    if (numRanges < 1) {
       return;
+    }
     let start = new Object();
     let end = new Object();
     for (let t = 0; t < numRanges; t++){
@@ -296,22 +335,25 @@ let optionsWindow = {
       }
     }
     this.editorOpened = true;
-    if (pref("hideOptionsWhileEditing"))
+    if (pref("hideOptionsWhileEditing")) {
       window.close();
+    }
   },
 
   createStyleSheet: function OW_editStyleSheet() {
     let args = [false, styleSheetList.length, true, "", true];
     openUserStyleEditor("User Style Manager - Editor - New", args).focus();
     this.editorOpened = true;
-    if (pref("hideOptionsWhileEditing"))
+    if (pref("hideOptionsWhileEditing")) {
       window.close();
+    }
   },
 
   deleteStyleSheet: function OW_deleteStyleSheet() {
     let numRanges = this.tree.view.selection.getRangeCount();
-    if (numRanges < 1)
+    if (numRanges < 1) {
       return;
+    }
     let start = new Object();
     let end = new Object();
     let count = 0;
@@ -322,7 +364,9 @@ let optionsWindow = {
     if (count == 1) {
       let index = this.treeView.list[this.tree.currentIndex][20];
       let finalAnswer = promptService.confirm(null, this.STR("confirm.pls"),
-        this.STR("remove.preText") + " " + unescape(styleSheetList[index][1]) + " " + this.STR("remove.postText"));
+                                              this.STR("remove.preText") + " " +
+                                              unescape(styleSheetList[index][1]) +
+                                              " " + this.STR("remove.postText"));
       if (finalAnswer) {
         // Unload the stylesheet if enabled
         deleteStylesFromUSM([index]);
@@ -331,9 +375,11 @@ let optionsWindow = {
     }
     else {
       let finalAnswer = promptService.confirm(null, this.STR("confirm.pls"),
-        this.STR("remove.preText") + " " + count + " " + this.STR("remove.postText"));
-      if (!finalAnswer)
+                                              this.STR("remove.preText") + " " +
+                                              count + " " + this.STR("remove.postText"));
+      if (!finalAnswer) {
         return;
+      }
       let indexes = [];
       for (let t = 0; t < numRanges; t++) {
         this.tree.view.selection.getRangeAt(t, start, end);
@@ -348,11 +394,12 @@ let optionsWindow = {
 
   updateStyle: function OW_updateStyle() {
     let numRanges = this.tree.view.selection.getRangeCount();
-    if (numRanges < 1)
+    if (numRanges < 1) {
       return;
+    }
     let start = new Object();
     let end = new Object();
-    for (let t = 0; t < numRanges; t++){
+    for (let t = 0; t < numRanges; t++) {
       this.tree.view.selection.getRangeAt(t, start, end);
       for (let i = start.value; i <= end.value; i++) {
         let index = this.treeView.list[i][20];
@@ -362,10 +409,12 @@ let optionsWindow = {
   },
 
   updateAllStyle: function OW_updateAllStyle(index) {
-    if (index == null)
+    if (index == null) {
       index = 0;
-    else if (index == styleSheetList.length)
+    }
+    else if (index == styleSheetList.length) {
       return;
+    }
     updateStyle(index, function() {
       this.updateAllStyle(index + 1);
     }.bind(this));
@@ -398,52 +447,66 @@ let optionsWindow = {
 
   showMoreInfo: function OW_showMoreInfo() {
     let numRanges = this.tree.view.selection.getRangeCount();
-    if (numRanges < 1)
+    if (numRanges < 1) {
       return;
+    }
     let start = new Object();
     let end = new Object();
     for (let t = 0; t < numRanges; t++){
       this.tree.view.selection.getRangeAt(t, start, end);
-      for (let i = start.value; i <= end.value; i++)
-        window.openDialog("chrome://UserStyleManager/content/moreInfo.xul", "More Information - User Style Manager " + i,
-          "centerscreen, chrome, resizable=yes", styleSheetList[this.treeView.list[i][20]]).focus();
+      for (let i = start.value; i <= end.value; i++) {
+        window.openDialog("chrome://UserStyleManager/content/moreInfo.xul",
+                          "More Information - User Style Manager " + i,
+                          "centerscreen, chrome, resizable=yes",
+                          styleSheetList[this.treeView.list[i][20]]).focus();
+      }
     }
   },
 
   backupMenuPopupShowing: function OW_backupMenuPopupShowing() {
     function $(id) document.getElementById(id);
-    if (pref("maintainBackup"))
+    if (pref("maintainBackup")) {
       $("maintainBackupMenuitem").setAttribute("checked", true);
-    if (pref("fallBack"))
+    }
+    if (pref("fallBack")) {
       $("fallBackMenuitem").setAttribute("checked", true);
+    }
   },
 
   entryMenuPopupShowing: function OW_entryMenuPopupShowing() {
     function $(id) document.getElementById(id);
-    if (pref("createToolsMenuButton"))
+    if (pref("createToolsMenuButton")) {
       $("createToolsMenuMenuitem").setAttribute("checked", true);
-    if (pref("createAppMenuButton"))
+    }
+    if (pref("createAppMenuButton")) {
       $("createAppMenuMenuitem").setAttribute("checked", true);
-    if (pref("createToolbarButton"))
+    }
+    if (pref("createToolbarButton")) {
       $("createToolbarButtonMenuitem").setAttribute("checked", true);
-    if (pref("createContextMenuEntry"))
+    }
+    if (pref("createContextMenuEntry")) {
       $("createContextMenuMenuitem").setAttribute("checked", true);
+    }
   },
 
   updateMenuPopupShowing: function OW_updateMenuPopupShowing() {
     function $(id) document.getElementById(id);
-    if (pref("updateAutomatically"))
+    if (pref("updateAutomatically")) {
       $("updateAutomatically").setAttribute("checked", true);
-    if (pref("updateOverwritesLocalChanges"))
+    }
+    if (pref("updateOverwritesLocalChanges")) {
       $("updateOverwritesLocalChanges").setAttribute("checked", true);
+    }
   },
 
   syncMenuPopupShowing: function OW_syncMenuPopupShowing() {
     function $(id) document.getElementById(id);
-    if (pref("syncStyles"))
+    if (pref("syncStyles")) {
       $("syncStyles").setAttribute("checked", true);
-    if (pref("keepDeletedOnSync"))
+    }
+    if (pref("keepDeletedOnSync")) {
       $("keepDeletedOnSync").setAttribute("checked", true);
+    }
   },
 
   togglePref: function OW_togglePref(prefName) {
@@ -458,7 +521,9 @@ let optionsWindow = {
         optionsWindow.shortcutKey = val[0];
         optionsWindow.shortcutChanged = true;
       }
-      else if (val.length > 1 && val[val.length - 1] >= 'a' && val[val.length - 1] <= 'z') {
+      else if (val.length > 1 &&
+               val[val.length - 1] >= 'a' &&
+               val[val.length - 1] <= 'z') {
         optionsWindow.shortcutKey = (val.splice(val.length - 1, 1))[0].toUpperCase();
         optionsWindow.shortcutModifiers = val.join(", ").toLowerCase();
         optionsWindow.shortcutChanged = true;
@@ -466,7 +531,12 @@ let optionsWindow = {
     }
     let nb = document.getElementById("changeNotificationBox");
     nb.removeAllNotifications(true);
-    nb.appendNotification(optionsWindow.STR("notif.text"), optionsWindow.STR("notif.title"), null, nb.PRIORITY_INFO_HIGH, "", null);
+    nb.appendNotification(optionsWindow.STR("notif.text"),
+                          optionsWindow.STR("notif.title"),
+                          null,
+                          nb.PRIORITY_INFO_HIGH,
+                          "",
+                          null);
   }
 };
 
