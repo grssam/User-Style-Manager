@@ -70,6 +70,7 @@ pref.defaults = {
   syncedStyleList: "[]",
   syncStyles: true,
   keepDeletedOnSync: true,
+  newInstall: false,
 };
 
 pref.observe = function(prefs, callback) {

@@ -21,6 +21,7 @@ let ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 let promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                       .getService(Ci.nsIPromptService);
 let syncUpdateTimer = null;
+let shouldUpdateInstall = false;
 const XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 const HTML = "http://www.w3.org/1999/xhtml";
 const EDITOR_WINDOW_FEATURES = "chrome,resizable,dialog=no,centerscreen,titlebar",
@@ -64,15 +65,7 @@ function readJSONPref(callback) {
 // Function to write the preferences
 function writeJSONPref(callback) {
   pref("userStyleList", JSON.stringify(styleSheetList));
-  if (!syncUpdateTimer) {
-    syncUpdateTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-    syncUpdateTimer.initWithCallback(updateSyncedList, 10000,
-                                     Ci.nsITimer.TYPE_ONE_SHOT);
-  }
-  else {
-    syncUpdateTimer.initWithCallback(updateSyncedList, 10000,
-                                     Ci.nsITimer.TYPE_ONE_SHOT);
-  }
+  prepareToUpdateSync();
   let JSONFile = getURIForFileInUserStyles("Preferences/usm.pref")
                    .QueryInterface(Ci.nsIFileURL).file;
   let ostream = FileUtils.openSafeFileOutputStream(JSONFile);
@@ -646,87 +639,94 @@ function checkAndDisplayProperOption(contentWindow, url) {
 }
 
 function updateFromSync() {
-  let remoteStyleSheetList = JSON.parse(pref("syncedStyleList"));
-  let tempStyleSheetList = JSON.parse(JSON.stringify(styleSheetList));
-  let newStyles = [], deletedStyle = [], found = false, i = 0, haveChanges = false;
-  remoteStyleSheetList.forEach(function([enabled, name, styleId, options]) {
-    enabled = (enabled?"enabled":"disabled");
-    found = false;
-    for each (let style in tempStyleSheetList) {
-      if (style[3].match(/styles\/([0-9]*)\//i) &&
-          style[3].match(/styles\/([0-9]*)\//i)[1] == styleId) {
-        found = true;
-        break;
+  let doUpdate = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+  let doSyncUpdate = {
+    notify: function() {
+      doUpdate = null;
+      if (pref("newInstall")) {
+        // Sync is form a new install of this addon on a synced machine
+        prepareToUpdateSync();
+        shouldUpdateInstall = true;
+        return;
       }
-      i++;
-    }
-    if (found) {
-      if (tempStyleSheetList[i][0] != enabled) {
-        enabled? loadStyleSheet(i): unloadStyleSheet(i);
-      }
-      if (tempStyleSheetList[i][0] != enabled ||
-          tempStyleSheetList[i][1] != name ||
-          tempStyleSheetList[i][7] != options) {
-        tempStyleSheetList[i][6] = JSON.stringify(new Date());
-        haveChanges = true;
-      }
-      tempStyleSheetList[i][0] = enabled;
-      tempStyleSheetList[i][1] = name;
-      if (tempStyleSheetList[i][7] != options) {
-        newStyles.push(i*1);
-      }
-      tempStyleSheetList[i][7] = options;
-    }
-    else {
-      haveChanges = true;
-      i = tempStyleSheetList.length;
-      newStyles.push(i*1);
-      let path = escape(name.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css");
-      if (path == ".css") {
-        path = "User Synced Style Sheet " + i + ".css";
-      }
-      tempStyleSheetList.push([enabled, name, path,
-                               "http://userstyles.org/styles/" + styleId + "/",
-                               "", JSON.stringify(new Date()),
-                               JSON.stringify(new Date()), options, false]);
-    }
-  });
-  if (haveChanges) {
-    styleSheetList = tempStyleSheetList;
-    addNewStylesFromSync(newStyles, 0, function() {
-      if (!pref("keepDeletedOnSync")) {
-        tempStyleSheetList.forEach(function([enabled, name, path, url], index) {
-          if (!url.match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
-            return;
+      let remoteStyleSheetList = JSON.parse(pref("syncedStyleList"));
+      let tempStyleSheetList = JSON.parse(JSON.stringify(styleSheetList));
+      let newStyles = [], deletedStyle = [], found = false, i = 0, haveChanges = false;
+      remoteStyleSheetList.forEach(function([enabled, name, styleId, options]) {
+        enabled = (enabled?"enabled":"disabled");
+        found = false;
+        for each (let style in tempStyleSheetList) {
+          if (style[3].match(/styles\/([0-9]*)\//i) &&
+              style[3].match(/styles\/([0-9]*)\//i)[1] == styleId) {
+            found = true;
+            break;
           }
-          found = false;
-          for each (let style in remoteStyleSheetList) {
-            if (style[3] == url) {
-              found = true;
-              break;
-            }
+          i++;
+        }
+        if (found) {
+          if (tempStyleSheetList[i][0] != enabled) {
+            enabled? loadStyleSheet(i): unloadStyleSheet(i);
           }
-          if (!found) {
-            deletedStyle.push(index);
+          if (tempStyleSheetList[i][0] != enabled ||
+              tempStyleSheetList[i][1] != name ||
+              tempStyleSheetList[i][7] != options) {
+            tempStyleSheetList[i][6] = JSON.stringify(new Date());
+            haveChanges = true;
           }
-        });
-        deleteStylesFromUSM(deletedStyle);
-      }
-      else {
-        if (!syncUpdateTimer) {
-          syncUpdateTimer = Cc["@mozilla.org/timer;1"]
-                              .createInstance(Ci.nsITimer);
-          syncUpdateTimer.initWithCallback(updateSyncedList, 10000,
-                                           Ci.nsITimer.TYPE_ONE_SHOT);
+          tempStyleSheetList[i][0] = enabled;
+          tempStyleSheetList[i][1] = name;
+          if (tempStyleSheetList[i][7] != options) {
+            newStyles.push(i*1);
+          }
+          tempStyleSheetList[i][7] = options;
         }
         else {
-          syncUpdateTimer.initWithCallback(updateSyncedList, 10000,
-                                           Ci.nsITimer.TYPE_ONE_SHOT);
+          haveChanges = true;
+          i = tempStyleSheetList.length;
+          newStyles.push(i*1);
+          let path = escape(name.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css");
+          if (path == ".css") {
+            path = "User Synced Style Sheet " + i + ".css";
+          }
+          tempStyleSheetList.push([enabled, name, path,
+                                   "http://userstyles.org/styles/" + styleId + "/",
+                                   "", JSON.stringify(new Date()),
+                                   JSON.stringify(new Date()), options, false]);
         }
+      });
+      if (haveChanges) {
+        styleSheetList = tempStyleSheetList;
       }
-      updateAffectedContents();
-    });
-  }
+      tempStyleSheetList.forEach(function([enabled, name, path, url], index) {
+        if (!url.match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
+          return;
+        }
+        found = false;
+        for each (let style in remoteStyleSheetList) {
+          if (style[3] == url) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          deletedStyle.push(index);
+          haveChanges = true;
+        }
+      });
+      if (haveChanges) {
+        addNewStylesFromSync(newStyles, 0, function() {
+          if (!pref("keepDeletedOnSync")) {
+            deleteStylesFromUSM(deletedStyle);
+          }
+          else {
+            prepareToUpdateSync();
+          }
+          updateAffectedContents();
+        });
+      }
+    }
+  };
+  doUpdate.initWithCallback(doSyncUpdate, 5000, Ci.nsITimer.TYPE_ONE_SHOT);
 }
 
 function addNewStylesFromSync(aStyles, aIndex, aCallback) {
@@ -780,6 +780,19 @@ function deleteStylesFromUSM(aStyleSheetList) {
   writeJSONPref();
 }
 
+function prepareToUpdateSync() {
+  if (!syncUpdateTimer) {
+    syncUpdateTimer = Cc["@mozilla.org/timer;1"]
+                        .createInstance(Ci.nsITimer);
+    syncUpdateTimer.initWithCallback(updateSyncedList, 10000,
+                                     Ci.nsITimer.TYPE_ONE_SHOT);
+  }
+  else {
+    syncUpdateTimer.initWithCallback(updateSyncedList, 10000,
+                                     Ci.nsITimer.TYPE_ONE_SHOT);
+  }
+}
+
 let updateSyncedList = {
   notify: function() {
     let syncedStyleList = styleSheetList.filter(function ([e,n,p,u]) {
@@ -789,6 +802,10 @@ let updateSyncedList = {
     syncedStyleList = styleSheetList.map(function ([e,n,p,u,a,da,dm,o,l]) {
       return [e?1:0,n, u.match(/styles\/([0-9]*)\//i)[1],o];
     });
+    if (shouldUpdateInstall) {
+      shouldUpdateInstall = false;
+      pref("newInstall", false);
+    }
     pref("syncedStyleList", JSON.stringify(syncedStyleList));
     syncUpdateTimer = null;
   }

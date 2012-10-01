@@ -800,13 +800,7 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     });
     // Update the synced list on startup if it is empty
     if (pref("syncedStyleList") == "[]") {
-      if (!syncUpdateTimer) {
-        syncUpdateTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-        syncUpdateTimer.initWithCallback(updateSyncedList,10000, Ci.nsITimer.TYPE_ONE_SHOT);
-      }
-      else {
-        syncUpdateTimer.initWithCallback(updateSyncedList,10000, Ci.nsITimer.TYPE_ONE_SHOT);
-      }
+      prepareToUpdateSync();
     }
     // observer to track and keep in sync any changes in styleSheetList
     pref.observe(["syncedStyleList"], function() {
@@ -818,23 +812,21 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     // Setting the sync pref to toggle sync
     if (pref("syncStyles")) {
       Services.prefs.setBoolPref("services.sync.prefs.sync.extensions.UserStyleManager.syncedStyleList", true);
+      Services.prefs.setBoolPref("services.sync.prefs.sync.extensions.UserStyleManager.newInstall", true);
     }
     else {
       Services.prefs.clearUserPref("services.sync.prefs.sync.extensions.UserStyleManager.syncedStyleList");
+      Services.prefs.clearUserPref("services.sync.prefs.sync.extensions.UserStyleManager.newInstall");
     }
     pref.observe(["syncStyles"], function() {
       if (pref("syncStyles")) {
         Services.prefs.setBoolPref("services.sync.prefs.sync.extensions.UserStyleManager.syncedStyleList", true);
-        if (!syncUpdateTimer) {
-          syncUpdateTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-          syncUpdateTimer.initWithCallback(updateSyncedList,10000, Ci.nsITimer.TYPE_ONE_SHOT);
-        }
-        else {
-          syncUpdateTimer.initWithCallback(updateSyncedList,10000, Ci.nsITimer.TYPE_ONE_SHOT);
-        }
+        Services.prefs.setBoolPref("services.sync.prefs.sync.extensions.UserStyleManager.newInstall", true);
+        prepareToUpdateSync();
       }
       else {
         Services.prefs.clearUserPref("services.sync.prefs.sync.extensions.UserStyleManager.syncedStyleList");
+        Services.prefs.clearUserPref("services.sync.prefs.sync.extensions.UserStyleManager.newInstall");
       }
     });
 
@@ -868,9 +860,14 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     unloadStyleSheet();
     loadStyleSheet();
   };
-  if (reason == 7 || reason == 5)
+  if (reason == 7 || reason == 5) {
     openSite = true;
+  }
   initiate();
+  // After initiating, update the newIsntall pref to trigger sync :)
+  if (reason == 7 || reason == 5) {
+    pref("newInstall", true);
+  }
 });
 
 function shutdown(data, reason) {
