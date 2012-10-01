@@ -15,8 +15,9 @@ Cu.import("resource://gre/modules/NetUtil.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
 
 function getFileURI(path) {
-  return path.indexOf("file") == 0? ios.newURI(path, null, null):
-    getURIForFileInUserStyles(path.replace(/^(styles\/)/, ""));
+  return path.indexOf("file") == 0
+           ? ios.newURI(path, null, null)
+           : getURIForFileInUserStyles(path.replace(/^(styles\/)/, ""));
 }
 
 ["helper", "pref", "main", "cssbeautify"].forEach(function(fileName) {
@@ -131,7 +132,8 @@ const CSSKeywordsList = [
 
 const RGB_HSLA_MATCH = '(rgba?|hsla?)[ ]{0,}\\(([0-9 .]+,[0-9% .]+,[0-9% .]+,?[0-9 .]{0,})\\)';
 const HEX_MATCH = '(#)([0-9abcdef]{3,9})';
-const URL_MATCH = 'url\\s{0,}\\((([\'\"]?([^\'\"\\)]{0,})[\'\"]?){0,}([ \\n]{0,}\\+[^\\+]+\\+[ \\n]{0,}){0,}([\'\"]?([^\'\"\\)]{0,})[\'\"]?){0,}){0,}\\)';
+const URL_MATCH = 'url\\s{0,}\\((([\'\"]?([^\'\"\\)]{0,})[\'\"]?){0,}([ \\n]' +
+                  '{0,}\\+[^\\+]+\\+[ \\n]{0,}){0,}([\'\"]?([^\'\"\\)]{0,})[\'\"]?){0,}){0,}\\)';
 
 function StyleEditor() {
   this.win = window;
@@ -226,10 +228,12 @@ StyleEditor.prototype = {
   },
 
   selectRange: function SE_selectRange(aStart, aEnd) {
-    if (this.sourceEditorEnabled)
+    if (this.sourceEditorEnabled) {
       this.editor.setSelection(aStart, aEnd);
-    else
+    }
+    else {
       this.editor.setSelectionRange(aStart, aEnd);
+    }
   },
 
   getSelectionRange: function SE_getSelection() {
@@ -241,17 +245,21 @@ StyleEditor.prototype = {
   },
 
   getCaretLine: function SE_getCaretLine() {
-    if (this.sourceEditorEnabled)
+    if (this.sourceEditorEnabled) {
       return this.editor.getCaretPosition().line;
-    else
+    }
+    else {
       return null;
+    }
   },
 
   getText: function SE_getText(aStart, aEnd) {
-    if (this.sourceEditorEnabled)
+    if (this.sourceEditorEnabled) {
       return this.editor.getText(aStart, aEnd);
-    else
+    }
+    else {
       return this.editor.value;
+    }
   },
 
   // Function to read the localized strings
@@ -260,15 +268,19 @@ StyleEditor.prototype = {
   },
 
   setText: function SE_setText(aText, aStart, aEnd) {
-    if (aStart == null)
+    if (aStart == null) {
       aStart = 0;
-    if (aEnd == null)
+    }
+    if (aEnd == null) {
       aEnd = this.getText().length;
-    if (this.sourceEditorEnabled)
+    }
+    if (this.sourceEditorEnabled) {
       this.editor.setText(aText, aStart, aEnd);
-    else
+    }
+    else {
       // separating out the text before and after astart and aend
       this.editor.value = this.editor.value.slice(0, aStart) + aText + this.editor.value.slice(aEnd);
+    }
   },
 
   setStyleName: function SE_setStyleName(aStyleName) {
@@ -281,21 +293,21 @@ StyleEditor.prototype = {
 
   // Function to convert mouse click coordinates (screenX, screenY) into offset
   getOffsetAtLocation: function SE_getOffsetAtLocation(aX, aY) {
-    aX -= (window.screenX + this.$("USMTextEditor").firstChild.boxObject.x
-      + 7*Math.max(this.editor.getLineCount(), 10).toString().length
-      + 20 - this.editor._view._getScroll().x);
-    aY -= (window.screenY + this.$("USMTextEditor").firstChild.boxObject.y + 30
-      - this.editor._view._getScroll().y);
+    aX -= (window.screenX + this.$("USMTextEditor").firstChild.boxObject.x +
+           7*Math.max(this.editor.getLineCount(), 10).toString().length + 20 -
+           this.editor._view._getScroll().x);
+    aY -= (window.screenY + this.$("USMTextEditor").firstChild.boxObject.y +
+           30 - this.editor._view._getScroll().y);
     if (this.sourceEditorEnabled) {
-      if (this.editor.getOffsetAtLocation)
+      if (this.editor.getOffsetAtLocation) {
         return this.editor.getOffsetAtLocation(aX, aY);
-      else if (this.editor._view.getOffsetAtLocation)
+      }
+      else if (this.editor._view.getOffsetAtLocation) {
         return this.editor._view.getOffsetAtLocation(aX, aY);
-      else
-        return 0;
-    }
-    else
+      }
       return 0;
+    }
+    return 0;
   },
 
   // Function to convert offset into X,Y coordinates
@@ -304,21 +316,23 @@ StyleEditor.prototype = {
     let x = 0, y = 0;
     if (this.sourceEditorEnabled) {
       if (this.editor._view._getOffsetToX) {
-        x = this.editor._view._getOffsetToX(aOffset) + window.screenX
-          + this.$("USMTextEditor").firstChild.boxObject.x;
+        x = this.editor._view._getOffsetToX(aOffset) + window.screenX +
+            this.$("USMTextEditor").firstChild.boxObject.x;
       }
       else {
-        x = window.screenX + Math.min(this.$("USMTextEditor").firstChild.boxObject.x
-          + 7*Math.max(this.editor.getLineCount(), 10).toString().length
-          + 16 + (this.caretPosCol)*8, window.innerWidth - (maxLen*8 + 30));
+        x = window.screenX + Math.min(this.$("USMTextEditor").firstChild.boxObject.x +
+            7*Math.max(this.editor.getLineCount(), 10).toString().length + 16 +
+            (this.caretPosCol)*8, window.innerWidth - (maxLen*8 + 30));
       }
       let line = 0;
-      if (this.editor._model.getLineAtOffset)
+      if (this.editor._model.getLineAtOffset) {
         line = this.editor._model.getLineAtOffset(aOffset);
-      else
+      }
+      else {
         line = this.caretPosLine;
-      y = window.screenY + (line + 1 - this.editor.getTopIndex())
-        * lineHeight + this.$("USMTextEditor").firstChild.boxObject.y + 30;
+      }
+      y = window.screenY + (line + 1 - this.editor.getTopIndex()) * lineHeight +
+          this.$("USMTextEditor").firstChild.boxObject.y + 30;
     }
     return {x: x, y: y};
   },
@@ -328,7 +342,7 @@ StyleEditor.prototype = {
     this.initialized = false;
     this.doc = null;
     // Resetting the preferences used for manually adding search engine
-    Services.prefs.getBranch("extensions.UserStyleManager.").clearUserPref("editorOpen");
+    Services.prefs.clearUserPref("extensions.UserStyleManager.editorOpen");
   },
 
   fixupText: function SE_fixupText() {
@@ -338,19 +352,19 @@ StyleEditor.prototype = {
 
   //  function to handle click/enter on the panel
   autocompletePanelPress: function SE_autocompletePanelPress(event) {
-    if (event.button && event.button == 0
-      || event.keyCode == event.DOM_VK_ENTER
-      || event.keyCode == event.DOM_VK_RETURN) {
-        if (this.$("USMAutocompletePanel").state == "open") {
-          if (this.$("USMAutocompleteList").selectedItem) {
-            let value = this.$("USMAutocompleteList").selectedItem.lastChild.value + ": ";
-            this.$("USMAutocompletePanel").hidePopup();
-            this.editor.focus();
-            this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
-            let caretOffset = this.getCaretOffset();
-            this.setText(value, caretOffset, caretOffset);
-          }
+    if (event.button && event.button == 0 ||
+        event.keyCode == event.DOM_VK_ENTER ||
+        event.keyCode == event.DOM_VK_RETURN) {
+      if (this.$("USMAutocompletePanel").state == "open") {
+        if (this.$("USMAutocompleteList").selectedItem) {
+          let value = this.$("USMAutocompleteList").selectedItem.lastChild.value + ": ";
+          this.$("USMAutocompletePanel").hidePopup();
+          this.editor.focus();
+          this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
+          let caretOffset = this.getCaretOffset();
+          this.setText(value, caretOffset, caretOffset);
         }
+      }
     }
   },
 
@@ -360,20 +374,25 @@ StyleEditor.prototype = {
   },
 
   preInputHelper: function SE_preInputHelper(event) {
-    if (event.keyCode != event.DOM_VK_DOWN && event.keyCode != event.DOM_VK_UP)
+    if (event.keyCode != event.DOM_VK_DOWN &&
+        event.keyCode != event.DOM_VK_UP) {
       return;
+    }
     let [start, end] = this.getSelectionPoints();
     let text = this.getText();
     switch (event.keyCode) {
       case event.DOM_VK_DOWN:
         // move to end of line if at last line
         if (text.slice(end).indexOf("\n") == -1) {
-          if (end > start && event.shiftKey && start > -1)
+          if (end > start && event.shiftKey && start > -1) {
             this.selectRange(start, text.length);
-          else if (event.shiftKey)
+          }
+          else if (event.shiftKey) {
             this.selectRange(end, text.length);
-          else
+          }
+          else {
             this.setCaretOffset(text.length);
+          }
         }
         if (this.$("USMColorPickerPanel").state == "open") {
           this.$("USMColorPickerPanel").hidePopup();
@@ -382,12 +401,15 @@ StyleEditor.prototype = {
         break;
       case event.DOM_VK_UP:
         if (text.slice(0, start).indexOf("\n") == -1) {
-          if (end > start && event.shiftKey && start > -1)
+          if (end > start && event.shiftKey && start > -1) {
             this.selectRange(end, 0);
-          else if (event.shiftKey)
+          }
+          else if (event.shiftKey) {
             this.selectRange(start, 0);
-          else
+          }
+          else {
             this.setCaretOffset(0);
+          }
         }
         if (this.$("USMColorPickerPanel").state == "open") {
           this.$("USMColorPickerPanel").hidePopup();
@@ -399,8 +421,9 @@ StyleEditor.prototype = {
 
   inputHelper: function SE_inputHelper(event) {
     if (event.ctrlKey || event.altKey || event.metaKey) {
-      if (this.$("USMAutocompletePanel").state == "open")
+      if (this.$("USMAutocompletePanel").state == "open") {
         this.$("USMAutocompletePanel").hidePopup();
+      }
       return;
     }
 
@@ -413,10 +436,11 @@ StyleEditor.prototype = {
         }
       case event.DOM_VK_UP:
         if (this.$("USMAutocompletePanel").state == "open") {
-          if (this.$("USMAutocompleteList").currentIndex == 0)
+          if (this.$("USMAutocompleteList").currentIndex == 0) {
             this.$("USMAutocompleteList").currentIndex =
               this.$("USMAutocompleteList").selectedIndex =
               this.$("USMAutocompleteList").itemCount - 1;
+          }
           else {
             this.$("USMAutocompleteList").currentIndex--;
             this.$("USMAutocompleteList").selectedIndex--;
@@ -426,8 +450,11 @@ StyleEditor.prototype = {
         return;
       case event.DOM_VK_DOWN:
         if (this.$("USMAutocompletePanel").state == "open") {
-          if (this.$("USMAutocompleteList").currentIndex == this.$("USMAutocompleteList").itemCount - 1)
-            this.$("USMAutocompleteList").currentIndex = this.$("USMAutocompleteList").selectedIndex = 0;
+          if (this.$("USMAutocompleteList").currentIndex ==
+                this.$("USMAutocompleteList").itemCount - 1) {
+            this.$("USMAutocompleteList").currentIndex =
+              this.$("USMAutocompleteList").selectedIndex = 0;
+          }
           else {
             this.$("USMAutocompleteList").currentIndex++;
             this.$("USMAutocompleteList").selectedIndex++;
@@ -449,7 +476,7 @@ StyleEditor.prototype = {
           if (this.$("USMAutocompleteList").selectedItem) {
             let value = this.$("USMAutocompleteList").selectedItem.lastChild.value + ": ";
             this.$("USMAutocompletePanel").hidePopup();
-            let tabSize = Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize");
+            let tabSize = Services.prefs.getIntPref("devtools.editor.tabsize");
             this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
             let currentPos = this.getCaretOffset();
             this.setText(value, currentPos, currentPos + tabSize - (this.caretPosCol)%tabSize);
@@ -462,8 +489,9 @@ StyleEditor.prototype = {
           if (this.$("USMAutocompleteList").selectedItem) {
             this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
             let currentPos = this.getCaretOffset();
-            this.setText(this.$("USMAutocompleteList").selectedItem.lastChild.value + ": ",
-              currentPos, currentPos + 2);
+            this.setText(this.$("USMAutocompleteList").selectedItem.lastChild.value +
+                          ": ",
+                         currentPos, currentPos + 2);
             this.$("USMAutocompletePanel").hidePopup();
           }
         }
@@ -492,13 +520,15 @@ StyleEditor.prototype = {
     }
 
     if (event.ctrlKey || event.altKey || event.metaKey) {
-      if (this.$("USMAutocompletePanel").state == "open")
+      if (this.$("USMAutocompletePanel").state == "open") {
         this.$("USMAutocompletePanel").hidePopup();
+      }
       return;
     }
 
-    if (this.selectedText().length > 0)
+    if (this.selectedText().length > 0) {
       return;
+    }
 
     let currentPos = this.getCaretOffset();
     let text = this.getText();
@@ -508,11 +538,16 @@ StyleEditor.prototype = {
     if ("!" == lastWord) {
       // checking whether we are not inside a comment
       let textBefore = text.slice(0, currentPos - 1);
-      if (textBefore.lastIndexOf("\/*") > textBefore.lastIndexOf("*\/"))
+      if (textBefore.lastIndexOf("\/*") > textBefore.lastIndexOf("*\/")) {
         return;
+      }
       let textAfter = text.slice(currentPos, currentPos + 9);
-      if (textAfter.length == 0 || textAfter.toLowerCase() != "important".slice(0, textAfter.length))
-        this.setText('important' + (textAfter[0] != ';'? ';': ''), currentPos, currentPos);
+      if (textAfter.length == 0 ||
+          textAfter.toLowerCase() != "important".slice(0, textAfter.length)) {
+        this.setText('important' + (textAfter[0] != ';'? ';': ''),
+                     currentPos,
+                     currentPos);
+      }
     }
     else if ("'" == lastWord) {
       let textAfter = text.slice(currentPos).split("\n")[0];
@@ -530,62 +565,71 @@ StyleEditor.prototype = {
         this.setCaretOffset(currentPos);
       }
     }
-    else if (text.slice(0, currentPos).split("\n").slice(-1)[0].split("'").length%2
-            && text.slice(0, currentPos).split("\n").slice(-1)[0].split('"').length%2) {
+    else if (text.slice(0, currentPos).split("\n").slice(-1)[0].split("'").length%2 &&
+             text.slice(0, currentPos).split("\n").slice(-1)[0].split('"').length%2) {
       if ("/*" == text.slice(currentPos - 2, currentPos)) {
-        if (text.slice(currentPos).split("*/").length == 1
-          || text.slice(currentPos).split("*/")[0].split("/*").length != 1) {
-            this.setText("*/", currentPos, currentPos);
-            this.setCaretOffset(currentPos);
+        if (text.slice(currentPos).split("*/").length == 1 ||
+            text.slice(currentPos).split("*/")[0].split("/*").length != 1) {
+          this.setText("*/", currentPos, currentPos);
+          this.setCaretOffset(currentPos);
         }
       }
       else if ("{" == lastWord) {
         let textAfter = text.slice(currentPos);
         let textBefore = text.slice(0, currentPos);
-        if (textBefore.split("{").length - textBefore.split("}").length
-            > textAfter.split("}").length - textAfter.split("{").length) {
+        if (textBefore.split("{").length - textBefore.split("}").length >
+            textAfter.split("}").length - textAfter.split("{").length) {
           let indent = textBefore.match(/\n?[^\n]{0,}\{$/)[0].search(/[^ \n]/) - 1;
           let indentation = "";
-          for (let i = 0; i < indent; i++)
+          for (let i = 0; i < indent; i++) {
             indentation += " ";
+          }
           this.setText("\n" + indentation + "}", currentPos, currentPos);
           this.setCaretOffset(currentPos);
         }
       }
       // Case for color picker as you type
-      else if (("(" == lastWord || "#" == lastWord) && text.slice(0, currentPos).match(/(rgba?\s*\(|#)$/)) {
+      else if (("(" == lastWord || "#" == lastWord) &&
+               text.slice(0, currentPos).match(/(rgba?\s*\(|#)$/)) {
         let match = text.slice(0, currentPos).match(/(rgba?\s*\()|(#)$/), color;
         let panel = document.getElementById("USMColorPickerPanel");
         if (match && match[2] != "#") {
           let alpha = match[1].length > 4;
-          this.setText("150, 150, 150" + (alpha?", 1":"") + ")", currentPos, currentPos);
+          this.setText("150, 150, 150" + (alpha?", 1":"") + ")",
+                       currentPos,
+                       currentPos);
           color = [150,150,150];
         }
         else if (match && match[2] == "#") {
           let lineBefore = text.slice(0, currentPos).match(/\n?[^\n]*$/)[0];
           let property = lineBefore.match(/\s*([a-zA-Z\-]+)\s*:[^:]*$/);
-          if (!property)
+          if (!property) {
             return;
+          }
           property = property[1];
-          if (CSSKeywordsList.indexOf(property.toLowerCase()) < 0)
+          if (CSSKeywordsList.indexOf(property.toLowerCase()) < 0) {
             return;
+          }
           this.setText("DDDDDD", currentPos, currentPos);
           color = "DDDDDD";
         }
-        else if (!match)
+        else if (!match) {
           return;
+        }
         this.colorCaretOffset = currentPos - match[0].length;
         this.colorMatch = match[2] != "#"? RGB_HSLA_MATCH: HEX_MATCH;
         this.color = color;
         //colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation
         //,parentObj,parentXY,color,difPad,rSpeed,docBody,onColorSave,onColorChange)
         colorPicker(event, 'B', 3, false, null, null, null, panel, null, color,
-          null, null, panel, this.onColorPickerSave.bind(this));
+                    null, null, panel, this.onColorPickerSave.bind(this));
         let screen = this.getLocationAtOffset(currentPos - match[0].length);
-        if (panel.state == "open")
+        if (panel.state == "open") {
           panel.moveTo(screen.x, screen.y + 15);
-        else
+        }
+        else {
           panel.openPopupAtScreen(screen.x, screen.y + 15, false);
+        }
         listen(window, panel, "popuphidden", function() {
           this.colorCaretOffset = -1;
           this.colorMatch = '';
@@ -596,8 +640,8 @@ StyleEditor.prototype = {
       else if ("(" == lastWord) {
         let textAfter = text.slice(currentPos);
         let textBefore = text.slice(0, currentPos);
-        if (textBefore.split("(").length - textBefore.split(")").length
-            > textAfter.split(")").length - textAfter.split("(").length) {
+        if (textBefore.split("(").length - textBefore.split(")").length >
+            textAfter.split(")").length - textAfter.split("(").length) {
           this.setText(")", currentPos, currentPos);
           this.setCaretOffset(currentPos);
         }
@@ -605,8 +649,8 @@ StyleEditor.prototype = {
       else if ("[" == lastWord) {
         let textAfter = text.slice(currentPos);
         let textBefore = text.slice(0, currentPos);
-        if (textBefore.split("[").length - textBefore.split("]").length
-            > textAfter.split("]").length - textAfter.split("[").length) {
+        if (textBefore.split("[").length - textBefore.split("]").length >
+            textAfter.split("]").length - textAfter.split("[").length) {
           this.setText("]", currentPos, currentPos);
           this.setCaretOffset(currentPos);
         }
@@ -614,11 +658,13 @@ StyleEditor.prototype = {
       else {
         let richlist = this.$("USMAutocompleteList");
         try {
-          while (richlist.firstChild)
+          while (richlist.firstChild) {
             richlist.removeChild(richlist.firstChild);
+          }
         } catch (ex) {}
-        if (!this.sourceEditorEnabled)
+        if (!this.sourceEditorEnabled) {
           return;
+        }
         // Checking for autocompleting
         let textBefore = text.slice(0, currentPos);
         let word = textBefore.match(/([0-9a-zA-Z_\-]+)$/);
@@ -635,48 +681,57 @@ StyleEditor.prototype = {
         word = word[1];
         let lineBefore = textBefore.slice(-colNum).slice(0, colNum - word.length);
         let numTabs = lineBefore.split("\t").length - 1;
-        colNum += numTabs*(Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize") - 1);
-        for (let i = 0; i < CSSKeywordsList.length; i++)
-          if (CSSKeywordsList[i].slice(0, word.length).toLowerCase() != word.toLowerCase())
+        colNum += numTabs*(Services.prefs.getIntPref("devtools.editor.tabsize") - 1);
+        for (let i = 0; i < CSSKeywordsList.length; i++) {
+          if (CSSKeywordsList[i].slice(0, word.length).toLowerCase() != word.toLowerCase()) {
             continue;
-          else
-            matchedList.push(CSSKeywordsList[i]);
+          }
+          matchedList.push(CSSKeywordsList[i]);
+        }
         if (matchedList.length == 0) {
-          if (this.$("USMAutocompletePanel").state == "open")
+          if (this.$("USMAutocompletePanel").state == "open") {
             this.$("USMAutocompletePanel").hidePopup();
+          }
           return;
         }
         let maxLen = 0;
         for (let i = 0; i < matchedList.length; i++) {
-          if (maxLen < matchedList[i].length)
+          if (maxLen < matchedList[i].length) {
             maxLen = matchedList[i].length;
+          }
           let item = document.createElementNS(XUL, "richlistitem");
           let matchingPart = document.createElementNS(XUL, "label");
           matchingPart.setAttribute("value", word);
-          matchingPart.setAttribute("style", "margin: 2px 0px; font-family: monospace; font-size: inherit; font-size: 14px;");
+          matchingPart.setAttribute("style", "margin: 2px 0px; font-family: " +
+                                    "monospace; font-size: inherit; font-size: 14px;");
           item.appendChild(matchingPart);
           let rest = document.createElementNS(XUL, "label");
           rest.setAttribute("value", matchedList[i].slice(word.length));
-          rest.setAttribute("style", "color: #444; margin: 2px 0px; font-family: monospace; font-size: inherit; font-size: 14px;");
+          rest.setAttribute("style", "color: #444; margin: 2px 0px; font-family:" +
+                            "monospace; font-size: inherit; font-size: 14px;");
           item.appendChild(rest);
           richlist.appendChild(item);
         }
         // Convert the caret position into x,y coordinates.
         let lineHeight = this.editor._view.getLineHeight() || 17;
         let {x, y} = this.getLocationAtOffset(currentPos - word.length);
-        this.$("USMAutocompleteList").setAttribute("height", Math.min(matchedList.length*20 + 15, 250));
+        this.$("USMAutocompleteList").setAttribute("height",
+                                                   Math.min(matchedList.length*20 + 15, 250));
         this.$("USMAutocompleteList").setAttribute("width", (maxLen*8 + 30));
-        if (this.$("USMAutocompletePanel").state == "open")
+        if (this.$("USMAutocompletePanel").state == "open") {
           this.$("USMAutocompletePanel").moveTo(x, y);
-        else
+        }
+        else {
           this.$("USMAutocompletePanel").openPopupAtScreen(x, y, false);
+        }
         // Shifting the popup above one line if not enough space below
         if (y + this.$("USMAutocompletePanel").boxObject.height > window.screen.height) {
           y -= (lineHeight + this.$("USMAutocompletePanel").boxObject.height);
           this.$("USMAutocompletePanel").moveTo(x, y);
         }
         this.$("USMAutocompleteList").focus();
-        this.$("USMAutocompleteList").currentIndex = this.$("USMAutocompleteList").selectedIndex = 0;
+        this.$("USMAutocompleteList").currentIndex =
+          this.$("USMAutocompleteList").selectedIndex = 0;
         this.editor.focus();
         this.setCaretOffset(currentPos);
       }
@@ -696,8 +751,9 @@ StyleEditor.prototype = {
       panel.hidePopup();
       return;
     }
-    else
+    else {
       startIndex = match;
+    }
     match = text.slice(startIndex).match(new RegExp('^' + URL_MATCH, 'i'));
     if (match[0].length < offset - startIndex) {
       panel.hidePopup();
@@ -706,18 +762,23 @@ StyleEditor.prototype = {
     event.preventDefault();
     event.stopPropagation();
     this.setCaretOffset(offset);
-    let url = match[1].replace(/[\n ]{0,}/g, "").replace(/['"]\+{0,}['"]/g, "")
-      .replace(/^['"]/, "").replace(/['"]$/, "");
+    let url = match[1].replace(/[\n ]{0,}/g, "")
+                      .replace(/['"]\+{0,}['"]/g, "")
+                      .replace(/^['"]/, "")
+                      .replace(/['"]$/, "");
 
     this.$("USMPreviewPanelImage").style.display = "none";
     panel.removeAttribute("class");
-    panel.setAttribute("style", "min-width: 150px !important; min-height: 150px !important;"
-      + "background-size:100% 100%; background-image: url(" + url + ")");
+    panel.setAttribute("style", "min-width: 150px !important; min-height: 150px" +
+                       " !important; background-size:100% 100%; background-image: url(" +
+                       url + ")");
 
-    if (panel.state == "closed")
+    if (panel.state == "closed") {
       panel.openPopupAtScreen(event.screenX, event.screenY, false);
-    else
+    }
+    else {
       panel.moveTo(event.screenX, event.screenY);
+    }
   },
 
   onMouseMove: function SE_onMouseMove({event}) {
@@ -728,12 +789,14 @@ StyleEditor.prototype = {
     }
     let offset = this.getOffsetAtLocation(event.screenX, event.screenY);
     let text = this.getText();
-    if (text.length < 4)
+    if (text.length < 4) {
       return;
+    }
     let rgbhslaMatch = false, color;
     let match = text.slice(0, offset).match(/(r|rg|rgb|rgba|h|hs|hsl|hsla)[ ,0-9%.\)\(]{0,}$/);
-    if (!match)
+    if (!match) {
       match = text.slice(0, offset).match(/(#)[0-9abcdef]{0,6}$/i);
+    }
     if (!match) {
       panel.hidePopup();
       return;
@@ -746,23 +809,27 @@ StyleEditor.prototype = {
     }
     text = text.slice(startIndex);
     match = text.match(new RegExp(RGB_HSLA_MATCH, 'i'));
-    if (!match)
+    if (!match) {
       match = text.match(new RegExp(HEX_MATCH, 'i'));
-    else
+    }
+    else {
       rgbhslaMatch = true;
+    }
     if (!match) {
       panel.hidePopup();
       return;
     }
     // Updating startIndex to be accurate
     startIndex += rgbhslaMatch
-      ?text.search(new RegExp(RGB_HSLA_MATCH, 'i'))
-      :text.search(new RegExp(HEX_MATCH, 'i'));
+                    ? text.search(new RegExp(RGB_HSLA_MATCH, 'i'))
+                    : text.search(new RegExp(HEX_MATCH, 'i'));
     // this.caretPosCol = text.slice(0, startIndex).match(/\n?.{0,}$/).length;
     // this.caretPosLine = text.slice(0, startIndex).split("\n").length - 1;
     let screen = this.getLocationAtOffset(startIndex);
-    if ((screen.x - event.screenX) > 20 || (screen.x - event.screenX) < -8*match[0].length
-      || (screen.y - event.screenY) > 20 || (screen.y - event.screenY) < -5) {
+    if ((screen.x - event.screenX) > 20 ||
+        (screen.x - event.screenX) < -8*match[0].length ||
+        (screen.y - event.screenY) > 20 ||
+        (screen.y - event.screenY) < -5) {
       panel.hidePopup();
       return;
     }
@@ -772,8 +839,9 @@ StyleEditor.prototype = {
         color = match[2].replace(/[ %]{0,}/g, "").split(",").map(function(s) {
           return Math.round(parseFloat(s));
         });
-        if (color.length == 4)
+        if (color.length == 4) {
           color.pop();
+        }
       }
       else {
         panel.hidePopup();
@@ -792,10 +860,12 @@ StyleEditor.prototype = {
       return;
     }
     this.setPreviewImage(this.regexp2RGB(match, color, color, color));
-    if (panel.state == "closed")
+    if (panel.state == "closed") {
       panel.openPopupAtScreen(screen.x, screen.y, false);
-    else
+    }
+    else {
       panel.moveTo(screen.x, screen.y);
+    }
   },
 
   setPreviewImage: function SE_setPreviewImage(url, isImage) {
@@ -811,8 +881,9 @@ StyleEditor.prototype = {
     if (event.button == 2) {
       return;
     }
-    if (this.$("USMPreviewPanel").state == "open")
+    if (this.$("USMPreviewPanel").state == "open") {
       this.$("USMPreviewPanel").hidePopup();
+    }
     let offset = this.getOffsetAtLocation(event.screenX, event.screenY);
     this.caretPosCol= this.editor.getCaretPosition().col;
     this.caretPosLine = this.editor.getCaretPosition().line;
@@ -820,59 +891,75 @@ StyleEditor.prototype = {
     let text = this.getText();
     let rgbhslaMatch = false, color;
     let match = text.slice(0, offset).match(/(r|rg|rgb|rgba|h|hs|hsl|hsla)[ ,0-9%.\)\(]{0,}$/);
-    if (!match)
+    if (!match) {
       match = text.slice(0, offset).match(/(#)[0-9abcdef]{0,6}$/i);
+    }
     if (!match) {
       panel.hidePopup();
       return;
     }
     let startIndex = offset - match[0].length;
     match = text.slice(startIndex).match(new RegExp(RGB_HSLA_MATCH, 'i'));
-    if (!match)
+    if (!match) {
       match = text.slice(startIndex).match(new RegExp(HEX_MATCH, 'i'));
-    else
+    }
+    else {
       rgbhslaMatch = true;
-    if (!match)
+    }
+    if (!match) {
       return;
+    }
     // Updating startIndex to be accurate
-    startIndex += rgbhslaMatch?
-      text.slice(startIndex).search(new RegExp(RGB_HSLA_MATCH, 'i')):
-      text.slice(startIndex).search(new RegExp(HEX_MATCH, 'i'));
+    startIndex += rgbhslaMatch
+                    ? text.slice(startIndex).search(new RegExp(RGB_HSLA_MATCH, 'i'))
+                    : text.slice(startIndex).search(new RegExp(HEX_MATCH, 'i'));
     let screen = this.getLocationAtOffset(startIndex);
-    if ((screen.x - event.screenX) > 20 || (screen.x - event.screenX) < -10*(match[0].length + (rgbhslaMatch?0:6))
-      || (screen.y - event.screenY) > 20 || (screen.y - event.screenY) < -5)
-        return;
+    if ((screen.x - event.screenX) > 20 ||
+        (screen.x - event.screenX) < -10*(match[0].length + (rgbhslaMatch?0:6)) ||
+        (screen.y - event.screenY) > 20 ||
+        (screen.y - event.screenY) < -5) {
+      return;
+    }
 
     if (rgbhslaMatch && match[2]) {
       let len = match[2].split(",").length;
       if (len == 3 || len == 4) {
         color = match[2].replace(/[ ]{0,}/g, "").split(",");
-        if (color.length == 4)
+        if (color.length == 4) {
           color.pop();
+        }
       }
-      else
+      else {
         return;
+      }
     }
     else if (!rgbhslaMatch && match[2]) {
       color = match[2];
-      if (color.length%3 != 0)
+      if (color.length%3 != 0) {
         return;
+      }
     }
-    else
+    else {
       return;
+    }
     this.colorCaretOffset = startIndex;
     this.colorMatch = rgbhslaMatch? RGB_HSLA_MATCH: HEX_MATCH;
     this.color = color;
     //colorPicker(e,mode,size,rO/*readOnly*/,offsetX,offsetY,orientation
     //,parentObj,parentXY,color,difPad,rSpeed,docBody,onColorSave,onColorChange)
-    if (match[1].search('hsl') > -1) // only rgb and hex values for now
+    if (match[1].search('hsl') > -1) {
+      // only rgb and hex values for now
       return;
-    colorPicker(event, 'B', 3, false, null, null, null, panel, null, match[1].search('hsl') > -1? this.HSV2RGB(color): color,
-      null, null, panel, this.onColorPickerSave.bind(this));
-    if (panel.state == "open")
+    }
+    colorPicker(event, 'B', 3, false, null, null, null, panel, null,
+                match[1].search('hsl') > -1? this.HSV2RGB(color): color,
+                null, null, panel, this.onColorPickerSave.bind(this));
+    if (panel.state == "open") {
       panel.moveTo(event.screenX, event.screenY + 15);
-    else
+    }
+    else {
       panel.openPopupAtScreen(event.screenX, event.screenY + 15, false);
+    }
     listen(window, panel, "popuphidden", function() {
       this.colorCaretOffset = -1;
       this.colorMatch = '';
@@ -895,103 +982,122 @@ StyleEditor.prototype = {
   },
 
   onColorPickerSave: function SE_onColorPickerSave(rgb, hsv, hex) {
-    if (this.colorCaretOffset == -1
-      || this.colorMatch == ''
-      || this.color == [])
-        return;
+    if (this.colorCaretOffset == -1 ||
+        this.colorMatch == '' ||
+        this.color == []) {
+      return;
+    }
     let text = this.getText().slice(this.colorCaretOffset);
     let match = text.match(new RegExp(this.colorMatch, 'i'));
     let color = this.regexp2RGB(match, rgb, hsv, hex);
-    if (color.match(new RegExp(this.colorMatch, 'i'))[2] == match[2])
+    if (color.match(new RegExp(this.colorMatch, 'i'))[2] == match[2]) {
       return;
+    }
     this.setText(color, this.colorCaretOffset, this.colorCaretOffset + match[0].length);
   },
 
   regexp2RGB: function SE_regexp2RGB(match, rgb, hsv, hex) {
     let color = match[2].split(",");
     rgb = match[1].search(/rgba?/i) > -1? rgb: match[1].search(/hsla?/i) > -1? hsv: null;
-    if (!rgb)
+    if (!rgb) {
       color = hex;
+    }
     else {
-      for (let i = 0; i < 3; i++)
+      for (let i = 0; i < 3; i++) {
         color[i] = color[i].replace(/[0-9.]+/,Math.round(rgb[i]));
+      }
       color = color.join(",");
     }
 
-    return match[1] + (match[1] != '#'? '(': '')
-      + color + (match[1] != '#'? ')': '');
+    return match[1] + (match[1] != '#'? '(': '') + color +
+           (match[1] != '#'? ')': '');
   },
 
   getAffectedContent: function SE_getAffectedContent() {
     let text = this.getText();
     let matchedURL = text.match(/[@]-moz-document[ ]+(((url|url-prefix|domain)[ ]{0,}\([\'\"]{0,1}([^\'\"\)]+)[\'\"]{0,1}\)[ ,]{0,})+)/);
-    if (!matchedURL)
+    if (!matchedURL) {
       return "chrome://";
-    let urlList = matchedURL[1].replace(/[ ]{0,}(url|url-prefix|domain)\(['"]?/g, "").replace(/['"]?\)[ ]{0,}/g, "").split(",");
-    if (!urlList)
+    }
+    let urlList = matchedURL[1].replace(/[ ]{0,}(url|url-prefix|domain)\(['"]?/g, "")
+                               .replace(/['"]?\)[ ]{0,}/g, "")
+                               .split(",");
+    if (!urlList) {
       return "";
-    else
-      return urlList.join(",");
+    }
+    return urlList.join(",");
   },
 
   saveButtonClick: function(aEvent, aCallback) {
-    if (!this.validateCSS())
+    if (!this.validateCSS()) {
       return;
-    if (this.saved && styleSheetList[this.index][1]
-      == escape(this.doc.getElementById("USMFileNameBox").value))
-        return;
+    }
+    if (this.saved && styleSheetList[this.index][1] ==
+          escape(this.doc.getElementById("USMFileNameBox").value)) {
+      return;
+    }
     if (this.previewShown) {
       unloadStyleSheet(this.index);
       this.previewShown = false;
       styleSheetList[this.index][0] = this.origEnabled;
       styleSheetList[this.index][2] = this.origPath;
     }
-    if (this.getText() == "")
+    if (this.getText() == "") {
       return;
+    }
     if (!this.createNew && !this.openNew) {
       styleSheetList[this.index][8] = true;
       unloadStyleSheet(this.index);
     }
-    if (this.options)
+    if (this.options) {
       styleSheetList[this.index][7] = this.options;
+    }
     if (this.createNew) {
-      if (this.styleName.length == 0)
+      if (this.styleName.length == 0) {
         styleSheetList[this.index][1] = escape(this.doc.getElementById("USMFileNameBox").value);
+      }
       styleSheetList[this.index][2] = escape(this.doc.getElementById("USMFileNameBox")
-        .value.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css");
-      if (unescape(styleSheetList[this.index][2]) == ".css")
+                                                 .value.replace(/[\\\/:*?\"<>|]+/gi, "") +
+                                                 ".css");
+      if (unescape(styleSheetList[this.index][2]) == ".css") {
         styleSheetList[this.index][2] = escape("User Created Style Sheet " + this.index + ".css");
+      }
       this.styleSheetFile = getFileURI(unescape(styleSheetList[this.index][2]))
-        .QueryInterface(Ci.nsIFileURL).file;
-      if (!this.styleSheetFile.exists())
+                              .QueryInterface(Ci.nsIFileURL).file;
+      if (!this.styleSheetFile.exists()) {
         try {
           this.styleSheetFile.create(0, parseInt('0666', 8));
         } catch (ex) { return; }
+      }
     }
     else {
       let fileName = this.doc.getElementById("USMFileNameBox").value.replace(/[\\\/:*?\"<>|]+/gi, "");
       if (unescape(styleSheetList[this.index][2]).match(/[\\\/]?([^\\\/]{0,})\.css$/)[1] != fileName) {
         this.styleSheetFile = getFileURI(unescape(styleSheetList[this.index][2]))
-          .QueryInterface(Ci.nsIFileURL).file;
-        if (this.styleSheetFile.exists())
+                                .QueryInterface(Ci.nsIFileURL).file;
+        if (this.styleSheetFile.exists()) {
           try {
             this.styleSheetFile.remove(false);
           } catch (ex) {}
-        styleSheetList[this.index][2] = escape(unescape(styleSheetList[this.index][2]).replace(/[^\\\/]{0,}\.css$/, fileName + ".css"));
+        }
+        styleSheetList[this.index][2] = escape(unescape(
+          styleSheetList[this.index][2]).replace(/[^\\\/]{0,}\.css$/, fileName + ".css"));
         this.styleSheetFile = getFileURI(unescape(styleSheetList[this.index][2]))
-          .QueryInterface(Ci.nsIFileURL).file;
-        if (!this.styleSheetFile.exists())
+                                .QueryInterface(Ci.nsIFileURL).file;
+        if (!this.styleSheetFile.exists()) {
           try {
             this.styleSheetFile.create(0, parseInt('0666', 8));
           } catch (ex) { return; }
+        }
         // File with sam name exists, so renaming it to original name (1) format
         else {
           let i = 1;
           while (this.styleSheetFile.exists()) {
             styleSheetList[this.index][2] = escape(unescape(styleSheetList[this.index][2])
-              .replace(/[^\\\/]{0,}\.css$/, fileName + " (" + i++ + ").css"));
+                                              .replace(/[^\\\/]{0,}\.css$/,
+                                                       fileName + " (" + i++ + ").css"));
             this.styleSheetFile = getFileURI(unescape(styleSheetList[this.index][2]))
-              .QueryInterface(Ci.nsIFileURL).file;
+                                    .QueryInterface(Ci.nsIFileURL).file;
           }
           this.styleSheetFile.create(0, parseInt('0666', 8));
         }
@@ -999,7 +1105,7 @@ StyleEditor.prototype = {
     }
     let ostream = FileUtils.openSafeFileOutputStream(this.styleSheetFile);
     let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-      .createInstance(Ci.nsIScriptableUnicodeConverter);
+                      .createInstance(Ci.nsIScriptableUnicodeConverter);
     converter.charset = "UTF-8";
     let istream = converter.convertToInputStream(this.fixupText());
     NetUtil.asyncCopy(istream, ostream, function(status) {
@@ -1013,11 +1119,13 @@ StyleEditor.prototype = {
       loadStyleSheet(this.index);
       writeJSONPref();
       this.onTextSaved();
-      if (aCallback)
+      if (aCallback) {
         aCallback();
-      // Close the editor on save if add a new file
-      else if (this.openNew)
+      }
+      else if (this.openNew) {
+        // Close the editor on save if add a new file
         this.exitButtonClick(aEvent);
+      }
     }.bind(this));
   },
 
@@ -1033,8 +1141,7 @@ StyleEditor.prototype = {
     // Save and exit
     else if (toClose == 0) {
       this.saveButtonClick(null, function() {
-        if (this.callback)
-          this.callback();
+        this.callback && this.callback();
         this.win.close();
       });
       return;
@@ -1046,35 +1153,41 @@ StyleEditor.prototype = {
         this.previewShown = false;
         styleSheetList[this.index][0] = this.origEnabled;
         styleSheetList[this.index][2] = this.origPath;
-        if (!this.createNew && !this.openNew)
+        if (!this.createNew && !this.openNew) {
           loadStyleSheet(this.index);
+        }
       }
-      if ((this.createNew || this.openNew) && !this.savedOnce)
+      if ((this.createNew || this.openNew) && !this.savedOnce) {
         styleSheetList.splice(this.index, 1);
+      }
     }
     this.resetVariables();
-    if (this.callback)
-      this.callback();
+    this.callback && this.callback();
     this.win.close();
   },
 
   previewButtonClick: function () {
-    if (!this.validateCSS(true))
+    if (!this.validateCSS(true)) {
       return;
-    let tmpFile = getURIForFileInUserStyles("tmpFile.css").QueryInterface(Ci.nsIFileURL).file;
-    if (!tmpFile.exists())
+    }
+    let tmpFile = getURIForFileInUserStyles("tmpFile.css")
+                    .QueryInterface(Ci.nsIFileURL).file;
+    if (!tmpFile.exists()) {
       tmpFile.create(0, parseInt('0666', 8));
+    }
     let ostream = FileUtils.openSafeFileOutputStream(tmpFile);
     let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-      .createInstance(Ci.nsIScriptableUnicodeConverter);
+                      .createInstance(Ci.nsIScriptableUnicodeConverter);
     converter.charset = "UTF-8";
     let istream = converter.convertToInputStream(this.fixupText());
     NetUtil.asyncCopy(istream, ostream, function(status) {
-      if (!Components.isSuccessCode(status))
+      if (!Components.isSuccessCode(status)) {
         return;
+      }
       // Unload the previous preview if there
-      if (this.previewShown || (!this.createNew && !this.openNew))
+      if (this.previewShown || (!this.createNew && !this.openNew)) {
         unloadStyleSheet(this.index);
+      }
       this.previewShown = true;
       styleSheetList[this.index][0] = 'enabled';
       styleSheetList[this.index][2] = escape("tmpFile.css");
@@ -1098,8 +1211,9 @@ StyleEditor.prototype = {
   onLoad: function SE_onLoad(aEvent) {
 
     let startEditor = function() {
-      if (this.sourceEditorEnabled)
+      if (this.sourceEditorEnabled) {
         this.editor.init(editorPlaceholder, config, this.onEditorLoad.bind(this));
+      }
       else {
         editorPlaceholder.appendChild(this.editor);
         this.setText(config.placeholderText);
@@ -1108,8 +1222,9 @@ StyleEditor.prototype = {
       this.origPath = styleSheetList[this.index][2];
       this.origEnabled = styleSheetList[this.index][0];
       this.styleName = styleSheetList[this.index][1];
-      if (!this.sourceEditorEnabled)
+      if (!this.sourceEditorEnabled) {
         this.onEditorLoad();
+      }
     }.bind(this);
 
     let readFileData = function() {
@@ -1131,8 +1246,9 @@ StyleEditor.prototype = {
       }.bind(this));
     }.bind(this);
 
-    if (aEvent.target != this.doc)
+    if (aEvent.target != this.doc) {
       return;
+    }
     // Check if the window was opened with any arguments called
     if (this.win.arguments[0]) {
       let args = this.win.arguments[0];
@@ -1147,28 +1263,36 @@ StyleEditor.prototype = {
       }
       else if (args[2]) {
         this.createNew = true;
-        if (args[3].length > 0)
+        if (args[3].length > 0) {
           this.initialText = args[3];
+        }
       }
-      else
+      else {
         this.index = args[1];
-      if (args[4])
+      }
+      if (args[4]) {
         this.callback = function() {
-          if (pref("hideOptionsWhileEditing"))
+          if (pref("hideOptionsWhileEditing")) {
             Services.wm.getMostRecentWindow("navigator:browser")
-              .openDialog("chrome://userstylemanager/content/options.xul",
-              "User Style Manager Options", "chrome,resizable,centerscreen");
+                    .openDialog("chrome://userstylemanager/content/options.xul",
+                                "User Style Manager Options", "chrome,resizable,centerscreen");
+          }
         };
-      if (args[5] && this.styleName.length == 0)
+      }
+      if (args[5] && this.styleName.length == 0) {
         this.styleName = escape(args[5]);
-      if (args[6])
+      }
+      if (args[6]) {
         this.updateURL = args[6];
-      if (args[7])
+      }
+      if (args[7]) {
         this.options = args[7];
+      }
     }
 
-    if (this.sourceEditorEnabled)
+    if (this.sourceEditorEnabled) {
       this.editor = new SourceEditor();
+    }
     else {
       this.editor = this.doc.createElementNS(XUL, "textbox");
       this.editor.setAttribute("multiline", true);
@@ -1195,15 +1319,18 @@ StyleEditor.prototype = {
     readJSONPref(function() {
       if (this.createNew) {
         this.index = styleSheetList.length;
-        styleSheetList.push(['enabled', "",
-          (this.styleName.length > 0? this.styleName + ".css":
-          escape("User Created Style Sheet " + this.index + ".css")), this.updateURL,
-          "", JSON.stringify(new Date()), ""]);
+        styleSheetList.push(['enabled', "", 
+                             (this.styleName.length > 0
+                              ? this.styleName + ".css"
+                              : escape("User Created Style Sheet " + this.index + ".css")),
+                             this.updateURL,
+                             "",
+                             JSON.stringify(new Date()), ""]);
       }
       else if (this.openNew) {
         this.index = styleSheetList.length;
         styleSheetList.push(['enabled', this.styleName, escape(this.stylePath),
-          "", "", JSON.stringify(new Date()), ""]);
+                             "", "", JSON.stringify(new Date()), ""]);
       }
 
       if (this.createNew) {
@@ -1220,10 +1347,12 @@ StyleEditor.prototype = {
       else {
         let fileURI = getFileURI(unescape(styleSheetList[this.index][2]));
         this.styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
-        if (!this.styleSheetFile.exists())
+        if (!this.styleSheetFile.exists()) {
           doRestore(this.index, readFileData);
-        else
+        }
+        else {
           readFileData();
+        }
       }
     }.bind(this));
   },
@@ -1236,27 +1365,33 @@ StyleEditor.prototype = {
     this.$("USMTextEditor").firstChild.addEventListener("keydown", this.preInputHelper, true);
 
     if (!this.createNew) {
-      if (this.styleName && !this.saved)
+      if (this.styleName && !this.saved) {
         this.onTextChanged();
-      else if (this.styleName && this.saved)
+      }
+      else if (this.styleName && this.saved) {
         this.onTextSaved();
+      }
     }
     else {
       this.onTextChanged();
       this.setCaretOffset(this.getText().length);
     }
-    if (this.createNew)
+    if (this.createNew) {
       this.setTitle(this.STR("newStyleSheet") + " - " + this.STR("USM.label"));
-    else
+    }
+    else {
       this.setTitle(unescape(this.styleName) + " - " + this.STR("USM.label"));
+    }
     if (!this.createNew) {
       this.$("USMFileNameLabel").setAttribute("collapsed", true);
       this.$("USMFileNameEditingLabel").setAttribute("collapsed", false);
     }
-    this.$("USMFileNameBox").value = unescape(styleSheetList[this.index][2].match(/[\\\/]?([^\\\/]{0,})\.css$/)[1]);
+    this.$("USMFileNameBox").value =
+      unescape(styleSheetList[this.index][2].match(/[\\\/]?([^\\\/]{0,})\.css$/)[1]);
     this.$("USMButtonSave").onclick = this.saveButtonClick;
-    if (this.openNew || this.createNew)
+    if (this.openNew || this.createNew) {
       this.$("USMButtonSave").label = this.STR("addLabel");
+    }
     this.$("USMButtonPreview").onclick = this.previewButtonClick;
     this.$("USMButtonExit").onclick = this.exitButtonClick;
     // Assigning the mouse move and mouse click handler
@@ -1265,24 +1400,28 @@ StyleEditor.prototype = {
       this.$("USMTextEditor").firstChild.addEventListener("click", this.onMouseClick);
       this.$("USMTextEditor").firstChild.addEventListener("dblclick", this.onDblClick);
     }
-    if (this.getText() == this.STR("placeholder.text"))
+    if (this.getText() == this.STR("placeholder.text")) {
       this.selectRange(0, this.getText().length);
-    else
+    }
+    else {
       this.setCaretOffset(0);
+    }
   },
 
   getCaretOffset: function SE_getCaretOffset() {
-    if (this.sourceEditorEnabled)
+    if (this.sourceEditorEnabled) {
       return this.editor.getCaretOffset();
-    else
-      return this.editor.selectionStart;
+    }
+    return this.editor.selectionStart;
   },
 
   setCaretOffset: function SE_setCaretOffset(aOffset) {
-    if (this.sourceEditorEnabled)
+    if (this.sourceEditorEnabled) {
       this.editor.setCaretOffset(aOffset);
-    else
+    }
+    else {
       this.editor.setSelectionRange(aOffset, aOffset);
+    }
   },
 
   onToolsMenuShowing: function SE_onToolsMenuShowing() {
@@ -1305,18 +1444,22 @@ StyleEditor.prototype = {
     if (!this.$("se-search-regexp").checked) {
       let str = aOptions.ignoreCase ? aString.toLowerCase() : aString;
 
-      if (aOptions.ignoreCase)
+      if (aOptions.ignoreCase) {
         text = text.toLowerCase();
+      }
 
-      return (aOptions.backwards ? text.lastIndexOf(str, aOptions.start) :
-        text.indexOf(str, aOptions.start));
+      return (aOptions.backwards
+              ? text.lastIndexOf(str, aOptions.start)
+              : text.indexOf(str, aOptions.start));
     }
     else {
-      if (this.regexpIndex == -1)
+      if (this.regexpIndex == -1) {
         return [-1, null];
+      }
       let modifiers = "gm";
-      if (aOptions.ignoreCase)
+      if (aOptions.ignoreCase) {
         modifiers += "i";
+      }
       let r;
       try {
         r = new RegExp(aString, modifiers);
@@ -1324,17 +1467,21 @@ StyleEditor.prototype = {
         return [-1, null];
       }
       // Hack to set the regexpindex to last possible value
-      if (this.regexpIndex == -2)
+      if (this.regexpIndex == -2) {
         this.regexpIndex = text.split(r).length - 1;
+      }
       this.regexpIndex += (aOptions.backwards? -1: 1);
-      if (this.regexpIndex <= 0)
+      if (this.regexpIndex <= 0) {
         return [-1, null];
-      for (let i = 1; i < this.regexpIndex; i++)
+      }
+      for (let i = 1; i < this.regexpIndex; i++) {
         r.exec(text);
+      }
       let result = r.exec(text);
       result = result?result[0]:null;
-      if (!result)
+      if (!result) {
         return [-1, null];
+      }
       let index = r.lastIndex - result.length;
       return [index, result];
     }
@@ -1343,22 +1490,27 @@ StyleEditor.prototype = {
   handleRestOfFind: function SE_handleRestOfFind(searchText, searchOptions) {
     let index, resultText;
     let searchIndex = 0, count = 0;
-    if (this.$("se-search-regexp").checked)
+    if (this.$("se-search-regexp").checked) {
       [index, resultText] = this.find(searchText, searchOptions);
-    else
+    }
+    else {
       index = this.find(searchText, searchOptions);
+    }
     if (this.$("se-search-wrap").checked && index < 0) {
       searchOptions.start = searchOptions.backwards? this.getText().length: 0;
       this.regexpIndex = searchOptions.backwards? -2: 0;
-      if (this.$("se-search-regexp").checked)
+      if (this.$("se-search-regexp").checked) {
         [index, resultText] = this.find(searchText, searchOptions);
-      else
+      }
+      else {
         index = this.find(searchText, searchOptions);
+      }
     }
     if (this.$("se-search-regexp").checked) {
       try {
-        count = this.getText().split(new RegExp(searchText,
-          "gm" + (searchOptions.ignoreCase? "i": ""))).length - 1;
+        count = this.getText()
+                    .split(new RegExp(searchText,"gm" + (searchOptions.ignoreCase? "i": "")))
+                    .length - 1;
       } catch (ex) {
         count = 0;
       }
@@ -1370,8 +1522,9 @@ StyleEditor.prototype = {
     }
     // don't update searchindex if we think that it is because
     // of trying to wrap on no wrap
-    if (index < 0 && count <= 0)
+    if (index < 0 && count <= 0) {
       this.regexpIndex = -1;
+    }
     else if (index >= 0) {
       if (this.$("se-search-regexp").checked) {
         searchIndex = this.regexpIndex - 1;
@@ -1391,16 +1544,19 @@ StyleEditor.prototype = {
     this.$("se-search-count").value = count;
     this.$("se-search-count").style.color = count? "green": "red";
     this.$("se-search-box").focus();
-    if (this.$("se-search-regexp").checked)
+    if (this.$("se-search-regexp").checked) {
       return [index, resultText];
-    else
+    }
+    else {
       return [index]
+    }
   },
 
   doNewFind: function SE_doNewFind() {
     let selected = this.selectedText();
-    if (selected && selected.length > 0)
+    if (selected && selected.length > 0) {
       this.$("se-search-box").value = selected;
+    }
     this.doFind();
   },
 
@@ -1414,12 +1570,13 @@ StyleEditor.prototype = {
     }
     else if (searchText.length > 0) {
       let searchOptions = [];
-      if (searchText == this.lastFind)
+      if (searchText == this.lastFind) {
         searchOptions = {
           backwards: this.$("se-search-backwards").checked,
           ignoreCase: this.$("se-search-case").checked,
           start: this.getCaretOffset(),
         };
+      }
       else {
         this.lastFind = searchText;
         searchOptions = {
@@ -1464,8 +1621,9 @@ StyleEditor.prototype = {
 
   doReplace: function SE_doReplace(replaceAll) {
     if (!this.replaceVisible) {
-      if (this.$("se-search-options-panel").state == "open")
+      if (this.$("se-search-options-panel").state == "open") {
         this.$("se-search-options-panel").hidePopup();
+      }
       this.$("se-replace-container").style.opacity = 1;
       this.$("se-replace-container").style.maxHeight = "30px";
       this.$("se-replace-container").style.margin = "0px";
@@ -1481,22 +1639,25 @@ StyleEditor.prototype = {
         if (replaceAll) {
           let text = this.getText();
           let modifiers = "gm";
-          if (this.$("se-search-case").checked)
+          if (this.$("se-search-case").checked) {
             modifiers += "i";
+          }
           text = text.replace(new RegExp(searchText, modifiers), replaceText);
           this.setText(text);
           this.selectRange(caretOffset - searchText.length, caretOffset - searchText.length + replaceText.length);
         }
         else {
-          if (this.lastReplacedIndex != caretOffset - this.selectedText().length)
+          if (this.lastReplacedIndex != caretOffset - this.selectedText().length) {
             this.setCaretOffset(caretOffset - this.selectedText().length);
+          }
           let index;
           if (this.$("se-search-regexp").checked) {
             this.regexpIndex = searchIndex - 1;
             [index, searchText] = this.doFind();
           }
-          else
+          else {
             [index] = this.doFind();
+          }
           this.lastReplacedIndex = index;
           if (index >= 0) {
             this.setText(replaceText, index, index + searchText.length);
@@ -1517,8 +1678,10 @@ StyleEditor.prototype = {
   },
 
   onReplaceBlur: function SE_onReplaceBlur() {
-    if (this.$("se-replace-box").value.length > 0 && this.$("se-search-box").value.length > 0)
+    if (this.$("se-replace-box").value.length > 0 &&
+        this.$("se-search-box").value.length > 0) {
       return;
+    }
     this.$("se-replace-toolbar").style.opacity = 0;
     this.$("se-replace-toolbar").style.maxWidth = "0px";
     this.onSearchBlur();
@@ -1541,8 +1704,10 @@ StyleEditor.prototype = {
   },
 
   onSearchBlur: function SE_onSearchBlur() {
-    if (this.$("se-search-options-panel").state == "open" || this.$("se-search-options-panel").state == "showing")
+    if (this.$("se-search-options-panel").state == "open" ||
+        this.$("se-search-options-panel").state == "showing") {
       return;
+    }
     this.$("se-search-toolbar").style.opacity = 0;
     this.$("se-search-toolbar").style.maxWidth = "0px";
     this.searchVisible = false;
@@ -1560,52 +1725,67 @@ StyleEditor.prototype = {
   },
 
   addNamespace: function SE_addNameSpace() {
-    if (this.getText().search(/[@]namespace[ ]+url\(['"]?http:\/\/www.mozilla.org\/keymaster\/gatekeeper\/there\.is\.only\.xul['"]?\)/) >= 0)
+    if (this.getText().search(/[@]namespace[ ]+url\(['"]?http:\/\/www.mozilla.org\/keymaster\/gatekeeper\/there\.is\.only\.xul['"]?\)/) >= 0) {
       return;
-    if (this.createNew && this.getText().match(/^(\/\*[^*\/]{0,}\*\/\n)$/))
+    }
+    if (this.createNew && this.getText().match(/^(\/\*[^*\/]{0,}\*\/\n)$/)) {
       this.setText("@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n");
-    else
+    }
+    else {
       this.setText("@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n" + this.getText());
+    }
     this.setCaretOffset(79);
   },
 
   addWebNamespace: function SE_addWebNameSpace() {
-    if (this.getText().search(/[@]namespace[ ]+url\(['"]?http:\/\/www.w3.org\/1999\/xhtml['"]?\)/) >= 0)
+    if (this.getText().search(/[@]namespace[ ]+url\(['"]?http:\/\/www.w3.org\/1999\/xhtml['"]?\)/) >= 0) {
       return;
-    if (this.createNew && this.getText().match(/^(\/\*[^*\/]{0,}\*\/\n)$/))
+    }
+    if (this.createNew && this.getText().match(/^(\/\*[^*\/]{0,}\*\/\n)$/)) {
       this.setText("@namespace url(http://www.w3.org/1999/xhtml);\n");
-    else
-      this.setText("@namespace url(http://www.w3.org/1999/xhtml);\n" + this.getText());
+    }
+    else {
+      this.setText("@namespace url(http://www.w3.org/1999/xhtml);\n" +
+                   this.getText());
+    }
     this.setCaretOffset(46);
   },
 
   addMozURL: function SE_addMozURL() {
     let pos = this.getCaretOffset();
     let [start, end] = this.getSelectionPoints();
-    if (start == end)
+    if (start == end) {
       this.setText("@-moz-document url('') {\n}", pos, pos);
-    else
-      this.setText("@-moz-document url('') {\n" + this.getText(start, end) + "\n}", start, end);
+    }
+    else {
+      this.setText("@-moz-document url('') {\n" + this.getText(start, end) + "\n}",
+                   start, end);
+    }
     this.setCaretOffset(pos + 20);
   },
 
   addMozPreURL: function SE_addMozPreURL() {
     let pos = this.getCaretOffset();
     let [start, end] = this.getSelectionPoints();
-    if (start == end)
+    if (start == end) {
       this.setText("@-moz-document url-prefix('') {\n}", pos, pos);
-    else
-      this.setText("@-moz-document url-prefix('') {\n" + this.getText(start, end) + "\n}", start, end);
+    }
+    else {
+      this.setText("@-moz-document url-prefix('') {\n" + this.getText(start, end) + "\n}",
+                   start, end);
+    }
     this.setCaretOffset(pos + 27);
   },
 
   addMozDomain: function SE_addMozDomain() {
     let pos = this.getCaretOffset();
     let [start, end] = this.getSelectionPoints();
-    if (start == end)
+    if (start == end) {
       this.setText("@-moz-document domain('') {\n}", pos, pos);
-    else
+    }
+    else {
       this.setText("@-moz-document domain('') {\n" + this.getText(start, end) + "\n}", start, end);
+    }
     this.setCaretOffset(pos + 23);
   },
 
@@ -1615,15 +1795,17 @@ StyleEditor.prototype = {
       this.$("USMErrorLabel").style.margin = "30px 0px -60px 0px";
       errorPanel.style.opacity = 0;
       errorPanel.style.margin = "100px 0px -100px 0px;";
-      while (errorPanel.firstChild)
+      while (errorPanel.firstChild) {
         errorPanel.removeChild(errorPanel.firstChild);
+      }
     }
   },
 
   validateCSS: function SE_validateCSS(previewing) {
     let (errorPanel = this.$("USMErrorPanel")) {
-      while (errorPanel.firstChild)
+      while (errorPanel.firstChild) {
         errorPanel.removeChild(errorPanel.firstChild);
+      }
     }
     function getLine(i) {
       return numLines;
@@ -1659,13 +1841,15 @@ StyleEditor.prototype = {
     let bracketStackLine = [];
     let bracketStackOffset = [];
     let numLines = 0;
-    if (previewing == null)
+    if (previewing == null) {
       previewing = false;
+    }
     // comments in this bracketStack are represented by #
 
     bracketStack.__defineGetter__("last", function() {
-      if (bracketStack.length == 0)
+      if (bracketStack.length == 0) {
         return "";
+      }
       return bracketStack[bracketStack.length - 1];
     });
 
@@ -1685,130 +1869,177 @@ StyleEditor.prototype = {
       switch (text[i]) {
         case '\n':
           numLines++;
-          while (bracketStack.last == '"' || bracketStack.last == "'")
+          while (bracketStack.last == '"' || bracketStack.last == "'") {
             del();
+          }
           break;
 
         case '/':
-          if (bracketStack.last == '"' || bracketStack.last == "'")
+          if (bracketStack.last == '"' || bracketStack.last == "'") {
             break;
+          }
           // this can probably mean a comment start or end
           if (bracketStack.last == '*') {
             // comment end
             del();
             // checking if this comment was even started
-            if (bracketStack.last != '#')
+            if (bracketStack.last != '#') {
               errorList.push([getLine(i), i, this.STR("error.comment")]);
-            else
+            }
+            else {
               del();
+            }
           }
-          else if (bracketStack.last != '/')
+          else if (bracketStack.last != '/') {
             add('/', i);
+          }
           break;
 
         case '*':
-          if (bracketStack.last == '"' || bracketStack.last == "'")
+          if (bracketStack.last == '"' || bracketStack.last == "'") {
             break;
+          }
           // this can probably mean a comment start or end
           if (bracketStack.last == '/') {
             // comment start
             del();
             // checking if any comment was started before also
-            if (bracketStack.last != '#')
+            if (bracketStack.last != '#') {
               add('#', i);
+            }
           }
-          else if (bracketStack.last != '*')
+          else if (bracketStack.last != '*') {
             add('*', i);
+          }
           break;
 
         case "'":
-          if (bracketStack.last == '#')
+          if (bracketStack.last == '#') {
             break;
-          if (bracketStack.last == "'")
+          }
+          if (bracketStack.last == "'") {
             del();
-          else if (bracketStack.last == '"')
+          }
+          else if (bracketStack.last == '"') {
             break;
-          else
+          }
+          else {
             add("'", i);
+          }
           break;
 
         case '"':
-          if (bracketStack.last == '#')
+          if (bracketStack.last == '#') {
             break;
-          if (bracketStack.last == '"')
+          }
+          if (bracketStack.last == '"') {
             del();
-          else if (bracketStack.last == "'")
+          }
+          else if (bracketStack.last == "'") {
             break;
-          else
+          }
+          else {
             add('"', i);
+          }
           break;
 
         case '{':
-          if (bracketStack.last == '"' || bracketStack.last == "'" || bracketStack.last == '#')
+          if (bracketStack.last == '"' ||
+              bracketStack.last == "'" ||
+              bracketStack.last == '#') {
             break;
-          else if (bracketStack.last == '/' || bracketStack.last == '*')
+          }
+          else if (bracketStack.last == '/' || bracketStack.last == '*') {
             del();
+          }
           if (bracketStack.last == ':') {
             errorList.push([getLine(i), i, this.STR("error.missing") + " ;"]);
             del();
           }
-          if (text.slice(0, i + 1).match(/[@]-moz-document[ ]+(url(-prefix)?|domain|regexp)[^\{\}]+\{$/))
+          if (text.slice(0, i + 1)
+                  .match(/[@]-moz-document[ ]+(url(-prefix)?|domain|regexp)[^\{\}]+\{$/)) {
             add('{{', i);
-          else
+          }
+          else {
             add('{', i);
+          }
           break;
 
         case '}':
-          if (bracketStack.last == '"' || bracketStack.last == "'" || bracketStack.last == '#')
+          if (bracketStack.last == '"' ||
+              bracketStack.last == "'" ||
+              bracketStack.last == '#') {
             break;
-          else if (bracketStack.last == '/' || bracketStack.last == '*')
+          }
+          else if (bracketStack.last == '/' || bracketStack.last == '*') {
             del();
-          if (bracketStack.last == ':')
+          }
+          if (bracketStack.last == ':') {
             del();
-          if (bracketStack.last == '{')
+          }
+          if (bracketStack.last == '{') {
             add('}', i);
-          else if (bracketStack.last == '{{')
+          }
+          else if (bracketStack.last == '{{') {
             del();
+          }
           else if (bracketStack.last == '}') {
             while (bracketStack.last == '}' &&
-              (bracketStack[bracketStack.length - 2] == '{' ||
-              bracketStack[bracketStack.length - 2] == '{{')) {
-                del();
-                del();
-            }
-            if (bracketStack.last == '{' || bracketStack.last == '{{')
+                   (bracketStack[bracketStack.length - 2] == '{' ||
+                    bracketStack[bracketStack.length - 2] == '{{')) {
               del();
-            else
+              del();
+            }
+            if (bracketStack.last == '{' || bracketStack.last == '{{') {
+              del();
+            }
+            else {
               errorList.push([getLine(i), i, this.STR("error.unmatched") + " }"]);
+            }
           }
-          else
+          else {
             errorList.push([getLine(i), i, this.STR("error.unmatched") + " }"]);
+          }
           break;
 
         case '(':
-          if (bracketStack.last == '"' || bracketStack.last == "'" || bracketStack.last == '#')
+          if (bracketStack.last == '"' ||
+              bracketStack.last == "'" ||
+              bracketStack.last == '#') {
             break;
-          else if (bracketStack.last == '/' || bracketStack.last == '*')
+          }
+          else if (bracketStack.last == '/' || bracketStack.last == '*') {
             del();
+          }
           add('(', i);
           break;
 
         case ')':
-          if (bracketStack.last == '"' || bracketStack.last == "'" || bracketStack.last == '#')
+          if (bracketStack.last == '"' ||
+              bracketStack.last == "'" ||
+              bracketStack.last == '#') {
             break;
-          else if (bracketStack.last == '/' || bracketStack.last == '*')
+          }
+          else if (bracketStack.last == '/' || bracketStack.last == '*') {
             del();
-          if (bracketStack.last == '(')
+          }
+          if (bracketStack.last == '(') {
             del();
-          else
+          }
+          else {
             errorList.push([getLine(i), i, this.STR("error.unmatched") + " )"]);
+          }
           break;
 
         case '[':
-          if (bracketStack.last == '"' || bracketStack.last == "'" || bracketStack.last == '#')
+          if (bracketStack.last == '"' ||
+              bracketStack.last == "'" ||
+              bracketStack.last == '#') {
             break;
-          else if (bracketStack.last == '/' || bracketStack.last == '*')
+          }
+          else if (bracketStack.last == '/' || bracketStack.last == '*') {
             del();
+          }
           if (bracketStack.last == ':') {
             errorList.push([getLine(i), i, this.STR("error.missing") + " ;"]);
             del();
@@ -1817,38 +2048,56 @@ StyleEditor.prototype = {
           break;
 
         case ']':
-          if (bracketStack.last == '"' || bracketStack.last == "'" || bracketStack.last == '#')
+          if (bracketStack.last == '"' ||
+              bracketStack.last == "'" ||
+              bracketStack.last == '#') {
             break;
-          else if (bracketStack.last == '/' || bracketStack.last == '*')
+          }
+          else if (bracketStack.last == '/' || bracketStack.last == '*') {
             del();
-          if (bracketStack.last == '[')
+          }
+          if (bracketStack.last == '[') {
             del();
-          else
+          }
+          else {
             errorList.push([getLine(i), i, this.STR("error.unmatched") + " ]"]);
+          }
           break;
 
         case ':':
-          if (bracketStack.last == '"' || bracketStack.last == "'" || bracketStack.last == '#')
+          if (bracketStack.last == '"' ||
+              bracketStack.last == "'" ||
+              bracketStack.last == '#') {
             break;
-          else if (bracketStack.last == '/' || bracketStack.last == '*')
+          }
+          else if (bracketStack.last == '/' || bracketStack.last == '*') {
             del();
-          if (bracketStack.last == '{')
+          }
+          if (bracketStack.last == '{') {
             add(':', i);
-          else if (bracketStack.last == ':')
+          }
+          else if (bracketStack.last == ':') {
             errorList.push([getLine(i), i, this.STR("error.missing") + " ;"]);
+          }
           break;
 
         case ';':
-          if (bracketStack.last == '"' || bracketStack.last == "'" || bracketStack.last == '#')
+          if (bracketStack.last == '"' ||
+              bracketStack.last == "'" ||
+              bracketStack.last == '#') {
             break;
-          else if (bracketStack.last == '/' || bracketStack.last == '*')
+          }
+          else if (bracketStack.last == '/' || bracketStack.last == '*') {
             del();
-          if (bracketStack.last == ':')
+          }
+          if (bracketStack.last == ':') {
             del();
+          }
           break;
         default:
-          if (bracketStack.last == "*" || bracketStack.last == "/")
+          if (bracketStack.last == "*" || bracketStack.last == "/") {
             del();
+          }
       }
     }
     this.setCaretOffset(origCaretPos);
@@ -1856,32 +2105,36 @@ StyleEditor.prototype = {
     // Checking bracklist for matching brackets
     let i = 0;
     while (i < bracketStack.length) {
-      if (bracketStack[i] && bracketStack[i + 1]
-        && (((bracketStack[i] == '{' || bracketStack[i] == '{{') && bracketStack[i + 1] == '}')
-        || (bracketStack[i] == '[' && bracketStack[i + 1] == ']')
-        || (bracketStack[i] == '(' && bracketStack[i + 1] == ')')
-        || (bracketStack[i] == '#' && bracketStack[i + 1] == '#')
-        || (bracketStack[i] == ':' && bracketStack[i + 1] == ';')
-        || (bracketStack[i] == "'" && bracketStack[i + 1] == "'")
-        || (bracketStack[i] == '"' && bracketStack[i + 1] == '"'))) {
-          bracketStackOffset.splice(i,2);
-          bracketStackLine.splice(i,2);
-          bracketStack.splice(i,2);
-          i = Math.max(0, i - 1);
+      if (bracketStack[i] && bracketStack[i + 1] &&
+          (((bracketStack[i] == '{' || bracketStack[i] == '{{') &&
+             bracketStack[i + 1] == '}') ||
+           (bracketStack[i] == '[' && bracketStack[i + 1] == ']') ||
+           (bracketStack[i] == '(' && bracketStack[i + 1] == ')') ||
+           (bracketStack[i] == '#' && bracketStack[i + 1] == '#') ||
+           (bracketStack[i] == ':' && bracketStack[i + 1] == ';') ||
+           (bracketStack[i] == "'" && bracketStack[i + 1] == "'") ||
+           (bracketStack[i] == '"' && bracketStack[i + 1] == '"'))) {
+        bracketStackOffset.splice(i,2);
+        bracketStackLine.splice(i,2);
+        bracketStack.splice(i,2);
+        i = Math.max(0, i - 1);
       }
-      else
+      else {
         i++;
+      }
     }
-    for (i = 0; i < bracketStack.length; i++)
+    for (i = 0; i < bracketStack.length; i++) {
       errorList.push([bracketStackLine[i], bracketStackOffset[i],
-        bracketStack[i] != "#"?
-          (bracketStack[i] != ":"?
-            this.STR("error.unmatched") + " " + bracketStack[i].replace(/\{+/, "{"):
-            this.STR("error.missing") + " ;"
-          ): this.STR("error.commentStart")]);
+                      bracketStack[i] != "#"
+                        ? (bracketStack[i] != ":"
+                            ? this.STR("error.unmatched") + " " + bracketStack[i].replace(/\{+/, "{")
+                            : this.STR("error.missing") + " ;")
+                        : this.STR("error.commentStart")]);
+    }
 
-    if (errorList.length || warningList.length)
+    if (errorList.length || warningList.length) {
       error = true;
+    }
 
     // Sorting errors based on line num
     errorList.sort(function(a,b) {
@@ -1889,12 +2142,15 @@ StyleEditor.prototype = {
     });
 
     if (error) {
-      let answer = previewing?false:
-        promptService.confirm(null, this.STR("validate.error"), this.STR("validate.notCSS"));
+      let answer = previewing
+                    ? false
+                    : promptService.confirm(null, this.STR("validate.error"),
+                                            this.STR("validate.notCSS"));
       if (!answer) {
         let (errorPanel = this.$("USMErrorPanel")) {
-          while (errorPanel.firstChild)
+          while (errorPanel.firstChild) {
             errorPanel.removeChild(errorPanel.firstChild);
+          }
           if (error) {
             errorList.forEach(function([lineNum, offset, msg]) {
               errorPanel.appendChild(createErrorLine(lineNum, msg, offset));
@@ -1907,27 +2163,38 @@ StyleEditor.prototype = {
         }
         return previewing == true;
       }
-      else
+      else {
         return true;
+      }
     }
-    else
+    else {
       this.editor.focus();
+    }
 
     // No error found, now looking for url suffixes
-    if (text.search(/[@]namespace[ ]+url\([^\)]{1,}\)/) == -1 && this.namespace == null) {
+    if (text.search(/[@]namespace[ ]+url\([^\)]{1,}\)/) == -1 &&
+        this.namespace == null) {
       // checking if moz-url is there or not
       let mozDocURL = text.match(/[@]-moz-document[ ]+(url[\-prefix]{0,7}|domain|regexp)[ ]{0,}\(['"]?([^'"\)]+)['"]?\)[ ]/);
-      if (mozDocURL != null && mozDocURL[2].search("chrome://") == -1 && mozDocURL[2].search("about:") == -1) {
+      if (mozDocURL != null &&
+          mozDocURL[2].search("chrome://") == -1 &&
+          mozDocURL[2].search("about:") == -1) {
         text = "@namespace url(http://www.w3.org/1999/xhtml);\n" + text;
         origCaretPos += 46;
       }
       else if (mozDocURL == null) {
-        let flags = promptService.BUTTON_POS_0 * promptService.BUTTON_TITLE_IS_STRING
-          + promptService.BUTTON_POS_1 * promptService.BUTTON_TITLE_IS_STRING
-          + promptService.BUTTON_POS_2 * promptService.BUTTON_TITLE_IS_STRING;;
-        let button = promptService.confirmEx(null, this.STR("validate.title"),
-          this.STR("validate.text"), flags, this.STR("validate.chrome"),
-          this.STR("validate.website"),this.STR("validate.none"), null, {value: false});
+        let flags = promptService.BUTTON_POS_0 * promptService.BUTTON_TITLE_IS_STRING +
+                    promptService.BUTTON_POS_1 * promptService.BUTTON_TITLE_IS_STRING +
+                    promptService.BUTTON_POS_2 * promptService.BUTTON_TITLE_IS_STRING;
+        let button = promptService.confirmEx(null,
+                                             this.STR("validate.title"),
+                                             this.STR("validate.text"),
+                                             flags,
+                                             this.STR("validate.chrome"),
+                                             this.STR("validate.website"),
+                                             this.STR("validate.none"),
+                                             null,
+                                             {value: false});
         if (button == 0) {
           // Adding a xul namespace
           text = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n" + text;
@@ -1940,8 +2207,9 @@ StyleEditor.prototype = {
           this.namespace = NAMESPACE.xhtml;
           origCaretPos += 46;
         }
-        else
+        else {
           this.namespace = NAMESPACE.none;
+        }
       }
       this.setText(text);
       this.setCaretOffset(origCaretPos);
@@ -1959,52 +2227,65 @@ StyleEditor.prototype = {
 
   beautify: function SE_beautify() {
     let selection = this.selectedText();
-    if (selection.length == 0)
+    if (selection.length == 0) {
       selection = this.getText();
+    }
     this.setText(cssbeautify(selection, {
-                  indent:'    '.slice(
-                    Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize"))
+                  indent:'    '.slice(Services.prefs.getIntPref("devtools.editor.tabsize"))
                 }));
   },
 
   onTextSaved: function SE_onTextSaved(aStatus) {
-    if (aStatus && !Components.isSuccessCode(aStatus))
+    if (aStatus && !Components.isSuccessCode(aStatus)) {
       return;
+    }
 
-    if (!this.doc || !this.initialized)
+    if (!this.doc || !this.initialized) {
       return;  // file saved to disk after this.win has closed
+    }
 
     this.doc.title = this.doc.title.replace(/^\*/, "");
     this.saved = true;
     this.savedOnce = true;
-    if (this.sourceEditorEnabled)
+    if (this.sourceEditorEnabled) {
       this.editor.addEventListener(SourceEditor.EVENTS.TEXT_CHANGED, this.onTextChanged);
-    else
+    }
+    else {
       this.editor.addEventListener("input", this.onTextChanged);
+    }
   },
 
   onTextChanged: function SE_onTextChanged() {
     this.doc.title = "*" + this.doc.title;
     this.saved = false;
-    if (this.sourceEditorEnabled)
+    if (this.sourceEditorEnabled) {
       this.editor.removeEventListener(SourceEditor.EVENTS.TEXT_CHANGED, this.onTextChanged);
-    else
+    }
+    else {
       this.editor.removeEventListener("input" , this.onTextChanged);
+    }
   },
 
   onUnload: function SE_onUnload(aEvent) {
-    if (aEvent.target != this.doc)
+    if (aEvent.target != this.doc) {
       return;
+    }
 
     this.resetVariables();
     if (this.sourceEditorEnabled) {
-      this.editor.removeEventListener(SourceEditor.EVENTS.MOUSE_MOVE, this.onMouseMove);
-      this.doc.getElementById("USMTextEditor").firstChild.removeEventListener("click", this.onMouseClick);
-      this.doc.getElementById("USMTextEditor").firstChild.removeEventListener("dblclick", this.onDblClick);
+      this.editor.removeEventListener(SourceEditor.EVENTS.MOUSE_MOVE,
+                                      this.onMouseMove);
+      this.doc.getElementById("USMTextEditor")
+          .firstChild.removeEventListener("click", this.onMouseClick);
+      this.doc.getElementById("USMTextEditor")
+          .firstChild.removeEventListener("dblclick", this.onDblClick);
     }
-    this.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keypress", this.inputHelper, true);
-    this.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keyup", this.postInputHelper, true);
-    this.doc.getElementById("USMTextEditor").firstChild.removeEventListener("keydown", this.preInputHelper, true);
+    this.doc.getElementById("USMTextEditor")
+        .firstChild.removeEventListener("keypress", this.inputHelper, true);
+    this.doc.getElementById("USMTextEditor")
+        .firstChild.removeEventListener("keyup", this.postInputHelper, true);
+    this.doc.getElementById("USMTextEditor")
+        .firstChild.removeEventListener("keydown", this.preInputHelper, true);
     this.editor.destroy();
     this.editor = null;
     this.initialized = false;
@@ -2017,8 +2298,10 @@ StyleEditor.prototype = {
       let flags = ps.BUTTON_POS_0 * ps.BUTTON_TITLE_SAVE +
                   ps.BUTTON_POS_1 * ps.BUTTON_TITLE_CANCEL +
                   ps.BUTTON_POS_2 * ps.BUTTON_TITLE_DONT_SAVE;
-      let button = ps.confirmEx(this.win, this.STR("saveDialogBox.title"),
-        this.STR("saveDialogBox.text"), flags, null, null, null, null, {});
+      let button = ps.confirmEx(this.win,
+                                this.STR("saveDialogBox.title"),
+                                this.STR("saveDialogBox.text"),
+                                flags, null, null, null, null, {});
       return button;
     }
     return 2;
@@ -2031,8 +2314,9 @@ StyleEditor.prototype = {
   close: function SE_close() {
     let toClose = this.promptSave();
     if (toClose == 2) {
-      if ((this.createNew || this.openNew) && !this.savedOnce)
+      if ((this.createNew || this.openNew) && !this.savedOnce) {
         styleSheetList.splice(this.index, 1);
+      }
       this.resetVariables();
       this.win.close();
     }
