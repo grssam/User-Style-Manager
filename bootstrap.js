@@ -48,8 +48,9 @@ function handleCustomization(window) {
 
 function setupUpdates(window) {
   function updateAllStyleAndDo(index, callback) {
-    if (index == null)
+    if (index == null) {
       index = 0;
+    }
     else if (index == styleSheetList.length) {
       callback();
       return;
@@ -64,7 +65,9 @@ function setupUpdates(window) {
     if (!pref("updateAutomatically") ||
         (Date.now() - pref("lastUpdatedOn")*1) < 24*60*60*1000) {
       updateTimeout = window.setTimeout(checkAndDoUpdate,
-        Math.max(Math.min(Date.now() - pref("lastUpdatedOn")*1, 24*60*60*1000), 60*1000));
+                                        Math.max(Math.min(Date.now() -
+                                        pref("lastUpdatedOn")*1, 24*60*60*1000),
+                                        60*1000));
       return;
     }
     updateAllStyleAndDo(0, function() {
@@ -135,10 +138,9 @@ function addContextMenuEntry(window) {
   removeContextEntry();
   function openEditor() {
     let CSSText = window.content.document.getSelection().toString();
-    CSSText = cssbeautify(CSSText, {
-                indent:'    '.slice(
-                  Services.prefs.getBranch("devtools.editor.").getIntPref("tabsize"))
-              });
+    CSSText = cssbeautify(CSSText,
+                          {indent:'    '.slice(Services.prefs
+                                        .getIntPref("devtools.editor.tabsize"))});
     let args = [false, styleSheetList.length, true, CSSText, false];
     openUserStyleEditor("User Style Manager - Editor", args).focus();
   }
@@ -150,8 +152,9 @@ function addContextMenuEntry(window) {
           return;
         }
       } catch (ex) {}
-      if (pref("createContextMenuEntry"))
+      if (pref("createContextMenuEntry")) {
         $(contextMenuEntryID + "Seperator").hidden = $(contextMenuEntryID).hidden = true;
+      }
     };
     let (contextEntry = window.document.createElementNS(XUL, "menuitem")) {
       contextEntry.setAttribute("id", contextMenuEntryID);
@@ -179,8 +182,9 @@ function getDomain(win) {
 function getURL(window) {
   // Get the current browser's URI even if loading
   let channel = window.gBrowser.selectedBrowser.webNavigation.documentChannel;
-  if (channel != null)
+  if (channel != null) {
     return decodeURI(channel.originalURI.spec);
+  }
 
   // Just return the finished loading uri
   return decodeURI(window.gBrowser.selectedBrowser.currentURI.spec);
@@ -212,8 +216,9 @@ function createNew(window, type) {
 }
 
 function populateMenuPopupList(window, id, event) {
-  if (event.target.id != id)
+  if (event.target.id != id) {
     return;
+  }
   let menupop = window.document.getElementById(id);
   styleSheetList = JSON.parse(pref("userStyleList"));
   if (menupop) {
@@ -285,8 +290,8 @@ function populateMenuPopupList(window, id, event) {
             if (domain == "mail.google.com")
               domain = "google mail";
             window.openUILinkIn("http://userstyles.org/styles/browse_r?search_terms=" +
-              encodeURIComponent(domain) +
-              "&category=site&sort=popularity&sort_direction=desc&per_page=10", "tab");
+                                encodeURIComponent(domain) +
+                                "&category=site&sort=popularity&sort_direction=desc&per_page=10", "tab");
           });
           createMenupop.appendChild(createItem);
         }
@@ -321,8 +326,9 @@ function populateMenuPopupList(window, id, event) {
             enableAll.setAttribute("tooltiptext", l10n("enableAll.tooltip"));
             listen(window, enableAll, "command", function() {
               for (let i = 1; i < data.length; i++) {
-                if (styleSheetList[data[i]][0] == 'enabled')
+                if (styleSheetList[data[i]][0] == 'enabled') {
                   continue;
+                }
                 styleSheetList[data[i]][0] = 'enabled';
                 loadStyleSheet(data[i]);
               }
@@ -336,8 +342,9 @@ function populateMenuPopupList(window, id, event) {
             disableAll.setAttribute("tooltiptext", l10n("disableAll.tooltip"));
             listen(window, disableAll, "command", function() {
               for (let i = 1; i < data.length; i++) {
-                if (styleSheetList[data[i]][0] == 'disabled')
+                if (styleSheetList[data[i]][0] == 'disabled') {
                   continue;
+                }
                 unloadStyleSheet(data[i]);
                 styleSheetList[data[i]][0] = 'disabled';
               }
@@ -354,12 +361,15 @@ function populateMenuPopupList(window, id, event) {
             let item = window.document.createElementNS(XUL, "menuitem");
             item.setAttribute("label", unescape(style[1]));
             item.setAttribute("type", "checkbox");
-            if (style[0] == 'enabled')
+            if (style[0] == 'enabled') {
               item.setAttribute("checked", true);
-            if (item.hasAttribute("checked"))
+            }
+            if (item.hasAttribute("checked")) {
               item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
-            else
+            }
+            else {
               item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"));
+            }
             listen(window, item, "click", function(event) {
               if (event.button == 2) {
                 event.target.parentNode.hidePopup();
@@ -372,7 +382,7 @@ function populateMenuPopupList(window, id, event) {
               event.preventDefault();
               event.stopPropagation();
               toggleStyleSheet(index, !item.hasAttribute("checked")?'disabled':'enabled',
-                !item.hasAttribute("checked")?'enabled':'disabled');
+                               !item.hasAttribute("checked")?'enabled':'disabled');
               if (item.hasAttribute("checked") && item.getAttribute("checked")) {
                 item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
               }
@@ -424,12 +434,15 @@ function populateMenuPopupList(window, id, event) {
       let item = window.document.createElementNS(XUL, "menuitem");
       item.setAttribute("label", unescape(style[1]));
       item.setAttribute("type", "checkbox");
-      if (style[0] == 'enabled')
+      if (style[0] == 'enabled') {
         item.setAttribute("checked", true);
-      if (item.hasAttribute("checked"))
+      }
+      if (item.hasAttribute("checked")) {
         item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
-      else
+      }
+      else {
         item.setAttribute("tooltiptext", l10n("styleSheet.enable.text"));
+      }
       listen(window, item, "click", function(event) {
         if (event.button == 2) {
           event.target.parentNode.hidePopup();
@@ -441,7 +454,7 @@ function populateMenuPopupList(window, id, event) {
         event.preventDefault();
         event.stopPropagation();
         toggleStyleSheet(index, !item.hasAttribute("checked")?'disabled':'enabled',
-          !item.hasAttribute("checked")?'enabled':'disabled');
+                         !item.hasAttribute("checked")?'enabled':'disabled');
         if (item.hasAttribute("checked") && item.getAttribute("checked")) {
           item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
         }
@@ -469,8 +482,9 @@ function addMenuItem(window) {
     let (menu = window.document.createElementNS(XUL, "menu")) {
       menu.setAttribute("id", toolsMenuitemID);
       menu.setAttribute("class", "menu-iconic");
-      if (pref("createHotKey"))
+      if (pref("createHotKey")) {
         menu.setAttribute("key", keyID);
+      }
       menu.setAttribute("label", l10n("userStyles.label"));
       menu.setAttribute("accesskey", l10n("userStyles.accesskey"));
       menu.setAttribute("image", LOGO);
@@ -494,8 +508,9 @@ function addMenuItem(window) {
         appMenuItem.setAttribute("class", "menu-iconic");
         appMenuItem.setAttribute("image", LOGO);
         appMenuItem.setAttribute("label", l10n("userStyles.label"))
-        if (pref("createHotKey"))
+        if (pref("createHotKey")) {
           appMenuItem.setAttribute("key", keyID);
+        }
         appMenuItem.setAttribute("accesskey", l10n("userStyles.accesskey"));
         let menupop = window.document.createElementNS(XUL, "menupopup");
         menupop.setAttribute("id", appMenuitemID + "Popup");
@@ -507,8 +522,9 @@ function addMenuItem(window) {
       }
     }
   }
-  if (pref("createAppMenuButton") || pref("createToolsMenuButton"))
+  if (pref("createAppMenuButton") || pref("createToolsMenuButton")) {
     unload(removeMenuItem, window);
+  }
 }
 
 function addToolbarButton(window) {
@@ -531,8 +547,9 @@ function addToolbarButton(window) {
       pref("buttonNextSiblingID", (toolbarButton.nextSibling || "")
         && toolbarButton.nextSibling.getAttribute("id").replace(/^wrapper-/i, ""));
     }
-    else
+    else {
       pref("buttonParentID", "");
+    }
   }
 
   // add toolbar button
@@ -546,8 +563,9 @@ function addToolbarButton(window) {
   toolbarButton.setAttribute("type", "menu");
   toolbarButton.setAttribute("orient", "horizontal");
   listen(window, toolbarButton, "click", function(event) {
-    if (event.target.id == toolbarButtonID && event.button == 1)
+    if (event.target.id == toolbarButtonID && event.button == 1) {
       openOptions(window);
+    }
   });
   let toolbarButtonMenupop = window.document.createElementNS(XUL, "menupopup");
   toolbarButtonMenupop.setAttribute("id", toolbarButtonID + "Popup");
@@ -566,8 +584,9 @@ function addToolbarButton(window) {
           let len = currentset.length;
           for (; i < len; i++) {
             nextSibling = $(currentset[i]);
-            if (nextSibling)
+            if (nextSibling) {
               break;
+            }
           }
         }
       }
@@ -586,10 +605,12 @@ function createHotKey(window) {
   function removeKey() {
     let keyset = $(keysetID);
     keyset && keyset.parentNode.removeChild(keyset);
-    if (pref("createAppMenuButton"))
+    if (pref("createAppMenuButton")) {
       $(appMenuitemID) && $(appMenuitemID).removeAttribute("key");
-    if (pref("createToolsMenuButton"))
+    }
+    if (pref("createToolsMenuButton")) {
       $(toolsMenuitemID) && $(toolsMenuitemID).removeAttribute("key");
+    }
   }
 
   removeKey();
@@ -604,24 +625,28 @@ function createHotKey(window) {
       optionsKey.setAttribute("oncommand", "void(0);");
       listen(window, optionsKey, "command", function() openOptions(window));
       $("mainKeyset").parentNode.appendChild(USMKeyset).appendChild(optionsKey);
-      if (pref("createAppMenuButton"))
+      if (pref("createAppMenuButton")) {
         $(appMenuitemID).setAttribute("key", keyID);
-      if (pref("createToolsMenuButton"))
+      }
+      if (pref("createToolsMenuButton")) {
         $(toolsMenuitemID).setAttribute("key", keyID);
+      }
       unload(removeKey, window);
     }
   }
   else {
-    if (pref("createAppMenuButton"))
+    if (pref("createAppMenuButton")) {
       $(appMenuitemID).removeAttribute("key");
-    if (pref("createToolsMenuButton"))
+    }
+    if (pref("createToolsMenuButton")) {
       $(toolsMenuitemID).removeAttribute("key");
+    }
   }
 }
 
 function openOptions(window) {
   window.open("chrome://userstylemanager/content/options.xul",
-    "User Style Manager Options","chrome,resizable,centerscreen").focus();
+              "User Style Manager Options","chrome,resizable,centerscreen").focus();
 }
 
 function addUserStyleHandler(window) {
@@ -630,8 +655,9 @@ function addUserStyleHandler(window) {
     let editor = openUserStyleEditor("User Style Manager - Editor", args);
     editor.focus();
     editor.onbeforeunload = function() {
-      if (window.gBrowser.selectedBrowser.currentURI.spec == url)
+      if (window.gBrowser.selectedBrowser.currentURI.spec == url) {
         window.gBrowser.contentWindow.location.reload();
+      }
     };
   }
   function installStyleFromSite(event) {
@@ -640,7 +666,7 @@ function addUserStyleHandler(window) {
     let links = document.getElementsByTagName("link");
     let name = null;
     let code = null;
-    for (let i = 0; i < links.length; i++)
+    for (let i = 0; i < links.length; i++) {
       switch (links[i].rel) {
         case "stylish-code":
           let (id = links[i].getAttribute("href").replace("#", "")) {
@@ -657,6 +683,7 @@ function addUserStyleHandler(window) {
           }
           break;
       }
+    }
     let options = getOptions(document.defaultView, true);
     if (code == null) {
       let styleId = url.match(/styles\/([0-9]*)\//i)[1];
@@ -664,8 +691,9 @@ function addUserStyleHandler(window) {
         addToUSM(code, name, url, options);
       });
     }
-    else
+    else {
       addToUSM(code, name, url, options);
+    }
   }
 
   function updateStyleFromSite(event) {
@@ -674,7 +702,7 @@ function addUserStyleHandler(window) {
     let links = document.getElementsByTagName("link");
     let name = null;
     let code = null;
-    for (let i = 0; i < links.length; i++)
+    for (let i = 0; i < links.length; i++) {
       switch (links[i].rel) {
         case "stylish-code":
           let (id = links[i].getAttribute("href").replace("#", "")) {
@@ -691,15 +719,17 @@ function addUserStyleHandler(window) {
           }
           break;
       }
-
+    }
     let options = getOptions(document.defaultView, true);
     let styleId = url.match(/styles\/([0-9]*)\//i)[1];
-    if (code == null)
+    if (code == null) {
       getCodeForStyle(styleId, options, function(code) {
         updateInUSM(styleId, code, name, url, options, document.location.reload);
       });
-    else
+    }
+    else {
       updateInUSM(styleId, code, name, url, options, document.location.reload);
+    }
   }
 
   let changeListener = {
@@ -713,17 +743,20 @@ function addUserStyleHandler(window) {
       let url = aURI.spec;
       if (url.match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
         let stylePage = window.gBrowser.contentDocument,
-          styleWindow = window.gBrowser.contentWindow;
+            styleWindow = window.gBrowser.contentWindow;
         listen(styleWindow, stylePage, "stylishInstall", changeListener.handleInstall);
         listen(styleWindow, stylePage, "stylishUpdate", changeListener.handleUpdate);
-        if (stylePage.readyState != "complete")
+        if (stylePage.readyState != "complete") {
           styleWindow.addEventListener("load", function onLoad() {
             styleWindow.removeEventListener("load", onLoad, true);
-            if (window.gBrowser.selectedBrowser.currentURI.spec == url)
+            if (window.gBrowser.selectedBrowser.currentURI.spec == url) {
               checkAndDisplayProperOption(styleWindow, url);
+            }
           });
-        else
+        }
+        else {
           checkAndDisplayProperOption(styleWindow, url);
+        }
       }
     }
   };
@@ -747,8 +780,9 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     Services.scriptloader.loadSubScript(fileURI.spec, global);
   });
   let openSite = false;
-  if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0)
+  if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0) {
     Components.manager.addBootstrappedManifestLocation(data.installPath);
+  }
   function initiate() {
     // setting the pref to be false
     pref("updateTimeoutActive", false);
@@ -756,9 +790,10 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     // Reading the JSON variable containing paths to style sheets
     readJSONPref(function() {
       updateSortedList();
-      if (updateStyleSheetList() && pref("stylesEnabled"))
+      if (updateStyleSheetList() && pref("stylesEnabled")) {
         // Load the style sheets as they have not been loaded by addDefaultStyles
         loadStyleSheet();
+      }
       unload(unloadStyleSheet);
       watchWindows(createHotKey);
       watchWindows(addMenuItem);
@@ -790,8 +825,9 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     });
     pref.observe(["stylesEnabled"], function() {
       unloadStyleSheet();
-      if (pref("stylesEnabled"))
+      if (pref("stylesEnabled")) {
         loadStyleSheet();
+      }
     });
     // observer to track and keep in sync any changes in styleSheetList
     pref.observe(["userStyleList"], function() {
@@ -849,9 +885,11 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
       let enumerator = wm.getEnumerator(null);
       while (enumerator.hasMoreElements()) {
         let win = enumerator.getNext();
-        if (win.name.search("User Style Manager Options") == 0 || win.name.search("User Style Manager - Editor") == 0
-          || win.name.search("More Information - User Style Manager") == 0)
-            win.close();
+        if (win.name.search("User Style Manager Options") == 0 ||
+            win.name.search("User Style Manager - Editor") == 0 ||
+            win.name.search("More Information - User Style Manager") == 0) {
+          win.close();
+        }
       }
     });
   }
@@ -871,10 +909,12 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
 });
 
 function shutdown(data, reason) {
-  if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0)
+  if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0) {
     Components.manager.removeBootstrappedManifestLocation(data.installPath);
-  if (reason != APP_SHUTDOWN)
+  }
+  if (reason != APP_SHUTDOWN) {
     unload();
+  }
 }
 
 function install() {}
