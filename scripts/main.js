@@ -712,6 +712,18 @@ function updateFromSync() {
         });
         deleteStylesFromUSM(deletedStyle);
       }
+      else {
+        if (!syncUpdateTimer) {
+          syncUpdateTimer = Cc["@mozilla.org/timer;1"]
+                              .createInstance(Ci.nsITimer);
+          syncUpdateTimer.initWithCallback(updateSyncedList, 10000,
+                                           Ci.nsITimer.TYPE_ONE_SHOT);
+        }
+        else {
+          syncUpdateTimer.initWithCallback(updateSyncedList, 10000,
+                                           Ci.nsITimer.TYPE_ONE_SHOT);
+        }
+      }
       updateAffectedContents();
     });
   }
@@ -736,14 +748,15 @@ function addNewStylesFromSync(aStyles, aIndex, aCallback) {
     if (styleSheetList[index][3].match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
       let styleId = styleSheetList[index][3].match(/styles\/([0-9]*)\//i)[1];
       getCodeForStyle(styleId, styleSheetList[index][7], function(code) {
-        updateInUSM(styleId, code, styleSheetList[index][1],
-          styleSheetList[index][3], styleSheetList[index][7], function() {
+        updateInUSM(styleId, code, styleSheetList[index][1], styleSheetList[index][3],
+                    styleSheetList[index][7], function() {
             addNewStylesFromSync(aStyles, aIndex, aCallback);
           });
       });
     }
-    else
+    else {
       addNewStylesFromSync(aStyles, aIndex, aCallback);
+    }
   }
   catch (ex) {
     addNewStylesFromSync(aStyles, aIndex, aCallback);
