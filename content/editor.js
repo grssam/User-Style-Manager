@@ -1122,7 +1122,8 @@ StyleEditor.prototype = {
       if (aCallback) {
         aCallback();
       }
-      else if (this.openNew) {
+      else if (this.openNew ||
+               (this.createNew && styleSheetList[this.index][3].length > 10)) {
         // Close the editor on save if add a new file
         this.exitButtonClick(aEvent);
       }

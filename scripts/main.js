@@ -764,6 +764,7 @@ function addNewStylesFromSync(aStyles, aIndex, aCallback) {
 }
 
 function deleteStylesFromUSM(aStyleSheetList) {
+  aStyleSheetList = aStyleSheetList.sort().reverse();
   for each (let index in aStyleSheetList) {
     // Unload the stylesheet if enabled
     if (styleSheetList[index][0] == 'enabled') {
@@ -800,7 +801,9 @@ let updateSyncedList = {
     });
     // trimming down the synced pref
     syncedStyleList = styleSheetList.map(function ([e,n,p,u,a,da,dm,o,l]) {
-      return [e?1:0,n, u.match(/styles\/([0-9]*)\//i)[1],o];
+      return [e? 1: 0, n,
+              u.match(/styles\/([0-9]*)\//i)? u.match(/styles\/([0-9]*)\//i)[1]: "",
+              o];
     });
     if (shouldUpdateInstall) {
       shouldUpdateInstall = false;
