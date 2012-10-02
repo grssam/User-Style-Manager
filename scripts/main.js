@@ -435,8 +435,8 @@ function toggleStyleSheet(index, oldVal, newVal) {
 }
 
 function openUserStyleEditor(name, params, focusExisting) {
-  if (focusExisting && Services.ww.getWindowByName(name)) {
-    return Services.ww.getWindowByName(name);
+  if (focusExisting && Services.ww.getWindowByName(name, null)) {
+    return Services.ww.getWindowByName(name, null);
   }
 
   let args = Cc["@mozilla.org/embedcomp/dialogparam;1"]
