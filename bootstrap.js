@@ -368,7 +368,8 @@ function populateMenuPopupList(window, id, event) {
                 event.preventDefault();
                 let args = [false, index, false, "", false, styleSheetList[index][1],
                             styleSheetList[index][3], styleSheetList[index][7]];
-                openUserStyleEditor("User Style Manager - Editor " + index, args).focus();
+                openUserStyleEditor("User Style Manager - Editor " + index,
+                                    args, true).focus();
                 return;
               }
               event.preventDefault();
@@ -440,7 +441,8 @@ function populateMenuPopupList(window, id, event) {
           event.target.parentNode.hidePopup();
           event.preventDefault();
           let args = [false, index, false, "", false];
-          openUserStyleEditor("User Style Manager - Editor " + index, args).focus();
+          openUserStyleEditor("User Style Manager - Editor " + index,
+                              args, true).focus();
           return;
         }
         event.preventDefault();

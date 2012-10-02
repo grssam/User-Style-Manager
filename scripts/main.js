@@ -27,6 +27,10 @@ const XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 const HTML = "http://www.w3.org/1999/xhtml";
 const EDITOR_WINDOW_FEATURES = "chrome,resizable,dialog=no,centerscreen,titlebar",
       EDITOR_WINDOW_URL = "chrome://userstylemanager/content/editor.xul";
+
+// Contains a list of currently open USM Editors.
+let openEditors = {};
+
 // Function to read the preferences
 function readJSONPref(callback) {
   let JSONFile = getURIForFileInUserStyles("Preferences/usm.pref")
@@ -430,13 +434,35 @@ function toggleStyleSheet(index, oldVal, newVal) {
   writeJSONPref();
 }
 
-function openUserStyleEditor(name, params) {
+function openUserStyleEditor(name, params, focusExisting) {
+  if (focusExisting && Services.ww.getWindowByName(name)) {
+    return Services.ww.getWindowByName(name);
+  }
+
   let args = Cc["@mozilla.org/embedcomp/dialogparam;1"]
                .createInstance(Ci.nsIDialogParamBlock);
   args.SetNumberStrings(1);
   args.SetString(0, JSON.stringify(params));
-  return Services.ww.openWindow(null, EDITOR_WINDOW_URL, name,
-                                EDITOR_WINDOW_FEATURES, args);
+
+  if (openEditors[name]) {
+    name += " - " + Date.now();
+  }
+  openEditors[name] = true;
+
+  let win = Services.ww.openWindow(null, EDITOR_WINDOW_URL, name,
+                                   EDITOR_WINDOW_FEATURES, args);
+
+  win.addEventListener("load", function oneTimeLoad() {
+    win.removeEventListener("load", oneTimeLoad, false);
+    win.addEventListener("unload", function onUnload(event) {
+      win.removeEventListener("unload", onUnload, false);
+      if (openEditors[win.name]) {
+        delete openEditors[win.name];
+      }
+    }, false);
+  }, false);
+
+  return win;
 }
 
 function getCodeForStyle(styleId, options, callback) {
@@ -834,4 +860,5 @@ unload(function() {
     syncUpdateTimer.cancel();
     syncUpdateTimer = null;
   }
+  openEditors = null;
 });

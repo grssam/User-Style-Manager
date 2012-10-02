@@ -331,7 +331,7 @@ let optionsWindow = {
       this.tree.view.selection.getRangeAt(t, start, end);
       for (let i = start.value; i <= end.value; i++) {
         let args = [false, this.treeView.list[i][20], false, "", true];
-        openUserStyleEditor("User Style Manager - Editor " + i, args).focus();
+        openUserStyleEditor("User Style Manager - Editor " + i, args, true).focus();
       }
     }
     this.editorOpened = true;
