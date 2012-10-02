@@ -11,26 +11,21 @@ treechildren::-moz-tree-checkbox {
 
 treechildren::-moz-tree-row {
   height: 28px;
-}
-
-treechildren::-moz-tree-row(disabled) {
-  border: none !important;
+  border: none;
 }
 
 treechildren::-moz-tree-row(hover) {
-  outline: 0px solid rgba(255,255,255,.43) !important;
-  border: 1px solid #84acdd;
+  border: 1px solid #84acdd !important;
   background: #ecf5ff;
   -moz-border-bottom-colors: none;
   -moz-border-top-colors: none;
   border-radius:0;
   -moz-outline-radius:0;
-  border-left: none;
-  border-right: none;
+  border-left: none !important;
+  border-right: none !important;
 }
 
 treechildren::-moz-tree-row(selected) {
-  outline: 0px solid rgba(255,255,255,.43) !important;
   border: 1px solid #84acdd !important;
   background-image: -moz-linear-gradient(#ecf5ff 0%, #d0e5ff 100%);
   -moz-border-bottom-colors: none;
