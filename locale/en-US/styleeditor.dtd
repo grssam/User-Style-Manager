@@ -1,17 +1,17 @@
 <!ENTITY fileMenu.label               "File">
 <!ENTITY fileMenu.accesskey           "F">
 
-<!ENTITY saveCmd.label                "Save">
+<!ENTITY saveCmd.label                "">
 <!ENTITY saveCmd.key                  "S">
-<!ENTITY saveCmd.accesskey            "S">
+<!ENTITY saveCmd.accesskey            "">
 
-<!ENTITY previewCmd.label             "Preview">
+<!ENTITY previewCmd.label             "">
 <!ENTITY previewCmd.key               "P">
-<!ENTITY previewCmd.accesskey         "P">
+<!ENTITY previewCmd.accesskey         "">
 
-<!ENTITY exitCmd.label                "Exit">
+<!ENTITY exitCmd.label                "">
 <!ENTITY exitCmd.key                  "W">
-<!ENTITY exitCmd.accesskey            "X">
+<!ENTITY exitCmd.accesskey            "">
 
 <!ENTITY editMenu.label               "Edit">
 <!ENTITY editMenu.accesskey           "E">
@@ -72,8 +72,8 @@
 <!ENTITY addMozDomain.key             "D">
 <!ENTITY addMozDomain.accesskey       "D">
 
-<!ENTITY fileName.label               "Enter the name of the Stylesheet file: ">
-<!ENTITY fileNameEditing.label        "Change the Name of the Stylesheet file: ">
+<!ENTITY fileName.label               "Stylesheet name: ">
+<!ENTITY fileNameEditing.label        "Stylesheet name: ">
 <!ENTITY fileName.accesskey           "N">
 <!ENTITY fileName.tooltip             "This will rename the file on your Hard Disk as well">
 
