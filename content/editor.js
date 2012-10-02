@@ -1306,11 +1306,14 @@ StyleEditor.prototype = {
       let fna = this.STR("featureNotAvailable");
       this.doc.getElementById("se-menu-gotoLine").setAttribute("tooltiptext", fna);
     }
+    if (this.initialText.length == 0) {
+      this.initialText = this.STR("placeholder.text");
+    }
     let config = {
       mode: this.sourceEditorEnabled? SourceEditor.MODES.CSS: null,
       showLineNumbers: true,
-      placeholderText: this.initialText.length > 0? this.initialText: this.STR("placeholder.text"),
-      initialText: this.initialText.length > 0? this.initialText: this.STR("placeholder.text"),
+      placeholderText: this.initialText,
+      initialText: this.initialText,
       contextMenu: "USMStyleEditorContextMenu",
     };
     let editorPlaceholder = this.doc.getElementById("USMTextEditor");
@@ -2294,7 +2297,8 @@ StyleEditor.prototype = {
 
   // return 0 : Save, 1 : Cancel , 2 : Don't Save
   promptSave: function SE_promptSave() {
-    if (this.styleName && !this.saved) {
+    if (this.styleName && !this.saved ||
+        this.getText() != this.initialText) {
       let ps = Services.prompt;
       let flags = ps.BUTTON_POS_0 * ps.BUTTON_TITLE_SAVE +
                   ps.BUTTON_POS_1 * ps.BUTTON_TITLE_CANCEL +
