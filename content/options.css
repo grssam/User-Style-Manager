@@ -11,12 +11,10 @@ treechildren::-moz-tree-checkbox {
 
 treechildren::-moz-tree-row {
   height: 28px;
-  /*border-bottom: 1px solid rgba(190,190,190, 0.5);*/
 }
 
 treechildren::-moz-tree-row(disabled) {
-  border: 1px solid rgba(205,202,200,.5);
-  background: rgba(205,202,200,.5);
+  border: none !important;
 }
 
 treechildren::-moz-tree-row(hover) {
@@ -150,8 +148,7 @@ caption {
 
 /* Buttons */
 
-button,
-menulist {
+button {
   -moz-appearance: none !important;
   -moz-transition: .24s background-color ease-in !important;
   border: 1px solid rgba(26,58,96,.38) !important;
@@ -171,31 +168,6 @@ menulist {
   font-size: 12px !important;
 }
 
-.menulist-dropmarker {
-  list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAJCAYAAADpeqZqAAAA7ElEQVQY02O48/w9AxAzAzEvEIsBsSQWLArEPFB1DCANjEDMD8R6QGyMB2sDMR9IPUgTExBLpGblRTIzs39mF5X/zyOtCsFSqv/ZRGT+s7ByvuyeNN0T6hJGuE2PXn+ymTBtTouWmf0vK8/g/3a+kf8t3YL+a5nafVq8cl3lg1cfzZBtgvlJBKjRrmvitF5nv9Bf0RkF/519Qr7NWbSi4eGrj9ZAeWFkP8EwC0jjkzefHDv6p0zyDon+Nm3Owg6gQbbIGtA1ITS+/exw+uLVvMdvwBpEkDVg0wRzKh9QgxTUD8zoarBpgmFGXHIAkOMrX8VG7WMAAAAASUVORK5CYII=) !important;
-}
-
-#manageAccountExpander {
-  padding: 1px 0 2px 0 !important;
-  list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAALCAYAAAB7/H1+AAABKElEQVQoz2NgoDW48/w9IynixBpqDMPEiEMB48uXL93+AwGIBvExDI2ITUjl5hP4AaJhhuAShxn6+PFjj/9IAMRHMRykgVdA+JuKrvELSTnld5GxiSkgMRAN4oPEQfJIBmMYitVwkIaO3gmdqromDwxtXK5LK6q9iE3OSAbRID5IHCQPNRjD0Obm5lqchj9+88mhq29Sh4aRxUUzZ59jBjbOp0E0iA8SB8lDXcuBbEh/f38RUMwURCOLg9TBgwSkuWfilDYtE+tDTkExq0E0iI9kKAjwLVq0KBXJUBUgFgHRMMNB8iB1KBEJMqR30tRWEUmZKyAazVAGqEuUgNgIiJWBmBuImaG0MlRcCcXFyIa//fw9DYuhDNCw44C6iAMpFeASp2KmgAIATpoOjMmgukYAAAAASUVORK5CYII=) !important;
-  -moz-image-region: rect(0,11px,11px,0) !important;
-}
-
-#manageAccountExpander .button-icon {
-  padding: 0 !important;
-  margin: 3px 5px 0 !important;
-}
-
-#manageAccountExpander.expander-up,
-#manageAccountExpander:hover:active {
-  -moz-image-region: rect(0,22px,11px,11px) !important;
-}
-
-menulist {
-  padding: 1px 0 !important;
-  -moz-padding-end: 2px !important;
-}
-
 button:not(:active):not([open]):not([disabled="true"]):not(.expander-up):hover,
 menulist:not([open]):not([disabled="true"]):hover {
   background-color: hsl(212,42%,95%) !important;
@@ -203,7 +175,6 @@ menulist:not([open]):not([disabled="true"]):hover {
 
 button:not([disabled="true"])[open],
 button:not([disabled="true"]):hover:active,
-menulist:not([disabled])[open],
 .expander-up {
   border-color: rgba(36,52,71,.5) !important;
   background-image: -moz-linear-gradient(rgba(61,76,92,.2), rgba(61,76,92,.2)),
@@ -218,33 +189,6 @@ menulist:not([disabled])[open],
 button[disabled="true"] {
   opacity: .8 !important;
   background-image: none !important;
-}
-
-.menulist-label-box {
-  border: 1px solid transparent !important;
-  background: none !important;
-}
-
-.menulist-label-box > .menulist-label {
-  color: rgba(37,47,59,.95) !important;
-  text-shadow: 0 1px 0 rgba(255,255,255,.1) !important;
-  font-weight: 600 !important;
-}
-
-menulist[open] .menulist-label-box > .menulist-label {
-  color: rgba(255,255,255,.95) !important;
-  text-shadow: 0 1px 0 rgba(37,47,59,.4) !important;
-}
-
-.menulist-dropmarker {
-  -moz-appearance: none !important;
-  border: 0 !important;
-  background: none !important;
-  padding: 0 !important;
-}
-
-menulist[open] .menulist-dropmarker {
-  list-style-image: url(chrome://browser/skin/appmenu-dropmarker.png) !important;
 }
 
 /* Checkbox */
