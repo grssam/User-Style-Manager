@@ -4,7 +4,7 @@
  * Creator:
  *   Girish Sharma <scrapmachines@gmail.com>
  */
- 
+
 "use strict";
 let global = this;
 
@@ -46,57 +46,49 @@ function handleCustomization(window) {
   });
 }
 
-function setupUpdates(window) {
-  function updateAllStyleAndDo(index, callback) {
-    if (index == null) {
-      index = 0;
-    }
-    else if (index == styleSheetList.length) {
-      callback();
-      return;
-    }
-    updateStyle(index, function() {
-      updateAllStyleAndDo(index + 1, callback);
-    });
+function updateAllStyleAndDo(index, callback) {
+  if (index == null) {
+    index = 0;
   }
-
-  function checkAndDoUpdate() {
-    // leave early and check again after 24 hours
-    if (!pref("updateAutomatically") ||
-        (Date.now() - pref("lastUpdatedOn")*1) < 24*60*60*1000) {
-      updateTimeout = window.setTimeout(checkAndDoUpdate,
-                                        Math.max(Math.min(Date.now() -
-                                        pref("lastUpdatedOn")*1, 24*60*60*1000),
-                                        60*1000));
-      return;
-    }
-    updateAllStyleAndDo(0, function() {
-      pref("lastUpdatedOn", "" + Date.now());
-      updateTimeout = window.setTimeout(checkAndDoUpdate, 24*60*60*1000);
-    });
+  else if (index == styleSheetList.length) {
+    callback();
+    return;
   }
+  updateStyle(index, function() {
+    updateAllStyleAndDo(index + 1, callback);
+  });
+}
 
-  let updateTimeout = null;
-
-  if (!pref("updateTimeoutActive")) {
-    updateTimeout = window.setTimeout(checkAndDoUpdate, 30*1000);
-    pref("updateTimeoutActive", true);
-    // If the pref is turned off by user, remove the timer from this window,
-    // as it will be anyways applied again :)
-    pref.observe(["updateTimeoutActive"], function() {
-      if (!pref("updateTimeoutActive") && updateTimeout) {
-        window.clearTimeout(updateTimeout);
-        updateTimeout = null;
+function setupUpdates() {
+  let checkAndDoUpdate = {
+    notify: function () {
+      // leave early and check again after 24 hours
+      if (!pref("updateAutomatically") ||
+          (Date.now() - pref("lastUpdatedOn")*1) < 24*60*60*1000) {
+        updateTimeout.initWithCallback(checkAndDoUpdate,
+                                       Math.max(Math.min(Date.now() -
+                                                 pref("lastUpdatedOn")*1,
+                                                24*60*60*1000), 60*1000),
+                                       Ci.nsITimer.TYPE_ONE_SHOT);
+        return;
       }
-    });
-    unload(function() {
-      if (updateTimeout) {
-        window.clearTimeout(updateTimeout);
-        updateTimeout = null;
-      }
-      pref("updateTimeoutActive", false);
-    }, window);
-  }
+      updateAllStyleAndDo(0, function() {
+        pref("lastUpdatedOn", "" + Date.now());
+        updateTimeout.initWithCallback(checkAndDoUpdate, 24*60*60*1000,
+                                       Ci.nsITimer.TYPE_ONE_SHOT);
+      });
+    }
+  };
+
+  let updateTimeout = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+  updateTimeout.initWithCallback(checkAndDoUpdate, 60000,
+                                 Ci.nsITimer.TYPE_ONE_SHOT);
+  unload(function() {
+    try {
+      updateTimeout.cancel();
+      updateTimeout = null;
+    } catch (ex) {}
+  });
 }
 
 function addSyncOption(window) {
@@ -763,6 +755,7 @@ function addUserStyleHandler(window) {
   window.gBrowser.addProgressListener(changeListener);
   unload(function() {
     window.gBrowser.removeProgressListener(changeListener);
+    changeListener = null;
   }, window);
 }
 
@@ -867,21 +860,12 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     });
 
     // Setup the updating mechanism
-    watchWindows(setupUpdates);
-    pref.observe(["updateTimeoutActive"], function() {
-      if (!pref("updateTimeoutActive")) {
-        let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
-        let enumerator = wm.getEnumerator("navigator:browser");
-        if (enumerator.hasMoreElements()) {
-          let win = enumerator.getNext();
-          setupUpdates(win);
-        }
-      }
-    });
+    setupUpdates();
 
     // Adding an unload funtion to close any opened options window
     unload(function() {
-      let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
+      let wm = Cc["@mozilla.org/appshell/window-mediator;1"]
+                 .getService(Ci.nsIWindowMediator);
       let enumerator = wm.getEnumerator(null);
       while (enumerator.hasMoreElements()) {
         let win = enumerator.getNext();
@@ -898,6 +882,9 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     unloadStyleSheet();
     loadStyleSheet();
   };
+  unload(function() {
+    strings = global = gAddon = reload = null;
+  });
   if (reason == 7 || reason == 5) {
     openSite = true;
   }
@@ -909,11 +896,11 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
 });
 
 function shutdown(data, reason) {
-  if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0) {
-    Components.manager.removeBootstrappedManifestLocation(data.installPath);
-  }
   if (reason != APP_SHUTDOWN) {
     unload();
+  }
+  if (Services.vc.compare(Services.appinfo.platformVersion, "10.0") < 0) {
+    Components.manager.removeBootstrappedManifestLocation(data.installPath);
   }
 }
 

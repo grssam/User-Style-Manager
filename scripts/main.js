@@ -5,6 +5,7 @@
  *   Girish Sharma <scrapmachines@gmail.com>
  */
 
+"use strict";
 // Global Variable to store the style sheet data
 // Format : [status, name, path, url, applies on, date added, date modified, style options, local changes ?]
 let styleSheetList = [],
@@ -317,26 +318,26 @@ function loadStyleSheet(index) {
     styleSheetList.forEach(function([enabled, fileName, filePath, fileURL,
                                      appliesOn, fileAdded, fileModified],
                                     index) {
-        if (enabled == 'disabled') {
-          return;
-        }
-        let fileURI = getFileURI(unescape(filePath));
-        try {
-          sss.loadAndRegisterSheet(fileURI, sss.AGENT_SHEET);
-          backUpLoaded[index] = false;
-        } catch (ex) {
-          // Seems like file does not exists
-          // Use backup is pref'd on
-          if (pref("fallBack")) {
-            let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index + ".css");
-            try {
-              sss.loadAndRegisterSheet(bckpFileURI, sss.AGENT_SHEET);
-              backUpLoaded[index] = true;
-            } catch (ex) {
-              backUpLoaded[index] = false;
-            }
+      if (enabled == 'disabled') {
+        return;
+      }
+      let fileURI = getFileURI(unescape(filePath));
+      try {
+        sss.loadAndRegisterSheet(fileURI, sss.AGENT_SHEET);
+        backUpLoaded[index] = false;
+      } catch (ex) {
+        // Seems like file does not exists
+        // Use backup is pref'd on
+        if (pref("fallBack")) {
+          let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" + index + ".css");
+          try {
+            sss.loadAndRegisterSheet(bckpFileURI, sss.AGENT_SHEET);
+            backUpLoaded[index] = true;
+          } catch (ex) {
+            backUpLoaded[index] = false;
           }
         }
+      }
     });
   }
   else if (index < styleSheetList.length) {
@@ -368,23 +369,23 @@ function unloadStyleSheet(index) {
     styleSheetList.forEach(function([enabled, fileName, filePath, fileURL,
                                      appliesOn, fileAdded, fileModified],
                                     index) {
-        if (enabled == 'disabled') {
-          return;
-        }
-        let fileURI = getFileURI(unescape(filePath));
-        let origFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
-        if (!origFile.exists() || backUpLoaded[index]) {
-          let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" +
-                                                       index + ".css");
-          try {
-            sss.unregisterSheet(bckpFileURI, sss.AGENT_SHEET);
-          } catch (ex) {}
-        }
-        else {
-          try {
-            sss.unregisterSheet(fileURI, sss.AGENT_SHEET);
-          } catch (ex) {}
-        }
+      if (enabled == 'disabled') {
+        return;
+      }
+      let fileURI = getFileURI(unescape(filePath));
+      let origFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
+      if (!origFile.exists() || backUpLoaded[index]) {
+        let bckpFileURI = getURIForFileInUserStyles("Backup/backupOfUserStyle" +
+                                                     index + ".css");
+        try {
+          sss.unregisterSheet(bckpFileURI, sss.AGENT_SHEET);
+        } catch (ex) {}
+      }
+      else {
+        try {
+          sss.unregisterSheet(fileURI, sss.AGENT_SHEET);
+        } catch (ex) {}
+      }
     });
   }
   else if (index < styleSheetList.length) {
@@ -483,30 +484,31 @@ function getOptions(contentWindow, promptOnIncomplete) {
     if (promptOnIncomplete) {
       contentWindow.alert("Choose a value for every setting first.");
     }
+    contentWindow = null;
     return null;
   }
+  contentWindow = null;
   return params.join("&");
 }
 
 function compareStyleVersion(installedIndex, styleId, code, callback) {
   function updateNow(code) {
-      let fileURI = getFileURI(unescape(styleSheetList[installedIndex][2]));
-      let styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
-      NetUtil.asyncFetch(styleSheetFile, function(inputStream, status) {
-        if (!Components.isSuccessCode(status)) {
-          return;
-        }
-        let data = "";
-        try {
-          data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-        } catch (ex) {
-          return;
-        }
-        if (callback) {
-          callback(data != code);
-        }
-        callback = null;
-      });
+    let fileURI = getFileURI(unescape(styleSheetList[installedIndex][2]));
+    let styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
+    NetUtil.asyncFetch(styleSheetFile, function(inputStream, status) {
+      if (!Components.isSuccessCode(status)) {
+        return;
+      }
+      let data = "";
+      try {
+        data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+      } catch (ex) {
+        return;
+      }
+      if (callback) {
+        callback(data != code);
+      }
+    });
   }
   if (code == null) {
     getCodeForStyle(styleId, (styleSheetList[installedIndex].length > 7
@@ -565,7 +567,7 @@ function updateStyle(index, callback) {
                       callback);
         }
         else if (callback) {
-            callback();
+          callback();
         }
       });
     });
@@ -642,6 +644,7 @@ function updateFromSync() {
   let doUpdate = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
   let doSyncUpdate = {
     notify: function() {
+      doUpdate.cancel();
       doUpdate = null;
       if (pref("newInstall")) {
         // Sync is form a new install of this addon on a synced machine
@@ -750,8 +753,8 @@ function addNewStylesFromSync(aStyles, aIndex, aCallback) {
       getCodeForStyle(styleId, styleSheetList[index][7], function(code) {
         updateInUSM(styleId, code, styleSheetList[index][1], styleSheetList[index][3],
                     styleSheetList[index][7], function() {
-            addNewStylesFromSync(aStyles, aIndex, aCallback);
-          });
+          addNewStylesFromSync(aStyles, aIndex, aCallback);
+        });
       });
     }
     else {
@@ -772,7 +775,8 @@ function deleteStylesFromUSM(aStyleSheetList) {
     }
     let deletedStyle = styleSheetList.splice(index, 1);
     if (pref("deleteFromDisk")) {
-      let deletedFile = getFileURI(unescape(deletedStyle[0][2])).QueryInterface(Ci.nsIFileURL).file;
+      let deletedFile = getFileURI(unescape(deletedStyle[0][2]))
+                          .QueryInterface(Ci.nsIFileURL).file;
       if (deletedFile.exists()) {
         deletedFile.remove(false);
       }
@@ -796,21 +800,20 @@ function prepareToUpdateSync() {
 
 let updateSyncedList = {
   notify: function() {
+    syncUpdateTimer.cancel();
+    syncUpdateTimer = null;
     let syncedStyleList = styleSheetList.filter(function ([e,n,p,u]) {
       return u && u.match(/styles\/([0-9]*)\//i);
     });
     // trimming down the synced pref
-    syncedStyleList = styleSheetList.map(function ([e,n,p,u,a,da,dm,o,l]) {
-      return [e? 1: 0, n,
-              u.match(/styles\/([0-9]*)\//i)? u.match(/styles\/([0-9]*)\//i)[1]: "",
-              o];
+    syncedStyleList = syncedStyleList.map(function ([e,n,p,u,a,da,dm,o,l]) {
+      return [e? 1: 0, n, u.match(/styles\/([0-9]*)\//i)[1], o];
     });
     if (shouldUpdateInstall) {
       shouldUpdateInstall = false;
       pref("newInstall", false);
     }
     pref("syncedStyleList", JSON.stringify(syncedStyleList));
-    syncUpdateTimer = null;
   }
 };
 
@@ -825,3 +828,10 @@ function getURIForFileInUserStyles(filepath) {
   return ios.newURI("file:///" + file.path.replace(/[\\]/g, "/") + "/" + filepath,
                     null, null);
 }
+
+unload(function() {
+  if (syncUpdateTimer) {
+    syncUpdateTimer.cancel();
+    syncUpdateTimer = null;
+  }
+});
