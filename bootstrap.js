@@ -802,7 +802,7 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
     watchWindows(addSyncOption, "Browser:Preferences");
     watchWindows(function(window) {
       if (openSite) {
-        window.openUILinkIn("http://grssam.wordpress.com/addons/user-style-manager/", "tab");
+        window.openUILinkIn("http://grssam.com/?p=319", "tab");
         openSite = false;
       }
     });

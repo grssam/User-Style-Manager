@@ -5,7 +5,7 @@
     <creator>Girish Sharma</creator>
     <id>UserStyleManager@girishsharma</id>
     <name>User Style Manager</name>
-    <version>0.9</version>
+    <version>1.0</version>
     <bootstrap>true</bootstrap>
     <type>2</type>
     <homepageURL>https://addons.mozilla.org/en-US/firefox/addon/user-style-manager/</homepageURL>
@@ -13,7 +13,9 @@
     <optionsType>1</optionsType>
     <optionsURL>chrome://UserStyleManager/content/options.xul</optionsURL>
     <translator>Drugoy (ru)</translator>
+    <translator>Alopepeo (es-ES)</translator>
     <contributor>Drugoy (extreme testing, feedback and bug reporting)</contributor>
+    <contributor>Alopepeo (testing, feedback and bug reporting)</contributor>
 
     <localized>
       <Description>
@@ -28,8 +30,8 @@
     <targetApplication>
       <r:Description>
         <id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</id>
-        <minVersion>8.0</minVersion>
-        <maxVersion>15.0a1</maxVersion>
+        <minVersion>13.0</minVersion>
+        <maxVersion>18.0a1</maxVersion>
       </r:Description>
     </targetApplication>
   </r:Description>
