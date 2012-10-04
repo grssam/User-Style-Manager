@@ -1,3 +1,107 @@
+
+/* Icons  */
+
+#USMButtonPreview {
+/*list-style-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABxUlEQVQ4jdWSv2tTcRTFz3nvDU1NIDxCcHsQMpihmULF4qJLHfyBwUWLIBQE/wInXfwHiotUKA7SrQgtCHYoOAkWB0mHaAkPQ8UhJI9AAgm++77H5SkF+w/0wh0uh/s5l3svcO6Dp4tmsxkAuEdyjeQygGouDSQdStoGsNPpdOw/QKPRWPE8bwvAJQBDknsAjnJ5SdLNHPjNObfe7XY/AYAPAPV6/ZGkHefcBUlPnXP30zT9bmbXzaxsZi8BPHfODbMsu+ucWw/D8GeSJF8ZRdEDkm9J9kjeiuP4OIqiGskjkosAIGkqaanf7/+o1Wp1Se8l1SU99Mxs08x6WZZdi+P4GADMrG1mi2mabqRpumFmRTNrA0Acxz0zu2JmPTPbDMxsKqkoqQzgVw5IcucVACAJAMO/+5rP5xdJFklOGYbhVUn7AOaS1sbj8YdKpbLgnDs4BfhIcnU0Gv0ul8s3SG4DWCC5SgAolUrLknYBVCW9BvDM9/0EQCs3/ZJlWQjgBcnHAAYk70wmk8N/ZywUClVJryS182n2AHzO5cskb+eu70g+mc1mgzM/KwiClu/7bzzPO/E8T3me+L6/FQRB68ym8x1/ADCc7/LbrlPYAAAAAElFTkSuQmCC");*/
+margin: 2px 3px !important;
+}
+
+#USMButtonSave {
+/*list-style-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABD0lEQVQ4jZ2TMU5CQRCGv9nsBUgsiT40cgNDZUGiFjYvFBrPYmLpHTgFhMYWEyriDWwUY2HhATDs7lj4kH2r4Mpfzcy/888/m125uLyaCezyTyg8otq13vtaszGmVTuoalW1CcyNMW8hhKeKaoOOrXeupjwYDZ/jvCx7BTAG7gejYbcsezHdti4RSJHyaW693yyQ8mkupydnGhdUwzHwGg8RMU3QuapaETOpOfhlhUlagLAmzljhL8QO3gW5Q5IRKRSj6Dmw8+XA+SXVnz5Mb3Kmdo46t8B1JfDtYJFr2zv3sYyt2+IO4p4fLzHTQSzgNxxdJ7DqWa2g2jhs7Rc5As4tGogAIAd7xYwtvnOFl08aUH7H1Z3LzgAAAABJRU5ErkJggg==");*/
+margin: 2px 3px !important;
+}
+
+#USMButtonExit {
+/*list-style-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAn0lEQVQ4jc2RMQrDMAxFH6V0yGSKMSFDz1B6+87BY0ZfJVOhXX6KYhSt7QOB/fUtyzL8IwXIjp6VCxmBRWHNxejj0eEsw1uxFSmO/u3wbAq8gNXsH8BT67vRV3ldrsBsbutjlickAdU5XJXbcXIKXIDB0QflQvqB9bFET/Bar442e08BmIDmGBP7wTZ5XW4y9NPefqfJEzIdtJiim3/HB9cMOiRXt3fbAAAAAElFTkSuQmCC");*/
+margin: 2px 3px !important;
+}
+
+
+/* Style */
+
+#USMButtonContainer {
+margin: 5px !important;
+}
+
+#USMButtonContainerV {
+border-top: 1px solid rgb(175,180,185);
+background: rgb(204, 217, 234) top left repeat -moz-linear-gradient(center top , rgb(237, 245, 252), rgba(237, 245, 252, 0) 156px);
+}
+
+#se-search-panel-container {
+padding-top: 2px;
+border-bottom: 1px solid rgb(175,180,185);
+background: rgb(204, 217, 234) top left repeat -moz-linear-gradient(center top , rgb(237, 245, 252), rgba(237, 245, 252, 0) 156px);
+}
+
+
+/* Textbox */
+
+filefield {
+  -moz-appearance: none !important;
+  border: 0 !important;
+  background: none !important;
+  margin: 3px 4px !important;
+}
+
+filefield .fileFieldContentBox,
+textbox:not(.fileFieldLabel) {
+  -moz-appearance: none !important;
+  border-radius: 2px !important;
+  border: 1px solid rgba(36,52,71,.5) !important; 
+  background-color: rgba(255,255,255,.75) !important;
+}
+
+textbox[readonly="true"] {
+  border: 1px solid transparent !important;
+  background: none !important;
+}
+
+
+/* Buttons */
+
+button {
+  -moz-appearance: none;
+  -moz-transition: .24s background-color ease-in;
+  border: 1px solid rgba(26,58,96,.38) !important;
+  padding: 0 1px !important;
+  margin: 0 !important;
+  background-color: rgba(223,232,242,.5) ;
+  background-image: -moz-linear-gradient(rgba(250,250,250,.5), rgba(166,184,206,.25) 50%,
+                                         rgba(45,78,115,.12) 50%, rgba(31,55,84,.05)) ;
+  background-clip: padding-box;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.25) inset,
+              0 0 3px rgba(255,255,255,.25) inset ;
+  border-radius: 1.5px ;
+  font-family: 'Segoe UI Semibold','Segoe UI',sans-serif ;
+  color: rgba(37,47,59,.95) ;
+  text-shadow: 0 1px 0 rgba(255,255,255,.1) ;
+  font-weight: 600 ;
+  font-size: 12px ;
+}
+
+button:not(:active):not([open]):not([disabled="true"]):not(.expander-up):hover,
+menulist:not([open]):not([disabled="true"]):hover {
+  background-color: hsl(212,42%,95%) ;
+}
+
+button:not([disabled="true"])[open],
+button:not([disabled="true"]):hover:active,
+menulist:not([disabled])[open],
+.expander-up {
+  border-color: rgba(36,52,71,.5) ;
+  background-image: -moz-linear-gradient(rgba(61,76,92,.2), rgba(61,76,92,.2)),
+                    -moz-linear-gradient(rgba(250,250,250,.25), rgba(166,184,206,.125) 50%,
+                                         rgba(45,78,115,.06) 50%, rgba(31,55,84,.025)) ;
+  box-shadow: 0 0 3px rgba(51,74,98,.2) inset,
+              0 1px 3px rgba(44,71,103,.2) inset ;
+  color: rgba(255,255,255,.95) ;
+  text-shadow: 0 1px 0 rgba(37,47,59,.4) ;
+}
+
+
+/* Original Code */
+
 .search-buttons {
   padding: 3px 4px;
   border: solid rgb(150,160,175);
