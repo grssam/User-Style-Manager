@@ -1,64 +1,103 @@
-<!ENTITY window.title  "Administre sus estilos">
-<!ENTITY styleSheet.list.caption  "Estilo Lista de planos">
-<!ENTITY styleHeader.enabled  "Habilitado">
-<!ENTITY styleHeader.name  "Nombre">
-<!ENTITY styleHeader.affects  "Se aplica en">
-<!ENTITY styleHeader.dateAdded  "Fecha Alta">
-<!ENTITY styleHeader.dateModified  "Fecha de modificación">
-<!ENTITY updateBtn.label  "Buscar actualizaciones">
-<!ENTITY updateBtn.accesskey  "U">
-<!ENTITY updateBtn.tooltip  "Buscar y actualiza la hoja de estilos seleccionada">
-<!ENTITY updateAllBtn.label  "Actualizar todo">
-<!ENTITY updateAllBtn.accesskey  "t">
-<!ENTITY updateAllBtn.tooltip  "Los cheques y las actualizaciones de una versión más reciente de la Hoja de Estilo">
-<!ENTITY infoBtn.label  "Más Información.">
-<!ENTITY infoBtn.accesskey  "I">
-<!ENTITY infoBtn.tooltip  "Más información sobre el estilo seleccionado">
-<!ENTITY editBtn.label  "Editar hoja de estilo">
-<!ENTITY editBtn.accesskey  "E">
-<!ENTITY editBtn.tooltip  "Modificar el contenido de la hoja de estilos seleccionada">
-<!ENTITY deleteBtn.label  "Eliminar hojas de estilo">
-<!ENTITY deleteBtn.accesskey  "H">
-<!ENTITY deleteBtn.tooltip  "Eliminación de aquí no va a eliminar el archivo de disco duro">
-<!ENTITY settings.caption  "Configuración de hoja de estilos">
-<!ENTITY backupMenu.label  "Copia de seguridad">
-<!ENTITY backupMenu.accesskey  "S">
-<!ENTITY entryMenu.label  "Menú de entrada">
-<!ENTITY entryMenu.accesskey  "M">
-<!ENTITY backup.label  "Mantenga copias de seguridad">
-<!ENTITY backup.accesskey  "G">
-<!ENTITY backup.tooltip  "Mantenga una copia de seguridad periódica de las hojas de estilo">
-<!ENTITY fallback.label  "Recurrir a la hoja de estilos Copia de seguridad">
-<!ENTITY fallback.accesskey  "R">
-<!ENTITY fallback.tooltip  "Cargue la hoja de estilos a partir de copia de seguridad si no está presente en el lugar original">
-<!ENTITY hideWindow.label  "Ocultar ventana de Opciones durante la edición de las Hojas de Estilo">
-<!ENTITY hideWindow.accesskey  "O">
-<!ENTITY hideWindow.tooltip  "Oculta la ventana Opciones durante la edición de hojas de estilo.\nEste permite cambiar de pestañas y ventanas.">
-<!ENTITY deleteFromDisk.label  "También elimina el archivo de hoja de estilos en el disco duro al eliminar aquí">
-<!ENTITY deleteFromDisk.tooltip  "ADVERTENCIA: Al habilitar esta función hará que la eliminación del archivo correspondiente desde el disco duro cuando se elimina un estilo de usuario Administrador de estilos">
-<!ENTITY appMenu.label  "Aplicaciones del menú">
-<!ENTITY appMenu.accesskey  "P">
-<!ENTITY appMenu.tooltip  "Crea una entrada en el menú de aplicaciones para acceder fácilmente a la ventana de Opciones y activar rápidamente / desactivar un estilo">
-<!ENTITY toolsMenu.label  "Menú Herramientas">
-<!ENTITY toolsMenu.accesskey  "T">
-<!ENTITY toolsMenu.tooltip  "Crea una entrada en el menú Herramientas para acceder fácilmente a la ventana de Opciones y activar rápidamente / desactivar un estilo">
-<!ENTITY button.label  "Botón de la barra">
-<!ENTITY button.accesskey  "B">
-<!ENTITY button.tooltip  "Crea un botón de barra de herramientas que se pueden colocar en cualquier lugar para acceder fácilmente a la ventana de opciones o las Hojas de Estilo">
-<!ENTITY hotkey.tooltip  "Crea una clave de acceso directo personalizables para abrir esta ventana de Opciones">
-<!ENTITY hotkey.label  "Crear un acceso directo del teclado">
-<!ENTITY hotkey.accesskey  "D">
-<!ENTITY contextMenu.tooltip  "Añade una opción en el menú contextual para convertir rápidamente el texto seleccionado en un estilo de usuario.">
-<!ENTITY contextMenu.label  "Menú Contextual">
-<!ENTITY contextMenu.accesskey  "C">
-<!ENTITY combination.label  "Combinación de teclas de acceso directo:">
-<!ENTITY combination.accesskey  "K">
-<!ENTITY combination.tooltip  "Haga clic en el cuadro de texto y pulse la combinación deseada">
-<!ENTITY addBtn.label  "Navegar…">
-<!ENTITY addBtn.label.label  "Añadir una nueva hoja de estilos:">
-<!ENTITY addBtn.label.tooltip  "Haga clic en el botón para agregar una nueva hoja de estilos">
-<!ENTITY addBtn.accesskey  "A">
-<!ENTITY addBtn.tooltip  "Navegar la hoja de estilo de su disco duro">
-<!ENTITY createBtn.label  "Crear Nuevo">
-<!ENTITY createBtn.accesskey  "N">
-<!ENTITY createBtn.tooltip  "Crear una nueva hoja de estilos">
+<!ENTITY window.title                 "Administrador de estilos">
+<!ENTITY styleSheet.list.caption      "Lista de estilos">
+<!ENTITY styleHeader.enabled          "Habilitado">
+<!ENTITY styleHeader.name             "Nombre">
+<!ENTITY styleHeader.affects          "Se aplica a">
+<!ENTITY styleHeader.dateAdded        "Fecha de Creación">
+<!ENTITY styleHeader.dateModified     "Última modificación">
+
+<!ENTITY updateBtn.label              "Buscar actualizaciones">
+<!ENTITY updateBtn.accesskey          "U">
+<!ENTITY updateBtn.tooltip            "Buscar actualizaciones para el estilo seleccionado">
+
+<!ENTITY updateAllBtn.label           "Actualizar todo">
+<!ENTITY updateAllBtn.accesskey       "t">
+<!ENTITY updateAllBtn.tooltip         "Busca una nueva versión de todos los estilos">
+
+<!ENTITY infoBtn.label                "Más Información">
+<!ENTITY infoBtn.accesskey            "I">
+<!ENTITY infoBtn.tooltip              "Más información sobre el estilo seleccionado">
+
+<!ENTITY editBtn.label                "Editar estilo">
+<!ENTITY editBtn.accesskey            "E">
+<!ENTITY editBtn.tooltip              "Eliminar estilo">
+
+<!ENTITY deleteBtn.label              "Eliminar estilo">
+<!ENTITY deleteBtn.accesskey          "M">
+<!ENTITY deleteBtn.tooltip            "Eliminarlo de aquí no lo hará del disco duro">
+
+<!ENTITY settings.caption             "Configuración General">
+
+<!ENTITY backupMenu.label             "Copias de seguridad">
+<!ENTITY backupMenu.accesskey         "S">
+<!ENTITY entryMenu.label              "Menú de entrada">
+<!ENTITY entryMenu.accesskey          "N">
+<!ENTITY updateMenu.label             "Actualizar">
+<!ENTITY updateMenu.accesskey         "C">
+<!ENTITY syncMenu.label               "Sincronización">
+<!ENTITY syncMenu.accesskey           "R">
+
+<!ENTITY backup.label                 "Realize copias de seguridad">
+<!ENTITY backup.accesskey             "G">
+<!ENTITY backup.tooltip               "Mantenga una copia de seguridad periódica de los estilos">
+
+<!ENTITY fallback.label               "Recurrir al estilo de la copia de seguridad">
+<!ENTITY fallback.accesskey           "P">
+<!ENTITY fallback.tooltip             "Recupere el estilo a partir de la copia de seguridad si no está presente en el lugar original">
+
+<!ENTITY hideWindow.label             "Ocultar esta ventana durante la edición de los estilos">
+<!ENTITY hideWindow.accesskey         "O">
+<!ENTITY hideWindow.tooltip           "Oculta la ventana de Opciones durante la edición de hojas de estilo. Esto permite cambiar entre pestañas y ventanas">
+
+<!ENTITY deleteFromDisk.label         "También eliminar el estilo del disco duro al eliminarlo aquí">
+<!ENTITY deleteFromDisk.tooltip       "ADVERTENCIA: Al habilitar esta función, el estilo presente en esta lista también se eliminará del disco duro">
+
+<!ENTITY appMenu.label                "Menú en el botón de Firefox">
+<!ENTITY appMenu.accesskey            "F">
+<!ENTITY appMenu.tooltip              "Crea una entrada en el menú de aplicaciones para acceder fácilmente a la ventana de Opciones y activar / desactivar rápidamente uno o varios estilos">
+
+<!ENTITY toolsMenu.label              "Menú Herramientas">
+<!ENTITY toolsMenu.accesskey          "T">
+<!ENTITY toolsMenu.tooltip            "Crea una entrada en el menú de Herramientas para acceder fácilmente a la ventana de Opciones y activar / desactivar rápidamente uno o varios estilos">
+
+<!ENTITY button.label                 "Botón en la barra de Navegación">
+<!ENTITY button.accesskey             "V">
+<!ENTITY button.tooltip               "Crea un botón de barra de herramientas que se pueda colocar en cualquier lugar para acceder fácilmente a la ventana de opciones o a los Estilos">
+
+<!ENTITY updateAutomatically.label              "Automáticamente">
+<!ENTITY updateAutomatically.accesskey          "A">
+<!ENTITY updateAutomatically.tooltip            "Periódicamente busca actualizaciones para los estilos desde donde se instalaron">
+
+<!ENTITY updateOverwritesLocalChanges.label     "Sobrescribir los cambios locales">
+<!ENTITY updateOverwritesLocalChanges.accesskey "O">
+<!ENTITY updateOverwritesLocalChanges.tooltip   "Si esta opción está acivada, todos los cambios locales a un estilo serán sobrescritos al momento de actualizar">
+
+<!ENTITY syncStyles.label             "Sincronizar estilos">
+<!ENTITY syncStyles.accesskey         "S">
+<!ENTITY syncStyles.tooltip           "Esto habilitará la sincronización de los estilos que tienen un origen de instalación apropiado">
+ 
+<!ENTITY keepDeletedOnSync.label      "Mantener los estilos eliminados">
+<!ENTITY keepDeletedOnSync.accesskey  "D">
+<!ENTITY keepDeletedOnSync.tooltip    "Mantener los estilos eliminados de sus otras computadoras. Esto los mantendrá en su cuenta de sincronización">
+ 
+<!ENTITY hotkey.tooltip               "Crea una combinación de teclas para acceder a esta ventana">
+<!ENTITY hotkey.label                 "Crear una combinación de teclado">
+<!ENTITY hotkey.accesskey             "B">
+
+<!ENTITY contextMenu.tooltip          "Añade una opción al menú contextual para convertir rápidamente el texto seleccionado en un nuevo estilo">
+<!ENTITY contextMenu.label            "Menú Contextual">
+<!ENTITY contextMenu.accesskey        "X">
+
+<!ENTITY combination.label            "Combinación del teclado:">
+<!ENTITY combination.accesskey        "L">
+<!ENTITY combination.tooltip          "Haga clic en el cuadro de texto y pulse la combinación deseada">
+
+<!ENTITY addBtn.label                 "Buscar…">
+<!ENTITY addBtn.label.label           "Añadir un nuevo estilo:">
+<!ENTITY addBtn.label.tooltip         "Haga clic en el botón para agregar una nueva hoja de estilos">
+<!ENTITY addBtn.accesskey             "A">
+<!ENTITY addBtn.tooltip               "Añadir un estilo desde su computadora">
+
+<!ENTITY createBtn.label              "Nuevo">
+<!ENTITY createBtn.accesskey          "N">
+<!ENTITY createBtn.tooltip            "Crear un nuevo estilo">
