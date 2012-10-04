@@ -3,7 +3,7 @@
 <!ENTITY saveCmd.label  "Guardar">
 <!ENTITY saveCmd.key  "G">
 <!ENTITY saveCmd.accesskey  "G">
-<!ENTITY previewCmd.label  "Previa">
+<!ENTITY previewCmd.label  "Vista previa">
 <!ENTITY previewCmd.key  "P">
 <!ENTITY previewCmd.accesskey  "P">
 <!ENTITY exitCmd.label  "Cerrar">
@@ -29,14 +29,14 @@
 <!ENTITY selectAllCmd.label  "Seleccionar todo">
 <!ENTITY selectAllCmd.key  "A">
 <!ENTITY selectAllCmd.accesskey  "A">
-<!ENTITY beautifyCmd.label  "embellecer CSS">
+<!ENTITY beautifyCmd.label  "Embellecer CSS">
 <!ENTITY beautifyCmd.key  "B">
 <!ENTITY beautifyCmd.accesskey  "B">
 <!ENTITY beautifyCmd.tooltip  "Formato de CSS con sangría y alineación correcta.">
 <!ENTITY gotoLineCmd.label  "Saltar a la línea…">
 <!ENTITY gotoLineCmd.key  "J">
 <!ENTITY gotoLineCmd.accesskey  "S">
-<!ENTITY toolsMenu.label  "instrumentos">
+<!ENTITY toolsMenu.label  "Herramientas">
 <!ENTITY toolsMenu.accesskey  "I">
 <!ENTITY addNameSpace.label  "Añadir Namespace">
 <!ENTITY addNameSpace.key  "N">
@@ -44,17 +44,17 @@
 <!ENTITY addWebNameSpace.label  "Añadir Web Namespace">
 <!ENTITY addWebNameSpace.key  "N">
 <!ENTITY addWebNameSpace.accesskey  "W">
-<!ENTITY addMozURL.label  "Añadir @-moz-url contenedor">
+<!ENTITY addMozURL.label  "Añadir @-moz-url">
 <!ENTITY addMozURL.key  "U">
 <!ENTITY addMozURL.accesskey  "U">
-<!ENTITY addMozPreURL.label  "Añadir @-moz-document url-prefix() contenedor">
+<!ENTITY addMozPreURL.label  "Añadir @-moz-document url-prefix()">
 <!ENTITY addMozPreURL.key  "P">
 <!ENTITY addMozPreURL.accesskey  "P">
-<!ENTITY addMozDomain.label  "Añadir @-moz-document domain() contenedor">
+<!ENTITY addMozDomain.label  "Añadir @-moz-document domain()">
 <!ENTITY addMozDomain.key  "D">
 <!ENTITY addMozDomain.accesskey  "D">
-<!ENTITY fileName.label  "Introduzca el nombre del archivo de hojas de estilo: ">
-<!ENTITY fileNameEditing.label  "Cambie el nombre del archivo de hojas de estilo: ">
+<!ENTITY fileName.label  "Introduzca el nombre del estilo: ">
+<!ENTITY fileNameEditing.label  "Cambie el nombre del estilo: ">
 <!ENTITY fileName.accesskey  "n">
 <!ENTITY fileName.tooltip  "Esto cambiará el nombre del archivo en el disco duro también">
 <!ENTITY findCmd.key  "F">
@@ -65,14 +65,14 @@
 <!ENTITY search.next.tooltip  "Buscar siguiente">
 <!ENTITY search.options.tooltip  "Mostrar opciones">
 <!ENTITY replace.placeholder  "Reemplazar">
-<!ENTITY replace.this.tooltip  "Reemplazar este">
+<!ENTITY replace.this.tooltip  "Reemplazar esto">
 <!ENTITY replace.all.tooltip  "Reemplazar todo">
 <!ENTITY search.wrap  "Ajustar texto">
 <!ENTITY search.wrap.accesskey  "t">
 <!ENTITY search.wrap.tooltip  "Envuelva el fin de la partida de texto.">
-<!ENTITY search.ignoreCase  "Ignorar el asunto">
+<!ENTITY search.ignoreCase  "Ignorar Mayúsculas">
 <!ENTITY search.ignoreCase.accesskey  "I">
-<!ENTITY search.ignoreCase.tooltip  "Tratar a minúsculas y mayúsculas como iguales mientras que la búsqueda">
+<!ENTITY search.ignoreCase.tooltip  "No diferenciar entre minúsculas y mayúsculas">
 <!ENTITY search.highlightAll  "Resaltar todo">
 <!ENTITY search.highlightAll.accesskey  "R">
 <!ENTITY search.highlightAll.tooltip  "Resalta todo el texto correspondiente">
