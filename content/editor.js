@@ -2297,8 +2297,8 @@ StyleEditor.prototype = {
 
   // return 0 : Save, 1 : Cancel , 2 : Don't Save
   promptSave: function SE_promptSave() {
-    if (this.styleName && !this.saved ||
-        this.getText() != this.initialText) {
+    if ((this.styleName || this.getText() != this.initialText) &&
+        !this.saved) {
       let ps = Services.prompt;
       let flags = ps.BUTTON_POS_0 * ps.BUTTON_TITLE_SAVE +
                   ps.BUTTON_POS_1 * ps.BUTTON_TITLE_CANCEL +
