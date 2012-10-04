@@ -62,3 +62,19 @@
 <!ENTITY createBtn.label  "Criar Novo">
 <!ENTITY createBtn.accesskey  "N">
 <!ENTITY createBtn.tooltip  "Criar uma nova folha de estilo">
+<!ENTITY updateAutomatically.label "Automaticamente">
+<!ENTITY updateAutomatically.accesskey "A">
+<!ENTITY updateAutomatically.tooltip "Verifique periodicamente para atualização de um estilo de sua fonte de instalação.">
+<!ENTITY updateOverwritesLocalChanges.label "Substituir alterações locais">
+<!ENTITY updateOverwritesLocalChanges.accesskey "O">
+<!ENTITY updateOverwritesLocalChanges.tooltip "Se esta opção estiver marcada, quaisquer alterações feitas em um estilo será substituído no momento da atualização.">
+<!ENTITY syncStyles.label "Estilos Sync">
+<!ENTITY syncStyles.accesskey "S">
+<!ENTITY syncStyles.tooltip "Isso vai permitir a sincronização de estilos que têm uma fonte adequada de instalação.">
+<!ENTITY keepDeletedOnSync.label "Mantenha estilos excluídos">
+<!ENTITY keepDeletedOnSync.accesskey "D">
+<!ENTITY keepDeletedOnSync.tooltip "Mantenha os estilos removidos por sua outra máquina. \nIsto inturn adicionar de volta o estilo a sua outra máquina.">
+<!ENTITY updateMenu.label "atualizar">
+<!ENTITY updateMenu.accesskey "P">
+<!ENTITY syncMenu.label "sincronizar">
+<!ENTITY syncMenu.accesskey "Y">

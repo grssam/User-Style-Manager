@@ -32,6 +32,10 @@
 <!ENTITY backupMenu.accesskey         "Р">
 <!ENTITY entryMenu.label              "Отключение меню">
 <!ENTITY entryMenu.accesskey          "М">
+<!ENTITY updateMenu.label             "обновление">
+<!ENTITY updateMenu.accesskey         "P">
+<!ENTITY syncMenu.label               "Синхронизация">
+<!ENTITY syncMenu.accesskey           "Y">
 
 <!ENTITY backup.label                 "Осуществлять резервное копирование">
 <!ENTITY backup.accesskey             "Р">
@@ -59,6 +63,22 @@
 <!ENTITY button.label                 "Кнопка на панели">
 <!ENTITY button.accesskey             "К">
 <!ENTITY button.tooltip               "Добавить/скрыть кнопку User Style Manager на панели. По умолчанию, она появляется на Панели Навигации, но оттуда её можно штатным методом перетащить куда-угодно.">
+
+<!ENTITY updateAutomatically.label     "Автоматическое">
+<!ENTITY updateAutomatically.accesskey "A">
+<!ENTITY updateAutomatically.tooltip   "Периодически проверяйте обновления стиля от своего источника установки.">
+
+<!ENTITY updateOverwritesLocalChanges.label      "Переписать локальные изменения">
+<!ENTITY updateOverwritesLocalChanges.accesskey  "O">
+<!ENTITY updateOverwritesLocalChanges.tooltip    "Если выбрана эта опция, любые локальные изменения стиля будут перезаписаны во время обновления.">
+
+<!ENTITY syncStyles.label              "Синхронизация стилей">
+<!ENTITY syncStyles.accesskey          "S">
+<!ENTITY syncStyles.tooltip            "Это позволит синхронизировать стили, которые имеют надлежащий источник установки.">
+
+<!ENTITY keepDeletedOnSync.label       "Хранить удаленные стили">
+<!ENTITY keepDeletedOnSync.accesskey   "D">
+<!ENTITY keepDeletedOnSync.tooltip     "Не стилей удалить вашу другую машину. \nЭто будет INTURN добавить обратно стиля на другие машины.">
 
 <!ENTITY contextMenu.label            "Пункт в контекстном меню">
 <!ENTITY contextMenu.accesskey        "К">

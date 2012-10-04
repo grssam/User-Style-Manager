@@ -86,3 +86,6 @@
 <!ENTITY replace.accesskey  "S">
 <!ENTITY replace.tooltip  "Exibe a caixa de diálogo Substituir.">
 <!ENTITY error.label  "Erros e avisos">
+<!ENTITY clearDefaultNamespace.label  "Usuário clara selecionado namespace padrão">
+<!ENTITY clearDefaultNamespace.key  "C">
+<!ENTITY clearDefaultNamespace.accesskey  "C">

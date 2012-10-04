@@ -86,3 +86,6 @@
 <!ENTITY replace.accesskey  "R">
 <!ENTITY replace.tooltip  "[置換]ダイアログボックスが表示されます。">
 <!ENTITY error.label  "エラーと警告">
+<!ENTITY clearDefaultNamespace.label  "明確なユーザーには、デフォルトの名前空間を選択">
+<!ENTITY clearDefaultNamespace.key  "C">
+<!ENTITY clearDefaultNamespace.accesskey  "C">

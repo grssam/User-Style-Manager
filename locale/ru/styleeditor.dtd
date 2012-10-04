@@ -72,6 +72,10 @@
 <!ENTITY addMozDomain.key             "D">
 <!ENTITY addMozDomain.accesskey       "D">
 
+<!ENTITY clearDefaultNamespace.label      "Очистить выбранные пользователем имен по умолчанию">
+<!ENTITY clearDefaultNamespace.key        "C">
+<!ENTITY clearDefaultNamespace.accesskey  "C">
+
 <!ENTITY fileName.label               "Имя файла стиля:">
 <!ENTITY fileNameEditing.label        "Изменить имя файла стиля:">
 <!ENTITY fileName.accesskey           "И">
