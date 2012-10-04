@@ -72,6 +72,10 @@
 <!ENTITY addMozDomain.key             "D">
 <!ENTITY addMozDomain.accesskey       "D">
 
+<!ENTITY clearDefaultNamespace.label      "Clear user selected default namespace">
+<!ENTITY clearDefaultNamespace.key        "C">
+<!ENTITY clearDefaultNamespace.accesskey  "C">
+
 <!ENTITY fileName.label               "Enter the name of the Stylesheet file: ">
 <!ENTITY fileNameEditing.label        "Change the Name of the Stylesheet file: ">
 <!ENTITY fileName.accesskey           "N">

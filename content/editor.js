@@ -1306,6 +1306,10 @@ StyleEditor.prototype = {
       let fna = this.STR("featureNotAvailable");
       this.doc.getElementById("se-menu-gotoLine").setAttribute("tooltiptext", fna);
     }
+    // Checking if clear default namespace needs to be disabled
+    this.doc.getElementById("se-cmd-clearDefaultNamespace")
+        .setAttribute("disabled", pref("defaultNamespace").match(/(xhtml|xul|none)/) == null);
+
     if (this.initialText.length == 0) {
       this.initialText = this.STR("placeholder.text");
     }
@@ -1435,6 +1439,8 @@ StyleEditor.prototype = {
     let addWebNamespace = this.doc.getElementById("se-cmd-addWebNamespace");
     addWebNamespace.setAttribute("disabled", this.getText()
       .search(/[@]namespace[ ]+url\(['"]?http:\/\/www\.w3\.org\/1999\/xhtml['"]?\);/) >= 0);
+    this.doc.getElementById("se-cmd-clearDefaultNamespace")
+        .setAttribute("disabled", pref("defaultNamespace").match(/(xhtml|xul|none)/) == null);
   },
 
   onToolsMenuHiding: function SE_onToolsMenuHiding() {
@@ -1791,6 +1797,10 @@ StyleEditor.prototype = {
       this.setText("@-moz-document domain('') {\n" + this.getText(start, end) + "\n}", start, end);
     }
     this.setCaretOffset(pos + 23);
+  },
+
+  clearDefaultNamespace: function SE_clearDefaultNamespace() {
+    pref("defaultNamespace", "");
   },
 
   closeErrorPanel: function SE_closeErrorPanel() {
@@ -2187,18 +2197,43 @@ StyleEditor.prototype = {
         origCaretPos += 46;
       }
       else if (mozDocURL == null) {
-        let flags = promptService.BUTTON_POS_0 * promptService.BUTTON_TITLE_IS_STRING +
-                    promptService.BUTTON_POS_1 * promptService.BUTTON_TITLE_IS_STRING +
-                    promptService.BUTTON_POS_2 * promptService.BUTTON_TITLE_IS_STRING;
-        let button = promptService.confirmEx(null,
-                                             this.STR("validate.title"),
-                                             this.STR("validate.text"),
-                                             flags,
-                                             this.STR("validate.chrome"),
-                                             this.STR("validate.website"),
-                                             this.STR("validate.none"),
-                                             null,
-                                             {value: false});
+        let button;
+        if (pref("defaultNamespace") == "" ||
+            !pref("defaultNamespace").match(/(xhtml|xul|none)/)) {
+          let checkState = {value: false};
+          let flags = promptService.BUTTON_POS_0 * promptService.BUTTON_TITLE_IS_STRING +
+                      promptService.BUTTON_POS_1 * promptService.BUTTON_TITLE_IS_STRING +
+                      promptService.BUTTON_POS_2 * promptService.BUTTON_TITLE_IS_STRING;
+          button = promptService.confirmEx(null,
+                                           this.STR("validate.title"),
+                                           this.STR("validate.text"),
+                                           flags,
+                                           this.STR("validate.chrome"),
+                                           this.STR("validate.website"),
+                                           this.STR("validate.none"),
+                                           this.STR("validate.setAsDefault"),
+                                           checkState);
+          if (checkState.value) {
+            pref("defaultNamespace", button == 0
+                                      ? "xul"
+                                      : (button == 1
+                                          ? "xhtml"
+                                          : "none"));
+          }
+        }
+        else {
+          switch (pref("defaultNamespace")) {
+            case "xul":
+              button = 0;
+              break;
+            case "xhtml":
+              button = 1;
+              break;
+            default:
+              button = 2;
+          }
+        }
+
         if (button == 0) {
           // Adding a xul namespace
           text = "@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);\n" + text;

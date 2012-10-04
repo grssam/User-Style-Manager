@@ -71,6 +71,7 @@ pref.defaults = {
   syncStyles: true,
   keepDeletedOnSync: true,
   newInstall: false,
+  defaultNamespace: "",
 };
 
 pref.observe = function(prefs, callback) {

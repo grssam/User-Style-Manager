@@ -61,6 +61,8 @@
              oncommand="styleEditor.addMozPreURL();"/>
     <command id="se-cmd-addMozDomain"
              oncommand="styleEditor.addMozDomain();"/>
+    <command id="se-cmd-clearDefaultNamespace"
+             oncommand="styleEditor.clearDefaultNamespace();"/>
   </commandset>
   <keyset>
     <key id="se-key-save"
@@ -148,6 +150,10 @@
          key="&addMozDomain.key;"
          command="se-cmd-addMozDomain"
          modifiers="accel"/>
+    <key id="key_clearDefaultNamespace"
+         key="&clearDefaultNamespace.key;"
+         command="se-cmd-clearDefaultNamespace"
+         modifiers="accel, shift"/>
   </keyset>
 
   <vbox id="se-search-panel-container">
@@ -260,6 +266,11 @@
                       label="&addMozDomain.label;"
                       command="se-cmd-addMozDomain"
                       accesskey="&addMozDomain.accesskey;"/>
+            <menuitem id="se-menu-clearDefaultNamespace"
+                      key="key_clearDefaultNamespace"
+                      label="&clearDefaultNamespace.label;"
+                      command="se-cmd-clearDefaultNamespace"
+                      accesskey="&clearDefaultNamespace.accesskey;"/>
           </menupopup>
         </menu>
       </menubar>
