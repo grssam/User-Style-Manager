@@ -793,7 +793,7 @@ function addNewStylesFromSync(aStyles, aIndex, aCallback) {
 }
 
 function deleteStylesFromUSM(aStyleSheetList) {
-  aStyleSheetList = aStyleSheetList.sort().reverse();
+  aStyleSheetList = aStyleSheetList.sort(function (a,b) a*1 - b*1).reverse();
   for each (let index in aStyleSheetList) {
     // Unload the stylesheet if enabled
     if (styleSheetList[index][0] == 'enabled') {

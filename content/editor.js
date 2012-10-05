@@ -1144,7 +1144,7 @@ StyleEditor.prototype = {
       this.saveButtonClick(null, function() {
         this.callback && this.callback();
         this.win.close();
-      });
+      }.bind(this));
       return;
     }
     // Don't Save
@@ -2314,17 +2314,7 @@ StyleEditor.prototype = {
     if (this.sourceEditorEnabled) {
       this.editor.removeEventListener(SourceEditor.EVENTS.MOUSE_MOVE,
                                       this.onMouseMove);
-      this.doc.getElementById("USMTextEditor")
-          .firstChild.removeEventListener("click", this.onMouseClick);
-      this.doc.getElementById("USMTextEditor")
-          .firstChild.removeEventListener("dblclick", this.onDblClick);
     }
-    this.doc.getElementById("USMTextEditor")
-        .firstChild.removeEventListener("keypress", this.inputHelper, true);
-    this.doc.getElementById("USMTextEditor")
-        .firstChild.removeEventListener("keyup", this.postInputHelper, true);
-    this.doc.getElementById("USMTextEditor")
-        .firstChild.removeEventListener("keydown", this.preInputHelper, true);
     this.editor.destroy();
     this.editor = null;
     this.initialized = false;
