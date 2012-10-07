@@ -114,6 +114,12 @@ function addSyncOption(window) {
       }
       $("syncEnginesList").appendChild(lastItem);
     }
+    else if ($("paneSync")) {
+      $("paneSync").addEventListener("paneload", function onPaneLoad() {
+        $("paneSync").removeEventListener("paneload", onPaneLoad, true);
+        addSyncOption(window);
+      }, true);
+    }
   }
   catch (ex) {}
 }
