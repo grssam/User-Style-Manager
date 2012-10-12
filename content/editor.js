@@ -1881,6 +1881,7 @@ StyleEditor.prototype = {
     // This is a syntax validator as of now.
     let text = this.getText();
     let origCaretPos = this.getCaretOffset();
+    let origTopIndex = this.editor._view.getTopIndex();
     let error = false;
     let errorList = [];
     let warningList = [];
@@ -2147,7 +2148,6 @@ StyleEditor.prototype = {
           }
       }
     }
-    this.setCaretOffset(origCaretPos);
 
     // Checking bracklist for matching brackets
     let i = 0;
@@ -2284,7 +2284,10 @@ StyleEditor.prototype = {
         }
       }
       this.setText(text);
-      this.setCaretOffset(origCaretPos);
+      this.win.setTimeout(function() {
+        this.editor.setCaretPosition(origTopIndex, 1);
+        this.setCaretOffset(origCaretPos);
+      }.bind(this), text.length < 1000 ? 50: (text.length < 2500 ? 150: 350));
     }
     return true;
   },
