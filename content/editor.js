@@ -504,18 +504,56 @@ StyleEditor.prototype = {
       case event.DOM_VK_CONTROL:
       case event.DOM_VK_ALT:
       case event.DOM_VK_SHIFT:
-      case event.DOM_VK_UP:
       case event.DOM_VK_DELETE:
       case event.DOM_VK_BACK_SPACE:
-      case event.DOM_VK_DOWN:
-      case event.DOM_VK_LEFT:
-      case event.DOM_VK_RIGHT:
       case event.DOM_VK_HOME:
       case event.DOM_VK_END:
       case event.DOM_VK_ESCAPE:
       case event.DOM_VK_TAB:
+        return;
+      case event.DOM_VK_UP:
+      case event.DOM_VK_DOWN:
+      case event.DOM_VK_LEFT:
+      case event.DOM_VK_RIGHT: {
+          let currentPos = this.getCaretOffset();
+          let text = this.getText();
+          let textBefore = text.slice(0, currentPos);
+          if (textBefore.match(/\}[ \n]{0,}$/) &&
+              textBefore.lastIndexOf("{") <
+                textBefore.lastIndexOf("\n", textBefore.lastIndexOf("}"))) {
+            let match =
+              textBefore.match(/([ ]{0,})[^\n^\{]{0,}\{[^\{\}]{0,}\n([^\n\}]{0,})\}[ \n]{0,}$/);
+            if (match) {
+              let indent = match[1].length;
+              let indentation = "";
+              for (let i = 0; i < indent; i++) {
+                indentation += " ";
+              }
+              if (match[2].length != indent) {
+                this.setText(indentation, currentPos - match[2].length - 1, currentPos - 1);
+                this.setCaretOffset(currentPos - match[2].length + indent);
+              }
+            }
+          }
+        }
+        return;
       case event.DOM_VK_ENTER:
-      case event.DOM_VK_RETURN:
+      case event.DOM_VK_RETURN: {
+          let currentPos = this.getCaretOffset();
+          let text = this.getText();
+          let textAfter = text.slice(currentPos);
+          let textBefore = text.slice(0, currentPos);
+          if (textBefore.lastIndexOf("{") > textBefore.lastIndexOf("}") &&
+              textBefore.match(/\{[^\{\n]{0,}\n[^\n\{]{0,}$/)) {
+            let indent = Services.prefs.getIntPref("devtools.editor.tabsize");
+            let indentation = "";
+            for (let i = 0; i < indent; i++) {
+              indentation += " ";
+            }
+            this.setText(indentation, currentPos, currentPos);
+            this.setCaretOffset(currentPos + indent);
+          }
+        }
         return;
     }
 
@@ -544,8 +582,8 @@ StyleEditor.prototype = {
       let textAfter = text.slice(currentPos, currentPos + 9);
       if (textAfter.length == 0 ||
           textAfter.toLowerCase() != "important".slice(0, textAfter.length)) {
-        this.setText('important' + (textAfter[0] != ';'? ';': ''),
-                     currentPos,
+        this.setText('!important' + (textAfter[0] != ';'? ';': ''),
+                     currentPos - 1,
                      currentPos);
       }
     }
@@ -579,12 +617,7 @@ StyleEditor.prototype = {
         let textBefore = text.slice(0, currentPos);
         if (textBefore.split("{").length - textBefore.split("}").length >
             textAfter.split("}").length - textAfter.split("{").length) {
-          let indent = textBefore.match(/\n?[^\n]{0,}\{$/)[0].search(/[^ \n]/) - 1;
-          let indentation = "";
-          for (let i = 0; i < indent; i++) {
-            indentation += " ";
-          }
-          this.setText("\n" + indentation + "}", currentPos, currentPos);
+          this.setText("}", currentPos, currentPos);
           this.setCaretOffset(currentPos);
         }
       }

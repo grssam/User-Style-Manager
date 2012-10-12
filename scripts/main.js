@@ -682,6 +682,9 @@ function updateFromSync() {
       let tempStyleSheetList = JSON.parse(JSON.stringify(styleSheetList));
       let newStyles = [], deletedStyle = [], found = false, i = 0, haveChanges = false;
       remoteStyleSheetList.forEach(function([enabled, name, styleId, options]) {
+        try {
+          name = unescape(name);
+        } catch (ex) {}
         enabled = (enabled?"enabled":"disabled");
         found = false;
         for each (let style in tempStyleSheetList) {
