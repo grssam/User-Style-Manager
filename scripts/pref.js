@@ -67,10 +67,8 @@ pref.defaults = {
   updateOverwritesLocalChanges: false,
   lastUpdatedOn: "0",
   updateTimeoutActive: false,
-  syncedStyleList: "[]",
   syncStyles: true,
   keepDeletedOnSync: true,
-  newInstall: false,
   defaultNamespace: "",
 };
 
