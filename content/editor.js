@@ -518,7 +518,7 @@ StyleEditor.prototype = {
           let currentPos = this.getCaretOffset();
           let text = this.getText();
           let textBefore = text.slice(0, currentPos);
-          if (textBefore.match(/\}[ \n]{0,}$/) &&
+          if (textBefore.match(/\n[ \n]{0,}\}[ \n]{0,}$/) &&
               textBefore.lastIndexOf("{") <
                 textBefore.lastIndexOf("\n", textBefore.lastIndexOf("}"))) {
             let match =
