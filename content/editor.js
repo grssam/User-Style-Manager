@@ -544,7 +544,7 @@ StyleEditor.prototype = {
           let textAfter = text.slice(currentPos);
           let textBefore = text.slice(0, currentPos);
           if (textBefore.lastIndexOf("{") > textBefore.lastIndexOf("}") &&
-              textBefore.match(/\{[^\{\n]{0,}\n[^\n\{]{0,}$/)) {
+              textBefore.match(/\{[^\{\n]{0,}\n[ ]{0,}$/)) {
             let indent = Services.prefs.getIntPref("devtools.editor.tabsize");
             let indentation = "";
             for (let i = 0; i < indent; i++) {
