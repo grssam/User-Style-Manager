@@ -21,7 +21,6 @@ let ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 // Global prompt service
 let promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                       .getService(Ci.nsIPromptService);
-let syncUpdateTimer = null;
 let shouldUpdateInstall = false;
 const XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 const HTML = "http://www.w3.org/1999/xhtml";
@@ -70,7 +69,6 @@ function readJSONPref(callback) {
 // Function to write the preferences
 function writeJSONPref(callback) {
   pref("userStyleList", JSON.stringify(styleSheetList));
-  prepareToUpdateSync();
   let JSONFile = getURIForFileInUserStyles("Preferences/usm.pref")
                    .QueryInterface(Ci.nsIFileURL).file;
   let ostream = FileUtils.openSafeFileOutputStream(JSONFile);
@@ -603,6 +601,26 @@ function updateStyle(index, callback) {
   }
 }
 
+function updateStyleCodeFromSync(index, CSSText) {
+  try {
+    unloadStyleSheet(index);
+  }
+  catch(ex) {}
+  let ostream =
+    FileUtils.openSafeFileOutputStream(getFileURI(unescape(styleSheetList[index][2]))
+             .QueryInterface(Ci.nsIFileURL).file);
+  let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+                    .createInstance(Ci.nsIScriptableUnicodeConverter);
+  converter.charset = "UTF-8";
+  let istream = converter.convertToInputStream(CSSText);
+  NetUtil.asyncCopy(istream, ostream, function(status) {
+    if (!Components.isSuccessCode(status)) {
+      return;
+    }
+    loadStyleSheet(index);
+  });
+}
+
 function checkAndDisplayProperOption(contentWindow, url) {
   function $(id) contentWindow.document.getElementById(id);
   function hideAllButtons() {
@@ -666,135 +684,6 @@ function checkAndDisplayProperOption(contentWindow, url) {
   }
 }
 
-function updateFromSync() {
-  let doUpdate = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-  let doSyncUpdate = {
-    notify: function() {
-      doUpdate.cancel();
-      doUpdate = null;
-      if (pref("newInstall")) {
-        // Sync is form a new install of this addon on a synced machine
-        prepareToUpdateSync();
-        shouldUpdateInstall = true;
-        return;
-      }
-      let remoteStyleSheetList = JSON.parse(pref("syncedStyleList"));
-      let tempStyleSheetList = JSON.parse(JSON.stringify(styleSheetList));
-      let newStyles = [], deletedStyle = [], found = false, i = 0, haveChanges = false;
-      remoteStyleSheetList.forEach(function([enabled, name, styleId, options]) {
-        try {
-          name = unescape(name);
-        } catch (ex) {}
-        enabled = (enabled?"enabled":"disabled");
-        found = false;
-        for each (let style in tempStyleSheetList) {
-          if (style[3].match(/styles\/([0-9]*)\//i) &&
-              style[3].match(/styles\/([0-9]*)\//i)[1] == styleId) {
-            found = true;
-            break;
-          }
-          i++;
-        }
-        if (found) {
-          if (tempStyleSheetList[i][0] != enabled) {
-            enabled? loadStyleSheet(i): unloadStyleSheet(i);
-          }
-          if (tempStyleSheetList[i][0] != enabled ||
-              tempStyleSheetList[i][1] != name ||
-              tempStyleSheetList[i][7] != options) {
-            tempStyleSheetList[i][6] = JSON.stringify(new Date());
-            haveChanges = true;
-          }
-          tempStyleSheetList[i][0] = enabled;
-          tempStyleSheetList[i][1] = name;
-          if (tempStyleSheetList[i][7] != options) {
-            newStyles.push(i*1);
-          }
-          tempStyleSheetList[i][7] = options;
-        }
-        else {
-          haveChanges = true;
-          i = tempStyleSheetList.length;
-          newStyles.push(i*1);
-          let path = escape(name.replace(/[\\\/:*?\"<>|]+/gi, "") + ".css");
-          if (path == ".css") {
-            path = "User Synced Style Sheet " + i + ".css";
-          }
-          tempStyleSheetList.push([enabled, name, path,
-                                   "http://userstyles.org/styles/" + styleId + "/",
-                                   "", JSON.stringify(new Date()),
-                                   JSON.stringify(new Date()), options, false]);
-        }
-      });
-      if (haveChanges) {
-        styleSheetList = tempStyleSheetList;
-      }
-      tempStyleSheetList.forEach(function([enabled, name, path, url], index) {
-        if (!url.match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
-          return;
-        }
-        found = false;
-        for each (let style in remoteStyleSheetList) {
-          if (style[3] == url) {
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          deletedStyle.push(index);
-          haveChanges = true;
-        }
-      });
-      if (haveChanges) {
-        addNewStylesFromSync(newStyles, 0, function() {
-          if (!pref("keepDeletedOnSync")) {
-            deleteStylesFromUSM(deletedStyle);
-          }
-          else {
-            prepareToUpdateSync();
-          }
-          updateAffectedContents();
-        });
-      }
-    }
-  };
-  doUpdate.initWithCallback(doSyncUpdate, 5000, Ci.nsITimer.TYPE_ONE_SHOT);
-}
-
-function addNewStylesFromSync(aStyles, aIndex, aCallback) {
-  if (aStyles.length == 0) {
-    aCallback && aCallback();
-    return;
-  }
-
-  if (aIndex == null) {
-    aIndex = 0;
-  }
-  else if (aIndex >= aStyles.length) {
-    aCallback && aCallback();
-    return;
-  }
-
-  let index = aStyles[aIndex++];
-  try {
-    if (styleSheetList[index][3].match(/^https?:\/\/(www.)?userstyles.org\/styles\/[0-9]*/i)) {
-      let styleId = styleSheetList[index][3].match(/styles\/([0-9]*)\//i)[1];
-      getCodeForStyle(styleId, styleSheetList[index][7], function(code) {
-        updateInUSM(styleId, code, styleSheetList[index][1], styleSheetList[index][3],
-                    styleSheetList[index][7], function() {
-          addNewStylesFromSync(aStyles, aIndex, aCallback);
-        });
-      });
-    }
-    else {
-      addNewStylesFromSync(aStyles, aIndex, aCallback);
-    }
-  }
-  catch (ex) {
-    addNewStylesFromSync(aStyles, aIndex, aCallback);
-  }
-}
-
 function deleteStylesFromUSM(aStyleSheetList) {
   aStyleSheetList = aStyleSheetList.sort(function (a,b) a*1 - b*1).reverse();
   for each (let index in aStyleSheetList) {
@@ -814,38 +703,6 @@ function deleteStylesFromUSM(aStyleSheetList) {
   writeJSONPref();
 }
 
-function prepareToUpdateSync() {
-  if (!syncUpdateTimer) {
-    syncUpdateTimer = Cc["@mozilla.org/timer;1"]
-                        .createInstance(Ci.nsITimer);
-    syncUpdateTimer.initWithCallback(updateSyncedList, 10000,
-                                     Ci.nsITimer.TYPE_ONE_SHOT);
-  }
-  else {
-    syncUpdateTimer.initWithCallback(updateSyncedList, 10000,
-                                     Ci.nsITimer.TYPE_ONE_SHOT);
-  }
-}
-
-let updateSyncedList = {
-  notify: function() {
-    syncUpdateTimer.cancel();
-    syncUpdateTimer = null;
-    let syncedStyleList = styleSheetList.filter(function ([e,n,p,u]) {
-      return u && u.match(/styles\/([0-9]*)\//i);
-    });
-    // trimming down the synced pref
-    syncedStyleList = syncedStyleList.map(function ([e,n,p,u,a,da,dm,o,l]) {
-      return [e? 1: 0, n, u.match(/styles\/([0-9]*)\//i)[1], o];
-    });
-    if (shouldUpdateInstall) {
-      shouldUpdateInstall = false;
-      pref("newInstall", false);
-    }
-    pref("syncedStyleList", JSON.stringify(syncedStyleList));
-  }
-};
-
 function getFileURI(path) {
   return path.indexOf("file") == 0
           ? ios.newURI(path, null, null)
@@ -859,9 +716,5 @@ function getURIForFileInUserStyles(filepath) {
 }
 
 unload(function() {
-  if (syncUpdateTimer) {
-    syncUpdateTimer.cancel();
-    syncUpdateTimer = null;
-  }
   openEditors = null;
 });
