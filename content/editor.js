@@ -1140,7 +1140,9 @@ StyleEditor.prototype = {
     let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
                       .createInstance(Ci.nsIScriptableUnicodeConverter);
     converter.charset = "UTF-8";
-    let istream = converter.convertToInputStream(this.fixupText());
+    let text = this.fixupText();
+    let istream = converter.convertToInputStream(text);
+
     NetUtil.asyncCopy(istream, ostream, function(status) {
       if (!Components.isSuccessCode(status)) {
         this.win.alert(this.STR("error.fileSaving"));
@@ -1150,7 +1152,13 @@ StyleEditor.prototype = {
       styleSheetList[this.index][4] = this.getAffectedContent();
       styleSheetList[this.index][6] = JSON.stringify(new Date());
       loadStyleSheet(this.index);
-      writeJSONPref();
+      writeJSONPref(function() {
+        // Update the mapped code and push for syncing
+        if (mappedCodeForIndex[this.index] != text) {
+          mappedCodeForIndex[this.index] = text;
+          Services.obs.notifyObservers(null, "USM:codeMappings:updated", this.index);
+        }
+      }.bind(this));
       this.onTextSaved();
       if (aCallback) {
         aCallback();
@@ -1262,22 +1270,32 @@ StyleEditor.prototype = {
     }.bind(this);
 
     let readFileData = function() {
-      NetUtil.asyncFetch(this.styleSheetFile, function(inputStream, status) {
-        if (!Components.isSuccessCode(status)) {
-          this.resetVariables();
-          this.win.close();
-          return;
-        }
-        let data = "";
+      if (mappedCodeForIndex[this.index] &&
+          mappedCodeForIndex[this.index].length > 0) {
         try {
-          data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-        } catch (ex) {}
-        try {
-          config.placeholderText = data;
-          config.initialText = data;
+          config.placeholderText = mappedCodeForIndex[this.index];
+          config.initialText = mappedCodeForIndex[this.index];
         } catch (ex) {}
         startEditor();
-      }.bind(this));
+      }
+      else {
+        NetUtil.asyncFetch(this.styleSheetFile, function(inputStream, status) {
+          if (!Components.isSuccessCode(status)) {
+            this.resetVariables();
+            this.win.close();
+            return;
+          }
+          let data = "";
+          try {
+            data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+          } catch (ex) {}
+          try {
+            config.placeholderText = data;
+            config.initialText = data;
+          } catch (ex) {}
+          startEditor();
+        }.bind(this));
+      }
     }.bind(this);
 
     if (aEvent.target != this.doc) {

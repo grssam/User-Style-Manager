@@ -22,6 +22,11 @@ let ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 let promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                       .getService(Ci.nsIPromptService);
 let shouldUpdateInstall = false;
+
+let codeMappingReady = false;
+let mappedIndexForGUIDs = {};
+let mappedCodeForIndex = [];
+
 const XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 const HTML = "http://www.w3.org/1999/xhtml";
 const EDITOR_WINDOW_FEATURES = "chrome,resizable,dialog=no,centerscreen,titlebar",
@@ -69,6 +74,7 @@ function readJSONPref(callback) {
 // Function to write the preferences
 function writeJSONPref(callback) {
   pref("userStyleList", JSON.stringify(styleSheetList));
+  Cu.reportError(JSON.stringify(styleSheetList));
   let JSONFile = getURIForFileInUserStyles("Preferences/usm.pref")
                    .QueryInterface(Ci.nsIFileURL).file;
   let ostream = FileUtils.openSafeFileOutputStream(JSONFile);
@@ -79,6 +85,33 @@ function writeJSONPref(callback) {
   NetUtil.asyncCopy(istream, ostream, function(status) {
     callback && callback();
   });
+}
+
+function readStylesToMap(index) {
+  if (index < 0) {
+    Services.obs.notifyObservers(null, "USM:codeMappings:error", null);
+    return;
+  }
+  else if (index == styleSheetList.length) {Cu.reportError("read");
+    codeMappingReady = true;
+    Services.obs.notifyObservers(null, "USM:codeMappings:ready", null);
+  }
+  else {Cu.reportError("reading " + index);
+    let file = getFileURI(unescape(styleSheetList[index][2]))
+                 .QueryInterface(Ci.nsIFileURL).file;
+    NetUtil.asyncFetch(file, function(inputStream, status) {
+      if (!Components.isSuccessCode(status)) {
+        readStylesToMap(-1);
+        return;
+      }
+      let data = "";
+      try {
+        data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+      } catch (ex) {}
+      mappedCodeForIndex[index] = data;
+      readStylesToMap(++index);
+    });
+  }
 }
 
 // Function to read each stylsheet and get the affected content
@@ -230,9 +263,13 @@ function doBackup(index) {
                                                 index + ".css")
                        .QueryInterface(Ci.nsIFileURL).file;
       if (bckpFile.exists()) {
-        bckpFile.remove(false);
+        try {
+          bckpFile.remove(false);
+        } catch (ex) {}
       }
-      origFile.copyTo(bckpDirectory, "backupOfUserStyle" + index + ".css");
+      try {
+        origFile.copyTo(bckpDirectory, "backupOfUserStyle" + index + ".css");
+      } catch (ex) {}
     });
   }
   else {
@@ -586,6 +623,8 @@ function updateStyle(index, callback) {
     getCodeForStyle(styleId, styleSheetList[index][7], function(code) {
       compareStyleVersion(index, styleId, code, function(needsUpdate) {
         if (needsUpdate && (!pref("updateOverwritesLocalChanges") || !styleSheetList[index][8])) {
+          mappedCodeForIndex[index] = code;
+          Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
           updateInUSM(styleId, code, styleSheetList[index][1],
                       styleSheetList[index][3], styleSheetList[index][7],
                       callback);
@@ -613,11 +652,14 @@ function updateStyleCodeFromSync(index, CSSText) {
                     .createInstance(Ci.nsIScriptableUnicodeConverter);
   converter.charset = "UTF-8";
   let istream = converter.convertToInputStream(CSSText);
+  mappedCodeForIndex[index] = CSSText;
   NetUtil.asyncCopy(istream, ostream, function(status) {
     if (!Components.isSuccessCode(status)) {
       return;
     }
-    loadStyleSheet(index);
+    if (styleSheetList[index][0] == "enabled") {
+      loadStyleSheet(index);
+    }
   });
 }
 
@@ -686,12 +728,17 @@ function checkAndDisplayProperOption(contentWindow, url) {
 
 function deleteStylesFromUSM(aStyleSheetList) {
   aStyleSheetList = aStyleSheetList.sort(function (a,b) a*1 - b*1).reverse();
+  let deletedGUIDs = [];
   for each (let index in aStyleSheetList) {
     // Unload the stylesheet if enabled
     if (styleSheetList[index][0] == 'enabled') {
       unloadStyleSheet(index);
     }
     let deletedStyle = styleSheetList.splice(index, 1);
+    if (deletedStyle[9] != null) {
+      deletedGUIDs.push(deletedStyle[9]);
+    }
+    mappedCodeForIndex.splice(index, 1);
     if (pref("deleteFromDisk")) {
       let deletedFile = getFileURI(unescape(deletedStyle[0][2]))
                           .QueryInterface(Ci.nsIFileURL).file;
@@ -700,7 +747,78 @@ function deleteStylesFromUSM(aStyleSheetList) {
       }
     }
   }
+  // Notify the tracker that style has been deleted
+  Services.obs.notifyObservers(null, "USM:codeMappings:deleted", deletedGUIDs);
   writeJSONPref();
+}
+
+function showNotification(aText, aTitle, aButtons, aCallback, aTimeout) {
+  let window = Services.wm.getMostRecentWindow("navigator:browser");
+  const XULNS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+  let notificationBox = window.document.getElementById("USM-sync-notifications");
+  if (!notificationBox) {
+    notificationBox = window.document.createElementNS(XULNS, "notificationbox");
+    notificationBox.id = "USM-sync-notifications";
+    notificationBox.setAttribute("flex", "1");
+    notificationBox.setAttribute("style", "max-height: 0px;");
+
+    let navigationBox = window.document.getElementById("navigator-toolbox");
+    navigationBox.parentNode.insertBefore(notificationBox, navigationBox.nextSibling);
+    unload(function() {
+      notificationBox.removeAllNotifications(true);
+      notificationBox.parentNode.removeChild(notificationBox);
+      notificationBox = null;
+    }, window);
+  }
+  // Force a style flush to ensure that our binding is attached.
+  notificationBox.clientTop;
+
+  let buttons = [], i = 0, choiceSelected = false;
+  let timeoutChecker = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+
+  for each (let button in aButtons) {
+    let index = JSON.parse(JSON.stringify(i++));
+    buttons.push({
+      label: button.label,
+      accessKey: button.accessKey,
+      tooltiptext: button.tooltipText,
+      callback: function() {
+        choiceSelected = true;
+        try {
+          timeoutChecker.cancel();
+          timeoutChecker = null;
+        } catch (ex) {}
+        aCallback(index);
+        Cu.reportError(index);
+      }
+    });
+  }
+  notificationBox.removeAllNotifications(true);
+  notificationBox.appendNotification(aText, "", null,
+                                     notificationBox.PRIORITY_INFO_MEDIUM,
+                                     buttons, null);
+  let checkChoiceSelected = {
+    notify: function () {
+      if (!choiceSelected) {
+        choiceSelected = true;
+        notificationBox.removeAllNotifications(true);
+        aCallback(-1);
+        try {
+          timeoutChecker.cancel();
+          timeoutChecker = null;
+        } catch (ex) {}
+      }
+    }
+  };
+
+  timeoutChecker.initWithCallback(checkChoiceSelected, aTimeout || 60000,
+                                  Ci.nsITimer.TYPE_ONE_SHOT);
+  unload(function() {
+    try {
+      timeoutChecker.cancel();
+      timeoutChecker = null;
+    } catch (ex) {}
+  });
 }
 
 function getFileURI(path) {

@@ -13,7 +13,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/NetUtil.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
 
-["helper", "pref", "main"].forEach(function(fileName) {
+["helper", "pref", "main", "sync"].forEach(function(fileName) {
   let fileURL = "chrome://userstylemanager-scripts/content/" + fileName + ".js";
   Services.scriptloader.loadSubScript(fileURL, global);
 });
@@ -262,8 +262,10 @@ let optionsWindow = {
         });
       }
     });
-    if (!Services.prefs.getBoolPref("services.sync.engine.prefs")) {
+    if (Weave.Status.service != Weave.STATUS_OK) {
       $("syncMenu").disabled = true;
+      $("syncMenu").setAttribute("tooltiptext",
+                                 optionsWindow.STR("firefoxSync.disabled"));
     }
     // Displaying the shortcut 
     this.shortcutTextBox = document.getElementById("shortcutTextBox");

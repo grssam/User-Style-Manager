@@ -70,6 +70,7 @@ pref.defaults = {
   syncStyles: true,
   keepDeletedOnSync: true,
   defaultNamespace: "",
+  syncImmediately: false,
 };
 
 pref.observe = function(prefs, callback) {

@@ -24,7 +24,11 @@ XPCOMUtils.defineLazyGetter(strings, "str", function () {
   return Services.strings.createBundle("chrome://userstylemanager/locale/main.properties");
 });
 function l10n(aString) {
-  return strings.str.GetStringFromName(aString);
+  let string = aString;
+  try {
+    string = strings.str.GetStringFromName(aString);
+  } catch (ex) {}
+  return string;
 }
 const keysetID = "USMKeyset";
 const keyID = "USMKeyID";
@@ -89,6 +93,50 @@ function setupUpdates() {
       updateTimeout = null;
     } catch (ex) {}
   });
+}
+
+function setupSyncEngine(reason) {
+  if (reason == 1) {
+    Cu.reportError(1);
+    Services.obs.addObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
+  }
+  else if (codeMappingReady && Weave.Status.service == Weave.STATUS_OK) {
+    Cu.reportError(2);
+    try {
+      Services.obs.removeObserver(setupSyncEngine, "USM:codeMappings:ready",  false);
+    } catch(ex) {}
+    try {
+      Services.obs.removeObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
+    } catch(ex) {}
+
+    try {
+      Weave.Engines.register(UserStylesSyncEngine);Cu.reportError(3);
+      unload(removeSyncEngine);
+    } catch(ex) {}
+  }
+  else if (codeMappingReady) {
+    try {
+      Services.obs.removeObserver(setupSyncEngine, "USM:codeMappings:ready",  false);
+    } catch(ex) {}
+    Services.obs.addObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
+  }
+  else {Cu.reportError(4);
+    try {
+      Services.obs.removeObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
+    } catch(ex) {}
+    Services.obs.addObserver(setupSyncEngine, "USM:codeMappings:ready",  false);
+    readStylesToMap(0);
+  }
+}
+
+function removeSyncEngine() {
+  let engine = Weave.Engines.get("userstyles");
+Cu.reportError("engine found " + engine);
+  if (engine) {Cu.reportError("removing engine");
+    engine.destroy();
+    Weave.Engines.unregister(engine);
+    Cu.reportError("removed");
+  }
 }
 
 function addSyncOption(window) {
@@ -776,7 +824,7 @@ function disable(id) {
 function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon) {
   gAddon = addon;
   // Load various javascript includes for helper functions
-  ["helper", "pref", "main", "cssbeautify"].forEach(function(fileName) {
+  ["helper", "pref", "main", "cssbeautify", "sync"].forEach(function(fileName) {
     let fileURI = addon.getResourceURI("scripts/" + fileName + ".js");
     Services.scriptloader.loadSubScript(fileURI.spec, global);
   });
@@ -800,6 +848,21 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
       watchWindows(addMenuItem);
       watchWindows(addToolbarButton);
       pref("firstRun", false);
+      // Setting the sync pref to toggle sync
+      if (pref("syncStyles")) {
+        setupSyncEngine(reason);
+        unload(function() {
+          try {
+            Services.obs.removeObserver(setupSyncEngine, "USM:codeMappings:error",  false);
+          } catch(ex) {}
+          try {
+            Services.obs.removeObserver(setupSyncEngine, "USM:codeMappings:ready",  false);
+          } catch(ex) {}
+          try {
+            Services.obs.removeObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
+          } catch(ex) {}
+        });
+      }
     });
 
     watchWindows(handleCustomization);
@@ -836,10 +899,6 @@ function startup(data, reason) AddonManager.getAddonByID(data.id, function(addon
       updateSortedList();
     });
 
-    // Setting the sync pref to toggle sync
-    if (pref("syncStyles")) {
-      setupSyncEngine();
-    }
     pref.observe(["syncStyles"], function() {
       if (pref("syncStyles")) {
         setupSyncEngine();
