@@ -26,7 +26,8 @@
         <translator>Drugoy</translator>
       </Description>
     </localized>
-  <localized>
+    
+   <localized>
       <Description>
         <locale>zh-CN</locale>
         <homepageURL>https://addons.mozilla.org/zh-CN/firefox/addon/user-style-manager/</homepageURL>
