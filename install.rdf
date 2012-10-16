@@ -26,7 +26,16 @@
         <translator>Drugoy</translator>
       </Description>
     </localized>
-
+    
+   <localized>
+      <Description>
+        <locale>zh-CN</locale>
+        <homepageURL>https://addons.mozilla.org/zh-CN/firefox/addon/user-style-manager/</homepageURL>
+        <description>便捷地在 Firefox 中添加和管理自定义样式</description>
+        <name>User Style Manager</name>
+        <translator>Fang5566</translator>
+      </Description>
+    </localized>
     <targetApplication>
       <r:Description>
         <id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</id>
