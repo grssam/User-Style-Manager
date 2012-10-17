@@ -1085,6 +1085,7 @@ StyleEditor.prototype = {
     if (this.options) {
       styleSheetList[this.index][7] = this.options;
     }
+    let changes = false;
     if (this.createNew) {
       if (this.styleName.length == 0) {
         styleSheetList[this.index][1] = escape(this.doc.getElementById("USMFileNameBox").value);
@@ -1106,6 +1107,7 @@ StyleEditor.prototype = {
     else {
       let fileName = this.doc.getElementById("USMFileNameBox").value.replace(/[\\\/:*?\"<>|]+/gi, "");
       if (unescape(styleSheetList[this.index][2]).match(/[\\\/]?([^\\\/]{0,})\.css$/)[1] != fileName) {
+        changes = true;
         this.styleSheetFile = getFileURI(unescape(styleSheetList[this.index][2]))
                                 .QueryInterface(Ci.nsIFileURL).file;
         if (this.styleSheetFile.exists()) {
@@ -1156,6 +1158,9 @@ StyleEditor.prototype = {
         // Update the mapped code and push for syncing
         if (mappedCodeForIndex[this.index] != text) {
           mappedCodeForIndex[this.index] = text;
+          codeChangeForIndex[this.index] = true;
+        }
+        if (changes || codeChangeForIndex[this.index]) {
           Services.obs.notifyObservers(null, "USM:codeMappings:updated", this.index);
         }
       }.bind(this));

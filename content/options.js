@@ -137,9 +137,12 @@ let optionsWindow = {
       },
       setCellValue : function(row, column, value) {
         if (column.id == "styleSheetStateCol") {
-          toggleStyleSheet(this.list[row][20], this.list[row][0],
+          let index = this.list[row][20];
+          toggleStyleSheet(index, this.list[row][0],
                            value == "true"? 'enabled': 'disabled');
-          this.origList[this.list[row][20]][0] = this.list[row][0] =
+          codeChangeForIndex[index] = codeChangeForIndex[index] || false;
+          Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
+          this.origList[index][0] = this.list[row][0] =
             (value == "true"? 'enabled': 'disabled');
         }
       },
@@ -295,7 +298,12 @@ let optionsWindow = {
       pref("shortcutKey", optionsWindow.shortcutKey);
       pref("shortcutModifiers", optionsWindow.shortcutModifiers);
     }
-    writeJSONPref();
+    writeJSONPref(function() {
+      for (let i = 0; i < styleSheetList.length; i++) {
+        codeChangeForIndex[i] = codeChangeForIndex[i] || false;
+        Services.obs.notifyObservers(null, "USM:codeMappings:updated", i);
+      }
+    });
   },
 
   handleShortcutChange: function OW_handleShortcutChange(event) {

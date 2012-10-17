@@ -80,6 +80,10 @@
 <!ENTITY keepDeletedOnSync.accesskey   "D">
 <!ENTITY keepDeletedOnSync.tooltip     "Keep the styles removed by your other machine.\nThis will inturn add back the style to your other machine.">
 
+<!ENTITY syncImmediately.label        "Sync Immediately">
+<!ENTITY syncImmediately.accesskey    "I">
+<!ENTITY syncImmediately.tooltip      "Tell Firefox Sync to do a sync up with the server as soon as you make any change to a style.\nOtherwise Firefox will determine the next Sync time on its own.">
+
 <!ENTITY hotkey.tooltip               "Creates a customizable Shortcut Key to open this Options Window">
 <!ENTITY hotkey.label                 "Create a Keyboard Shortcut">
 <!ENTITY hotkey.accesskey             "S">

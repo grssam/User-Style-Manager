@@ -377,6 +377,8 @@ function populateMenuPopupList(window, id, event) {
                 }
                 styleSheetList[data[i]][0] = 'enabled';
                 loadStyleSheet(data[i]);
+                codeChangeForIndex[i] = codeChangeForIndex[i] || false;
+                Services.obs.notifyObservers(null, "USM:codeMappings:updated", i);
               }
               writeJSONPref();
             });
@@ -393,6 +395,8 @@ function populateMenuPopupList(window, id, event) {
                 }
                 unloadStyleSheet(data[i]);
                 styleSheetList[data[i]][0] = 'disabled';
+                codeChangeForIndex[i] = codeChangeForIndex[i] || false;
+                Services.obs.notifyObservers(null, "USM:codeMappings:updated", i);
               }
               writeJSONPref();
             });
@@ -430,6 +434,8 @@ function populateMenuPopupList(window, id, event) {
               event.stopPropagation();
               toggleStyleSheet(index, !item.hasAttribute("checked")?'disabled':'enabled',
                                !item.hasAttribute("checked")?'enabled':'disabled');
+              codeChangeForIndex[index] = codeChangeForIndex[index] || false;
+              Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
               if (item.hasAttribute("checked") && item.getAttribute("checked")) {
                 item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
               }
@@ -503,6 +509,8 @@ function populateMenuPopupList(window, id, event) {
         event.stopPropagation();
         toggleStyleSheet(index, !item.hasAttribute("checked")?'disabled':'enabled',
                          !item.hasAttribute("checked")?'enabled':'disabled');
+        codeChangeForIndex[index] = codeChangeForIndex[index] || false;
+        Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
         if (item.hasAttribute("checked") && item.getAttribute("checked")) {
           item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
         }

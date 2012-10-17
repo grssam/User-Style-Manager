@@ -14,7 +14,7 @@ UserStyleRecord.prototype = {
   __proto__: CryptoWrapper.prototype,
 };
 
-Utils.deferGetSet(UserStyleRecord, "cleartext", ["id", "json", "code"]);
+Utils.deferGetSet(UserStyleRecord, "cleartext", ["id", "json", "code", "codeChange"]);
 
 function UserStylesStore(name) {
   Store.call(this, name);
@@ -45,7 +45,13 @@ UserStylesStore.prototype = {
     }
     record.json = JSON.stringify(styleSheetList[index]);
     record.id = id;
-    record.code = JSON.stringify(mappedCodeForIndex[index]);
+    if (record.codeChange = codeChangeForIndex[index]) {
+      record.code = JSON.stringify(mappedCodeForIndex[index]);
+    }
+    else {
+      record.code = "";
+    }
+    codeChangeForIndex[index] = false;
     return record;
   },
 
@@ -104,7 +110,9 @@ UserStylesStore.prototype = {
     }
     if (index != null && index > -1) {
       styleSheetList[index] = JSON.parse(record.json);
-      updateStyleCodeFromSync(index, JSON.parse(record.code));
+      if (record.codeChange) {
+        updateStyleCodeFromSync(index, JSON.parse(record.code));
+      }
       writeJSONPref();
     }
   },
@@ -156,8 +164,8 @@ UserStylesTracker.prototype = {
         break;
 
       case "USM:codeMappings:updated":
-        let guid = styleSheetList[data][9];
         data = data*1;
+        let guid = styleSheetList[data][9];
         Cu.reportError(data + " " + typeof data + " " + styleSheetList[data][9]);
         if (guid == null || guid == undefined) {
           guid = Utils.makeGUID();

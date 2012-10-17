@@ -126,6 +126,12 @@
                       accesskey="&keepDeletedOnSync.accesskey;"
                       oncommand="optionsWindow.togglePref('keepDeletedOnSync');"
                       tooltiptext="&keepDeletedOnSync.tooltip;"/>
+            <menuitem id="syncImmediately"
+                      type="checkbox"
+                      label="&syncImmediately.label;"
+                      accesskey="&syncImmediately.accesskey;"
+                      oncommand="optionsWindow.togglePref('syncImmediately');"
+                      tooltiptext="&syncImmediately.tooltip;"/>
           </menupopup>
         </menu>
       </menubar>

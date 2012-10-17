@@ -26,6 +26,7 @@ let shouldUpdateInstall = false;
 let codeMappingReady = false;
 let mappedIndexForGUIDs = {};
 let mappedCodeForIndex = [];
+let codeChangeForIndex = [];
 
 const XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 const HTML = "http://www.w3.org/1999/xhtml";
@@ -739,6 +740,7 @@ function deleteStylesFromUSM(aStyleSheetList) {
       deletedGUIDs.push(deletedStyle[9]);
     }
     mappedCodeForIndex.splice(index, 1);
+    codeChangeForIndex.splice(index, 1);
     if (pref("deleteFromDisk")) {
       let deletedFile = getFileURI(unescape(deletedStyle[0][2]))
                           .QueryInterface(Ci.nsIFileURL).file;
