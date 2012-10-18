@@ -789,6 +789,7 @@ function showNotification(aText, aTitle, aButtons, aCallback, aTimeout) {
         try {
           timeoutChecker.cancel();
           timeoutChecker = null;
+          notificationBox.blur();
         } catch (ex) {}
         aCallback(index);
         Cu.reportError(index);
@@ -804,6 +805,7 @@ function showNotification(aText, aTitle, aButtons, aCallback, aTimeout) {
       if (!choiceSelected) {
         choiceSelected = true;
         notificationBox.removeAllNotifications(true);
+        notificationBox.blur();
         aCallback(-1);
         try {
           timeoutChecker.cancel();
