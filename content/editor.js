@@ -608,8 +608,11 @@ StyleEditor.prototype = {
     else if (text.slice(0, currentPos).split("\n").slice(-1)[0].split("'").length%2 &&
              text.slice(0, currentPos).split("\n").slice(-1)[0].split('"').length%2) {
       if ("/*" == text.slice(currentPos - 2, currentPos)) {
-        if (text.slice(currentPos).split("*/").length == 1 ||
-            text.slice(currentPos).split("*/")[0].split("/*").length != 1) {
+        let textAfter = text.slice(currentPos);
+        if ((textAfter.split("*/").length == 1 ||
+             textAfter.split("*/")[0].split("/*").length != 1) &&
+            (textAfter.match(/^[ ]{0,}\n/) ||
+             textAfter.match(/^[ ]{0,}$/))) {
           this.setText("*/", currentPos, currentPos);
           this.setCaretOffset(currentPos);
         }
