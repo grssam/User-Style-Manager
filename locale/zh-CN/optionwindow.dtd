@@ -1,0 +1,103 @@
+<!ENTITY window.title                 "管理您的样式">
+<!ENTITY styleSheet.list.caption      "样式列表">
+<!ENTITY styleHeader.enabled          "已启用">
+<!ENTITY styleHeader.name             "样式名">
+<!ENTITY styleHeader.affects          "适用范围">
+<!ENTITY styleHeader.dateAdded        "添加日期">
+<!ENTITY styleHeader.dateModified     "修改日期">
+
+<!ENTITY updateBtn.label              "检查更新">
+<!ENTITY updateBtn.accesskey          "U">
+<!ENTITY updateBtn.tooltip            "检查和更新所选样式">
+
+<!ENTITY updateAllBtn.label           "全部更新">
+<!ENTITY updateAllBtn.accesskey       "L">
+<!ENTITY updateAllBtn.tooltip         "检查和更新样式版本">
+
+<!ENTITY infoBtn.label                "更多信息">
+<!ENTITY infoBtn.accesskey            "I">
+<!ENTITY infoBtn.tooltip              "所选样式的更多信息">
+
+<!ENTITY editBtn.label                "编辑样式">
+<!ENTITY editBtn.accesskey            "E">
+<!ENTITY editBtn.tooltip              "修改所选样式的内容">
+
+<!ENTITY deleteBtn.label              "删除样式">
+<!ENTITY deleteBtn.accesskey          "D">
+<!ENTITY deleteBtn.tooltip            "在这里删除并不会真正从硬盘上删除样式">
+
+<!ENTITY settings.caption             "样式设定">
+
+<!ENTITY backupMenu.label             "备份">
+<!ENTITY backupMenu.accesskey         "B">
+<!ENTITY entryMenu.label              "菜单项">
+<!ENTITY entryMenu.accesskey          "N">
+<!ENTITY updateMenu.label             "更新">
+<!ENTITY updateMenu.accesskey         "P">
+<!ENTITY syncMenu.label               "同步">
+<!ENTITY syncMenu.accesskey           "Y">
+
+<!ENTITY backup.label                 "维护备份的样式">
+<!ENTITY backup.accesskey             "M">
+<!ENTITY backup.tooltip               "维护定期备份的样式">
+
+<!ENTITY fallback.label               "回退到已备份的样式">
+<!ENTITY fallback.accesskey           "F">
+<!ENTITY fallback.tooltip             "如果原本的样式不存在，则使用已备份的样式">
+
+<!ENTITY hideWindow.label             "编辑样式时隐藏选项窗口">
+<!ENTITY hideWindow.accesskey         "H">
+<!ENTITY hideWindow.tooltip           "编辑样式时隐藏选项窗口，该操作会导致标签页和窗口的切换">
+
+<!ENTITY deleteFromDisk.label         "在此删除样式时一并删除硬盘上的文件">
+<!ENTITY deleteFromDisk.tooltip       "警告：一旦启用该项，您在 User Styles Manager 删除样式时会连带删除您硬盘中相应的文件">
+
+<!ENTITY appMenu.label                "应用菜单">
+<!ENTITY appMenu.accesskey            "P">
+<!ENTITY appMenu.tooltip              "在应用（Firefox 按钮）菜单中创建菜单项以便快速打开选项窗口或启用/禁用样式">
+
+<!ENTITY toolsMenu.label              "工具菜单">
+<!ENTITY toolsMenu.accesskey          "T">
+<!ENTITY toolsMenu.tooltip            "在工具菜单中创建菜单项以便快速打开选项窗口或启用/禁用样式">
+
+<!ENTITY button.label                 "工具栏按钮">
+<!ENTITY button.accesskey             "B">
+<!ENTITY button.tooltip               "创建一个可任意摆放的工具栏按钮以便快速打开选项窗口或样式">
+
+<!ENTITY updateAutomatically.label     "自动更新">
+<!ENTITY updateAutomatically.accesskey "A">
+<!ENTITY updateAutomatically.tooltip   "定期从样式来源检查并更新样式">
+
+<!ENTITY updateOverwritesLocalChanges.label      "覆盖本地所做的修改">
+<!ENTITY updateOverwritesLocalChanges.accesskey  "O">
+<!ENTITY updateOverwritesLocalChanges.tooltip    "一旦勾选该项，样式更新时将覆盖所有在本地所做的修改">
+
+<!ENTITY syncStyles.label              "同步样式">
+<!ENTITY syncStyles.accesskey          "S">
+<!ENTITY syncStyles.tooltip            "同步具有有效安装来源的样式">
+
+<!ENTITY keepDeletedOnSync.label       "保留已删除的样式">
+<!ENTITY keepDeletedOnSync.accesskey   "D">
+<!ENTITY keepDeletedOnSync.tooltip     "保留您在其他设备上删除掉的样式。\n这么做会将样式重新同步回您的其他设备">
+
+<!ENTITY hotkey.tooltip               "创建一个自定义快捷键用以打开选项窗口">
+<!ENTITY hotkey.label                 "创建键盘快捷键">
+<!ENTITY hotkey.accesskey             "S">
+
+<!ENTITY contextMenu.tooltip          "添加一个上下文菜单项以便快速添加所选文字到新样式">
+<!ENTITY contextMenu.label            "上下文菜单">
+<!ENTITY contextMenu.accesskey        "C">
+
+<!ENTITY combination.label            "快捷键组合：">
+<!ENTITY combination.accesskey        "K">
+<!ENTITY combination.tooltip          "点击文本框并按下想要的按键组合">
+
+<!ENTITY addBtn.label                 "浏览…">
+<!ENTITY addBtn.label.label           "添加一个新样式：">
+<!ENTITY addBtn.label.tooltip         "点击按钮添加一个新样式">
+<!ENTITY addBtn.accesskey             "A">
+<!ENTITY addBtn.tooltip               "浏览您硬盘中的样式">
+
+<!ENTITY createBtn.label              "创建新样式">
+<!ENTITY createBtn.accesskey          "N">
+<!ENTITY createBtn.tooltip            "创建一个新样式">

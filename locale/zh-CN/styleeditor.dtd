@@ -1,0 +1,120 @@
+<!ENTITY fileMenu.label               "文件">
+<!ENTITY fileMenu.accesskey           "F">
+
+<!ENTITY saveCmd.label                "保存">
+<!ENTITY saveCmd.key                  "S">
+<!ENTITY saveCmd.accesskey            "S">
+
+<!ENTITY previewCmd.label             "预览">
+<!ENTITY previewCmd.key               "P">
+<!ENTITY previewCmd.accesskey         "P">
+
+<!ENTITY exitCmd.label                "退出">
+<!ENTITY exitCmd.key                  "W">
+<!ENTITY exitCmd.accesskey            "X">
+
+<!ENTITY editMenu.label               "编辑">
+<!ENTITY editMenu.accesskey           "E">
+
+<!ENTITY undoCmd.label                "撤销">
+<!ENTITY undoCmd.key                  "Z">
+<!ENTITY undoCmd.accesskey            "U">
+
+<!ENTITY redoCmd.label                "重做">
+<!ENTITY redoCmd.key                  "Y">
+<!ENTITY redoCmd.accesskey            "R">
+
+<!ENTITY cutCmd.label                 "剪切">
+<!ENTITY cutCmd.key                   "X">
+<!ENTITY cutCmd.accesskey             "t">
+
+<!ENTITY copyCmd.label                "复制">
+<!ENTITY copyCmd.key                  "C">
+<!ENTITY copyCmd.accesskey            "C">
+
+<!ENTITY pasteCmd.label               "粘贴">
+<!ENTITY pasteCmd.key                 "V">
+<!ENTITY pasteCmd.accesskey           "P">
+
+<!ENTITY selectAllCmd.label           "全选">
+<!ENTITY selectAllCmd.key             "A">
+<!ENTITY selectAllCmd.accesskey       "A">
+
+<!ENTITY beautifyCmd.label            "调整 CSS">
+<!ENTITY beautifyCmd.key              "B">
+<!ENTITY beautifyCmd.accesskey        "B">
+<!ENTITY beautifyCmd.tooltip          "调整 CSS 为合适的缩进和对齐方式">
+
+<!ENTITY gotoLineCmd.label            "跳转到某行…">
+<!ENTITY gotoLineCmd.key              "J">
+<!ENTITY gotoLineCmd.accesskey        "J">
+
+<!ENTITY toolsMenu.label              "工具">
+<!ENTITY toolsMenu.accesskey          "T">
+
+<!ENTITY addNameSpace.label           "添加命名空间">
+<!ENTITY addNameSpace.key             "N">
+<!ENTITY addNameSpace.accesskey       "N">
+
+<!ENTITY addWebNameSpace.label        "添加网页命名空间">
+<!ENTITY addWebNameSpace.key          "N">
+<!ENTITY addWebNameSpace.accesskey    "W">
+
+<!ENTITY addMozURL.label              "添加 @-moz-url 容器">
+<!ENTITY addMozURL.key                "U">
+<!ENTITY addMozURL.accesskey          "U">
+
+<!ENTITY addMozPreURL.label           "添加 @-moz-document url-prefix() 容器">
+<!ENTITY addMozPreURL.key             "P">
+<!ENTITY addMozPreURL.accesskey       "P">
+
+<!ENTITY addMozDomain.label           "添加 @-moz-document domain() 容器">
+<!ENTITY addMozDomain.key             "D">
+<!ENTITY addMozDomain.accesskey       "D">
+
+<!ENTITY clearDefaultNamespace.label      "清除用户所选的默认命名空间">
+<!ENTITY clearDefaultNamespace.key        "C">
+<!ENTITY clearDefaultNamespace.accesskey  "C">
+
+<!ENTITY fileName.label               "输入样式文件名： ">
+<!ENTITY fileNameEditing.label        "修改样式文件名：">
+<!ENTITY fileName.accesskey           "N">
+<!ENTITY fileName.tooltip             "这么做会同时修改您硬盘上的样式文件名">
+
+<!ENTITY findCmd.key                  "F">
+<!ENTITY findPreviousCmd.key          "F">
+<!ENTITY replaceCmd.key               "H">
+
+<!ENTITY search.placeholder           "查找">
+<!ENTITY search.prev.tooltip          "查找上一个">
+<!ENTITY search.next.tooltip          "查找下一个">
+<!ENTITY search.options.tooltip       "显示选项">
+
+<!ENTITY replace.placeholder          "替换">
+<!ENTITY replace.this.tooltip         "替换当前">
+<!ENTITY replace.all.tooltip          "全部替换">
+
+<!ENTITY search.wrap                  "文字换行">
+<!ENTITY search.wrap.accesskey        "W">
+<!ENTITY search.wrap.tooltip          "文字末尾自动换行">
+
+<!ENTITY search.ignoreCase            "忽略大小写">
+<!ENTITY search.ignoreCase.accesskey  "C">
+<!ENTITY search.ignoreCase.tooltip    "查找时不区分大小写">
+
+<!ENTITY search.highlightAll            "全部高亮">
+<!ENTITY search.highlightAll.accesskey  "A">
+<!ENTITY search.highlightAll.tooltip    "高亮所有匹配的文本">
+
+<!ENTITY search.regexp                "允许正则表达式">
+<!ENTITY search.regexp.accesskey      "e">
+<!ENTITY search.regexp.tooltip        "允许使用正则表达式查找">
+
+<!ENTITY search.backwards             "反向查找">
+<!ENTITY search.backwards.accesskey   "B">
+<!ENTITY search.backwards.tooltip     "以默认查找方向相反进行查找">
+
+<!ENTITY replace                      "替换">
+<!ENTITY replace.accesskey            "R">
+<!ENTITY replace.tooltip              "显示替换对话框">
+<!ENTITY error.label                  "错误和警告">
