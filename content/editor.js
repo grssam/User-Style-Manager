@@ -360,6 +360,8 @@ StyleEditor.prototype = {
           let value = this.$("USMAutocompleteList").selectedItem.lastChild.value + ": ";
           this.$("USMAutocompletePanel").hidePopup();
           this.editor.focus();
+          event.stopPropagation();
+          event.preventDefault();
           this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
           let caretOffset = this.getCaretOffset();
           this.setText(value, caretOffset, caretOffset);
@@ -489,9 +491,9 @@ StyleEditor.prototype = {
           if (this.$("USMAutocompleteList").selectedItem) {
             this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
             let currentPos = this.getCaretOffset();
+            this.editor.undo();
             this.setText(this.$("USMAutocompleteList").selectedItem.lastChild.value +
-                          ": ",
-                         currentPos, currentPos + 2);
+                          ": ", currentPos, currentPos);
             this.$("USMAutocompletePanel").hidePopup();
           }
         }
