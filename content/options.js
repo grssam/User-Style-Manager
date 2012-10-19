@@ -517,6 +517,9 @@ let optionsWindow = {
     if (pref("keepDeletedOnSync")) {
       $("keepDeletedOnSync").setAttribute("checked", true);
     }
+    if (pref("syncImmediately")) {
+      $("syncImmediately").setAttribute("checked", true);
+    }
   },
 
   togglePref: function OW_togglePref(prefName) {
