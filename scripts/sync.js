@@ -193,7 +193,7 @@ UserStylesTracker.prototype = {
 };
 
 function UserStylesSyncEngine() {
-  Weave.SyncEngine.call(this, "UserStyles");
+  SyncEngine.call(this, "UserStyles");
   this.enabled = true;
   this.Name = l10n("userStyles.label");
   if (this.lastSync == null ||
@@ -224,7 +224,7 @@ function UserStylesSyncEngine() {
 }
 
 UserStylesSyncEngine.prototype = {
-  __proto__: Weave.SyncEngine.prototype,
+  __proto__: SyncEngine.prototype,
   _recordObj: UserStyleRecord,
   _storeObj: UserStylesStore,
   _trackerObj: UserStylesTracker,
@@ -234,26 +234,26 @@ UserStylesSyncEngine.prototype = {
   get trackerInstance() trackerInstance,
 
   onFirstTimeChoiceSelect: function(aChoice) {
-    let wasLocked = Weave.Service.locked;
+    let wasLocked = this.service.locked;
     let eng = this;
     let syncAction = null;
     try {
       if (!wasLocked) {
-        Weave.Service.lock();
+        this.service.lock();
       }
       switch(aChoice) {
         case 1:
           syncAction = function() {
-            Weave.Service.resetClient([eng.name]);
-            Weave.Service.wipeServer([eng.name]);
-            Weave.Clients.sendCommand("wipeEngine", [eng.name]);
+            eng.service.resetClient([eng.name]);
+            eng.service.wipeServer([eng.name]);
+            eng.service.Clients.sendCommand("wipeEngine", [eng.name]);
           };
           break;
 
         case 2:
           syncAction = function() {
-            Weave.Service.wipeClient([eng.name]);
-          }
+            eng.service.wipeClient([eng.name]);
+          };
           break;
 
         case 3:
@@ -266,14 +266,14 @@ UserStylesSyncEngine.prototype = {
 
         default:
           syncAction = function() {
-            Weave.Service.resetClient([eng.name])
+            eng.service.resetClient([eng.name])
           };
           break;
       }
     } catch(ex) {
     } finally {
       if (!wasLocked) {
-        Weave.Service.unlock();
+        this.service.unlock();
       }
     }
     if (syncAction) {

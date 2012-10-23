@@ -110,7 +110,7 @@ function setupSyncEngine(reason) {
     } catch(ex) {}
 
     try {
-      Weave.Engines.register(UserStylesSyncEngine);Cu.reportError(3);
+      Weave.Service.engineManager.register(UserStylesSyncEngine);Cu.reportError(3);
       unload(removeSyncEngine);
     } catch(ex) {}
   }
@@ -130,11 +130,11 @@ function setupSyncEngine(reason) {
 }
 
 function removeSyncEngine() {
-  let engine = Weave.Engines.get("userstyles");
+  let engine = Weave.Service.engineManager.get("userstyles");
 Cu.reportError("engine found " + engine);
   if (engine) {Cu.reportError("removing engine");
     engine.destroy();
-    Weave.Engines.unregister(engine);
+    Weave.Service.engineManager.unregister(engine);
     Cu.reportError("removed");
   }
 }
