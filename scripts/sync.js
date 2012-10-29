@@ -3,6 +3,7 @@ Cu.import("resource://services-sync/record.js");
 Cu.import("resource://services-sync/util.js");
 Cu.import("resource://services-sync/main.js");
 Cu.import("resource://services-sync/constants.js");
+Cu.import("chrome://userstylemanager-scripts/content/shared.jsm");
 
 let trackerInstance = null;
 
@@ -14,22 +15,28 @@ UserStyleRecord.prototype = {
   __proto__: CryptoWrapper.prototype,
 };
 
-Utils.deferGetSet(UserStyleRecord, "cleartext", ["id", "json", "code", "codeChange"]);
+Utils.deferGetSet(UserStyleRecord, "cleartext", ["id", "json", "code"]);
 
-function UserStylesStore(name) {
-  Store.call(this, name);
+function UserStylesStore(name, engine) {
+  Store.call(this, name, engine);
 }
 
 UserStylesStore.prototype = {
   __proto__: Store.prototype,
 
+  get reconciler() {
+    return this.engine._reconciler;
+  },
+
   itemExists: function (id) {
-    Cu.reportError("checking ofr " + id);
-    return mappedIndexForGUIDs[id] != null && mappedIndexForGUIDs[id] > -1;
+    try {
+      return mappedIndexForGUIDs[id] != null && mappedIndexForGUIDs[id] > -1;
+    } catch(ex) {
+      return false;
+    }
   },
 
   createRecord: function(id, collection) {
-    Cu.reportError("creating record for " + id);
     let record = new UserStyleRecord(collection, id);
     let index;
     try {
@@ -45,18 +52,11 @@ UserStylesStore.prototype = {
     }
     record.json = JSON.stringify(styleSheetList[index]);
     record.id = id;
-    if (record.codeChange = codeChangeForIndex[index]) {
-      record.code = JSON.stringify(mappedCodeForIndex[index]);
-    }
-    else {
-      record.code = "";
-    }
-    codeChangeForIndex[index] = false;
+    record.code = JSON.stringify(mappedCodeForIndex[index]);
     return record;
   },
 
   changeItemID: function(oldId, newId) {
-    Cu.reportError("change id ");
     let index = mappedIndexForGUIDs[oldId];
     if (index != null && index > -1) {
       delete mappedIndexForGUIDs[oldId];
@@ -67,7 +67,6 @@ UserStylesStore.prototype = {
   },
 
   getAllIDs: function() {
-    Cu.reportError("get all id ");
     let guids = {};
     mappedIndexForGUIDs = {};
     for (let index = 0; index < styleSheetList.length; index++) {
@@ -88,11 +87,10 @@ UserStylesStore.prototype = {
   },
 
   create: function(record) {
-  Cu.reportError("create " + record);
     this.update(record, true);
   },
 
-  update: function(record, createNew) {Cu.reportError("update");
+  update: function(record, createNew) {
     let index = mappedIndexForGUIDs[record.id];
     if (createNew) {
       index = styleSheetList.length;
@@ -110,14 +108,12 @@ UserStylesStore.prototype = {
     }
     if (index != null && index > -1) {
       styleSheetList[index] = JSON.parse(record.json);
-      if (record.codeChange) {
-        updateStyleCodeFromSync(index, JSON.parse(record.code));
-      }
+      updateStyleCodeFromSync(index, JSON.parse(record.code));
       writeJSONPref();
     }
   },
 
-  remove: function(record) {Cu.reportError("remove");
+  remove: function(record) {
     let index = mappedIndexForGUIDs[record.id];
     if (index != null && index > -1) {
       if (pref("keepDeletedOnSync")) {
@@ -132,13 +128,11 @@ UserStylesStore.prototype = {
   }
 };
 
-function UserStylesTracker(name) {
-  Tracker.call(this, name);
-Cu.reportError("engine 1");
+function UserStylesTracker(name, engine) {
+  Tracker.call(this, name, engine);
   Services.obs.addObserver(this, "USM:codeMappings:deleted", false);
   Services.obs.addObserver(this, "USM:codeMappings:updated", false);
   trackerInstance = this;
-  Cu.reportError("engine 2");
 }
 
 UserStylesTracker.prototype = {
@@ -146,7 +140,7 @@ UserStylesTracker.prototype = {
 
   _enabled: true,
   observe: function observe(subject, topic, data) {
-    Cu.reportError("tracket " + topic + " " + data);
+    data = JSON.parse(data);
     switch (topic) {
 
       case "USM:codeMappings:deleted":
@@ -166,34 +160,36 @@ UserStylesTracker.prototype = {
       case "USM:codeMappings:updated":
         data = data*1;
         let guid = styleSheetList[data][9];
-        Cu.reportError(data + " " + typeof data + " " + styleSheetList[data][9]);
         if (guid == null || guid == undefined) {
           guid = Utils.makeGUID();
           styleSheetList[data][9] = guid;
-          writeJSONPref(function() Cu.reportError("written"));
+          mappedIndexForGUIDs[guid] = data;
+          writeJSONPref(function() {
+            this._add(guid);
+          }.bind(this));
         }
-        Cu.reportError(data + " " + typeof data + " " + styleSheetList);
-        this._add(guid);
+        else {
+          this._add(guid);
+        }
         break;
     }
   },
 
-  _add: function(guid) {Cu.reportError("adding " + guid);
+  _add: function(guid) {
     if (this.addChangedID(guid) && pref("syncImmediately")) {
       this.score += SCORE_INCREMENT_XLARGE;
     }
   },
 
-  destroy: function() {Cu.reportError("removing observers");
+  destroy: function() {
     Services.obs.removeObserver(this, "USM:codeMappings:deleted", false);
     Services.obs.removeObserver(this, "USM:codeMappings:updated", false);
     trackerInstance = null;
-    Cu.reportError("removed");
   }
 };
 
-function UserStylesSyncEngine() {
-  SyncEngine.call(this, "UserStyles");
+function UserStylesSyncEngine(service) {
+  SyncEngine.call(this, "UserStyles", service);
   this.enabled = true;
   this.Name = l10n("userStyles.label");
   if (this.lastSync == null ||
@@ -220,7 +216,6 @@ function UserStylesSyncEngine() {
     showNotification(l10n("firstSync.label"), l10n("firstSync.title"),
                      buttons, this.onFirstTimeChoiceSelect.bind(this));
   }
-  Cu.reportError("engine");
 }
 
 UserStylesSyncEngine.prototype = {
@@ -288,7 +283,7 @@ UserStylesSyncEngine.prototype = {
     }
   },
 
-  destroy: function () {Cu.reportError("ending engine");
+  destroy: function () {
     if (this.trackerInstance) {
       this.trackerInstance.destroy();
     }

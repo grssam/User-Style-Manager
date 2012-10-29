@@ -14,6 +14,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/NetUtil.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
+Cu.import("chrome://userstylemanager-scripts/content/shared.jsm");
 
 let gAddon;
 let reload = function() {};
@@ -24,11 +25,7 @@ XPCOMUtils.defineLazyGetter(strings, "str", function () {
   return Services.strings.createBundle("chrome://userstylemanager/locale/main.properties");
 });
 function l10n(aString) {
-  let string = aString;
-  try {
-    string = strings.str.GetStringFromName(aString);
-  } catch (ex) {}
-  return string;
+  return strings.str.GetStringFromName(aString);;
 }
 const keysetID = "USMKeyset";
 const keyID = "USMKeyID";
@@ -97,11 +94,9 @@ function setupUpdates() {
 
 function setupSyncEngine(reason) {
   if (reason == 1) {
-    Cu.reportError(1);
     Services.obs.addObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
   }
   else if (codeMappingReady && Weave.Status.service == Weave.STATUS_OK) {
-    Cu.reportError(2);
     try {
       Services.obs.removeObserver(setupSyncEngine, "USM:codeMappings:ready",  false);
     } catch(ex) {}
@@ -110,7 +105,7 @@ function setupSyncEngine(reason) {
     } catch(ex) {}
 
     try {
-      Weave.Service.engineManager.register(UserStylesSyncEngine);Cu.reportError(3);
+      (Weave.Service.engineManager || Weave.Engines).register(UserStylesSyncEngine);
       unload(removeSyncEngine);
     } catch(ex) {}
   }
@@ -120,7 +115,7 @@ function setupSyncEngine(reason) {
     } catch(ex) {}
     Services.obs.addObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
   }
-  else {Cu.reportError(4);
+  else {
     try {
       Services.obs.removeObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
     } catch(ex) {}
@@ -130,12 +125,10 @@ function setupSyncEngine(reason) {
 }
 
 function removeSyncEngine() {
-  let engine = Weave.Service.engineManager.get("userstyles");
-Cu.reportError("engine found " + engine);
-  if (engine) {Cu.reportError("removing engine");
+  let engine = (Weave.Service.engineManager || Weave.Engines).get("userstyles");
+  if (engine) {
     engine.destroy();
-    Weave.Service.engineManager.unregister(engine);
-    Cu.reportError("removed");
+    (Weave.Service.engineManager || Weave.Engines).unregister(engine);
   }
 }
 
@@ -377,7 +370,6 @@ function populateMenuPopupList(window, id, event) {
                 }
                 styleSheetList[data[i]][0] = 'enabled';
                 loadStyleSheet(data[i]);
-                codeChangeForIndex[i] = codeChangeForIndex[i] || false;
                 Services.obs.notifyObservers(null, "USM:codeMappings:updated", i);
               }
               writeJSONPref();
@@ -395,7 +387,6 @@ function populateMenuPopupList(window, id, event) {
                 }
                 unloadStyleSheet(data[i]);
                 styleSheetList[data[i]][0] = 'disabled';
-                codeChangeForIndex[i] = codeChangeForIndex[i] || false;
                 Services.obs.notifyObservers(null, "USM:codeMappings:updated", i);
               }
               writeJSONPref();
@@ -434,7 +425,6 @@ function populateMenuPopupList(window, id, event) {
               event.stopPropagation();
               toggleStyleSheet(index, !item.hasAttribute("checked")?'disabled':'enabled',
                                !item.hasAttribute("checked")?'enabled':'disabled');
-              codeChangeForIndex[index] = codeChangeForIndex[index] || false;
               Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
               if (item.hasAttribute("checked") && item.getAttribute("checked")) {
                 item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
@@ -509,7 +499,6 @@ function populateMenuPopupList(window, id, event) {
         event.stopPropagation();
         toggleStyleSheet(index, !item.hasAttribute("checked")?'disabled':'enabled',
                          !item.hasAttribute("checked")?'enabled':'disabled');
-        codeChangeForIndex[index] = codeChangeForIndex[index] || false;
         Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
         if (item.hasAttribute("checked") && item.getAttribute("checked")) {
           item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));

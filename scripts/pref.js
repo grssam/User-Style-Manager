@@ -71,6 +71,7 @@ pref.defaults = {
   keepDeletedOnSync: true,
   defaultNamespace: "",
   syncImmediately: false,
+  editingOptions: '{"codeBlockStyle":{}}',
 };
 
 pref.observe = function(prefs, callback) {

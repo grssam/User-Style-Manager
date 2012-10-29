@@ -6,6 +6,9 @@
  */
 
 "use strict";
+
+Cu.import("chrome://userstylemanager-scripts/content/shared.jsm");
+
 // Global Variable to store the style sheet data
 // Format : [status, name, path, url, applies on, date added, date modified, style options, local changes ?]
 let styleSheetList = [],
@@ -24,9 +27,6 @@ let promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 let shouldUpdateInstall = false;
 
 let codeMappingReady = false;
-let mappedIndexForGUIDs = {};
-let mappedCodeForIndex = [];
-let codeChangeForIndex = [];
 
 const XUL = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
 const HTML = "http://www.w3.org/1999/xhtml";
@@ -75,7 +75,6 @@ function readJSONPref(callback) {
 // Function to write the preferences
 function writeJSONPref(callback) {
   pref("userStyleList", JSON.stringify(styleSheetList));
-  Cu.reportError(JSON.stringify(styleSheetList));
   let JSONFile = getURIForFileInUserStyles("Preferences/usm.pref")
                    .QueryInterface(Ci.nsIFileURL).file;
   let ostream = FileUtils.openSafeFileOutputStream(JSONFile);
@@ -90,14 +89,14 @@ function writeJSONPref(callback) {
 
 function readStylesToMap(index) {
   if (index < 0) {
-    Services.obs.notifyObservers(null, "USM:codeMappings:error", null);
+    Services.obs.notifyObservers(null, "USM:codeMappings:error", "null");
     return;
   }
-  else if (index == styleSheetList.length) {Cu.reportError("read");
+  else if (index == styleSheetList.length) {
     codeMappingReady = true;
-    Services.obs.notifyObservers(null, "USM:codeMappings:ready", null);
+    Services.obs.notifyObservers(null, "USM:codeMappings:ready", "null");
   }
-  else {Cu.reportError("reading " + index);
+  else {
     let file = getFileURI(unescape(styleSheetList[index][2]))
                  .QueryInterface(Ci.nsIFileURL).file;
     NetUtil.asyncFetch(file, function(inputStream, status) {
@@ -625,7 +624,8 @@ function updateStyle(index, callback) {
       compareStyleVersion(index, styleId, code, function(needsUpdate) {
         if (needsUpdate && (!pref("updateOverwritesLocalChanges") || !styleSheetList[index][8])) {
           mappedCodeForIndex[index] = code;
-          Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
+          Services.obs.notifyObservers(null, "USM:codeMappings:updated",
+                                       JSON.stringify(index));
           updateInUSM(styleId, code, styleSheetList[index][1],
                       styleSheetList[index][3], styleSheetList[index][7],
                       callback);
@@ -736,11 +736,10 @@ function deleteStylesFromUSM(aStyleSheetList) {
       unloadStyleSheet(index);
     }
     let deletedStyle = styleSheetList.splice(index, 1);
-    if (deletedStyle[9] != null) {
-      deletedGUIDs.push(deletedStyle[9]);
+    if (deletedStyle[0][9] != null) {
+      deletedGUIDs.push(deletedStyle[0][9]);
     }
     mappedCodeForIndex.splice(index, 1);
-    codeChangeForIndex.splice(index, 1);
     if (pref("deleteFromDisk")) {
       let deletedFile = getFileURI(unescape(deletedStyle[0][2]))
                           .QueryInterface(Ci.nsIFileURL).file;
@@ -750,7 +749,8 @@ function deleteStylesFromUSM(aStyleSheetList) {
     }
   }
   // Notify the tracker that style has been deleted
-  Services.obs.notifyObservers(null, "USM:codeMappings:deleted", deletedGUIDs);
+  Services.obs.notifyObservers(null, "USM:codeMappings:deleted",
+                               JSON.stringify(deletedGUIDs));
   writeJSONPref();
 }
 
@@ -792,7 +792,6 @@ function showNotification(aText, aTitle, aButtons, aCallback, aTimeout) {
           notificationBox.blur();
         } catch (ex) {}
         aCallback(index);
-        Cu.reportError(index);
       }
     });
   }

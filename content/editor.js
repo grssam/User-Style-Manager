@@ -13,6 +13,7 @@ Cu.import("resource:///modules/source-editor.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/NetUtil.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
+Cu.import("chrome://userstylemanager-scripts/content/shared.jsm");
 
 function getFileURI(path) {
   return path.indexOf("file") == 0
@@ -209,6 +210,13 @@ StyleEditor.prototype = {
   namespace: null,
   sourceEditorEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "10.0") >= 0),
   editorFindEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "12.0") >= 0),
+  get codeBlockStyle() {
+    if (this._codeBlockStyle) {
+      return this._codeBlockStyle;
+    }
+    this._codeBlockStyle = JSON.parse(pref("editingOptions")).codeBlockStyle;
+    return this._codeBlockStyle;
+  },
 
   // Call back function to be called when closing the editor
   callback: null,
@@ -1149,7 +1157,6 @@ StyleEditor.prototype = {
     converter.charset = "UTF-8";
     let text = this.fixupText();
     let istream = converter.convertToInputStream(text);
-
     NetUtil.asyncCopy(istream, ostream, function(status) {
       if (!Components.isSuccessCode(status)) {
         this.win.alert(this.STR("error.fileSaving"));
@@ -1163,9 +1170,9 @@ StyleEditor.prototype = {
         // Update the mapped code and push for syncing
         if (mappedCodeForIndex[this.index] != text) {
           mappedCodeForIndex[this.index] = text;
-          codeChangeForIndex[this.index] = true;
+          changes = true;
         }
-        if (changes || codeChangeForIndex[this.index]) {
+        if (changes) {
           Services.obs.notifyObservers(null, "USM:codeMappings:updated", this.index);
         }
       }.bind(this));
@@ -1474,6 +1481,12 @@ StyleEditor.prototype = {
     }
     else {
       this.setCaretOffset(0);
+    }
+
+    // Check for the codeBlockStyle to be empty and prompt the user to
+    // choose one style or enter his own
+    if (this.codeBlockStyle == {}) {
+      this.promptCodeBlockStyles();
     }
   },
 
@@ -2382,6 +2395,10 @@ StyleEditor.prototype = {
     this.editor.destroy();
     this.editor = null;
     this.initialized = false;
+  },
+
+  promptCodeBlockStyles: function SE_promptCodeBlockStyles() {
+    
   },
 
   // return 0 : Save, 1 : Cancel , 2 : Don't Save

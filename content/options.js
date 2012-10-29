@@ -12,6 +12,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/NetUtil.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
+Cu.import("chrome://userstylemanager-scripts/content/shared.jsm");
 
 ["helper", "pref", "main", "sync"].forEach(function(fileName) {
   let fileURL = "chrome://userstylemanager-scripts/content/" + fileName + ".js";
@@ -140,7 +141,6 @@ let optionsWindow = {
           let index = this.list[row][20];
           toggleStyleSheet(index, this.list[row][0],
                            value == "true"? 'enabled': 'disabled');
-          codeChangeForIndex[index] = codeChangeForIndex[index] || false;
           Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
           this.origList[index][0] = this.list[row][0] =
             (value == "true"? 'enabled': 'disabled');
@@ -299,9 +299,10 @@ let optionsWindow = {
       pref("shortcutModifiers", optionsWindow.shortcutModifiers);
     }
     writeJSONPref(function() {
-      for (let i = 0; i < styleSheetList.length; i++) {
-        codeChangeForIndex[i] = codeChangeForIndex[i] || false;
-        Services.obs.notifyObservers(null, "USM:codeMappings:updated", i);
+      if (optionsWindow.hasChanges) {
+        for (let i = 0; i < styleSheetList.length; i++) {
+          Services.obs.notifyObservers(null, "USM:codeMappings:updated", i);
+        }
       }
     });
   },
@@ -542,6 +543,7 @@ let optionsWindow = {
         optionsWindow.shortcutChanged = true;
       }
     }
+    optionsWindow.hasChanges = true;
     let nb = document.getElementById("changeNotificationBox");
     nb.removeAllNotifications(true);
     nb.appendNotification(optionsWindow.STR("notif.text"),
