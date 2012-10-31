@@ -14,7 +14,6 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/NetUtil.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
-Cu.import("chrome://userstylemanager-scripts/content/shared.jsm");
 
 let gAddon;
 let reload = function() {};
@@ -25,7 +24,11 @@ XPCOMUtils.defineLazyGetter(strings, "str", function () {
   return Services.strings.createBundle("chrome://userstylemanager/locale/main.properties");
 });
 function l10n(aString) {
-  return strings.str.GetStringFromName(aString);;
+  let string = aString;
+  try {
+    string = strings.str.GetStringFromName(aString);
+  } catch(ex) {}
+  return string;
 }
 const keysetID = "USMKeyset";
 const keyID = "USMKeyID";
