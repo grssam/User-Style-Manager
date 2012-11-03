@@ -641,27 +641,37 @@ function updateStyle(index, callback) {
   }
 }
 
-function updateStyleCodeFromSync(index, CSSText) {
+function updateStyleFromSync(index, newJSON, CSSText) {
   try {
     unloadStyleSheet(index);
-  }
-  catch(ex) {}
-  let ostream =
-    FileUtils.openSafeFileOutputStream(getFileURI(unescape(styleSheetList[index][2]))
-             .QueryInterface(Ci.nsIFileURL).file);
-  let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-                    .createInstance(Ci.nsIScriptableUnicodeConverter);
-  converter.charset = "UTF-8";
-  let istream = converter.convertToInputStream(CSSText);
-  mappedCodeForIndex[index] = CSSText;
-  NetUtil.asyncCopy(istream, ostream, function(status) {
-    if (!Components.isSuccessCode(status)) {
-      return;
+  } catch(ex) {}
+  styleSheetList[index] = JSON.parse(newJSON);
+  if ((!mappedCodeForIndex[index] || CSSText != mappedCodeForIndex[index]) &&
+      CSSText != "") {
+    let file = getFileURI(unescape(styleSheetList[index][2]))
+                 .QueryInterface(Ci.nsIFileURL).file;
+    if (!file.exists()) {
+      file.create(0, parseInt('0666', 8));
     }
-    if (styleSheetList[index][0] == "enabled") {
+    let ostream =
+      FileUtils.openSafeFileOutputStream(file);
+    let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+                      .createInstance(Ci.nsIScriptableUnicodeConverter);
+    converter.charset = "UTF-8";
+    let istream = converter.convertToInputStream(CSSText);
+    mappedCodeForIndex[index] = CSSText;
+    NetUtil.asyncCopy(istream, ostream, function(status) {
+      if (!Components.isSuccessCode(status)) {
+        return;
+      }
       loadStyleSheet(index);
-    }
-  });
+      writeJSONPref();
+    });
+  }
+  else {
+    loadStyleSheet(index);
+    writeJSONPref();
+  }
 }
 
 function checkAndDisplayProperOption(contentWindow, url) {
@@ -783,12 +793,12 @@ function showNotification(aText, aTitle, aButtons, aCallback, aTimeout) {
     buttons.push({
       label: button.label,
       accessKey: button.accessKey,
-      tooltiptext: button.tooltipText,
       callback: function() {
         choiceSelected = true;
         try {
           timeoutChecker.cancel();
           timeoutChecker = null;
+          notificationBox.removeAllNotifications(true);
           notificationBox.blur();
         } catch (ex) {}
         aCallback(index);

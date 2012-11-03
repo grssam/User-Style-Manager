@@ -107,9 +107,7 @@ UserStylesStore.prototype = {
       }
     }
     if (index != null && index > -1) {
-      styleSheetList[index] = JSON.parse(record.json);
-      updateStyleCodeFromSync(index, JSON.parse(record.code));
-      writeJSONPref();
+      updateStyleFromSync(index, record.json, JSON.parse(record.code));
     }
   },
 
@@ -198,20 +196,16 @@ function UserStylesSyncEngine(service) {
     // First Time sync
     let buttons = [{
       label: l10n("mergeSyncServer.label"),
-      accessKey: l10n("mergeSyncServer.accesskey"),
-      tooltipText: l10n("mergeSyncServer.tooltip")
+      accessKey: l10n("mergeSyncServer.accesskey")
     }, {
       label: l10n("wipeServerData.label"),
-      accessKey: l10n("wipeServerData.accesskey"),
-      tooltipText: l10n("wipeServerData.tooltip")
+      accessKey: l10n("wipeServerData.accesskey")
     }, {
       label: l10n("wipeLocalDate.label"),
-      accessKey: l10n("wipeLocalDate.accesskey"),
-      tooltipText: l10n("wipeLocalDate.tooltip")
+      accessKey: l10n("wipeLocalDate.accesskey")
     }, {
       label: l10n("disableSync.label"),
-      accessKey: l10n("disableSync.accessKey"),
-      tooltipText: l10n("disableSync.tooltip")
+      accessKey: l10n("disableSync.accessKey")
     }];
     showNotification(l10n("firstSync.label"), l10n("firstSync.title"),
                      buttons, this.onFirstTimeChoiceSelect.bind(this));
