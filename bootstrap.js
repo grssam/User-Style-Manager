@@ -97,14 +97,14 @@ function setupUpdates() {
 
 function setupSyncEngine(reason) {
   if (reason == 1) {
-    Services.obs.addObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
+    Services.obs.addObserver(setupSyncEngine, "weave:engine:start-tracking", false);
   }
   else if (codeMappingReady && Weave.Status.service == Weave.STATUS_OK) {
     try {
-      Services.obs.removeObserver(setupSyncEngine, "USM:codeMappings:ready",  false);
+      Services.obs.removeObserver(setupSyncEngine, "USM:codeMappings:ready", false);
     } catch(ex) {}
     try {
-      Services.obs.removeObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
+      Services.obs.removeObserver(setupSyncEngine, "weave:engine:start-tracking", false);
     } catch(ex) {}
 
     try {
@@ -114,15 +114,15 @@ function setupSyncEngine(reason) {
   }
   else if (codeMappingReady) {
     try {
-      Services.obs.removeObserver(setupSyncEngine, "USM:codeMappings:ready",  false);
+      Services.obs.removeObserver(setupSyncEngine, "USM:codeMappings:ready", false);
     } catch(ex) {}
-    Services.obs.addObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
+    Services.obs.addObserver(setupSyncEngine, "weave:engine:start-tracking", false);
   }
   else {
     try {
-      Services.obs.removeObserver(setupSyncEngine, "weave:engine:start-tracking",  false);
+      Services.obs.removeObserver(setupSyncEngine, "weave:engine:start-tracking", false);
     } catch(ex) {}
-    Services.obs.addObserver(setupSyncEngine, "USM:codeMappings:ready",  false);
+    Services.obs.addObserver(setupSyncEngine, "USM:codeMappings:ready", false);
     readStylesToMap(0);
   }
 }

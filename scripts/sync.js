@@ -222,6 +222,17 @@ UserStylesSyncEngine.prototype = {
 
   get trackerInstance() trackerInstance,
 
+  _findDupe: function(record) {
+    let styleToCheck = JSON.parse(record.json);
+    for each (let userStyle in styleSheetList) {
+      if (styleToCheck[3] == userStyle[3] &&
+          styleToCheck[9] != userStyle[9]) {
+        return userStyle[9];
+      }
+    }
+    return null;
+  },
+
   onFirstTimeChoiceSelect: function(aChoice) {
     let wasLocked = this.service.locked;
     let eng = this;

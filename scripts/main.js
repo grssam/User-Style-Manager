@@ -102,6 +102,8 @@ function readStylesToMap(index) {
     NetUtil.asyncFetch(file, function(inputStream, status) {
       if (!Components.isSuccessCode(status)) {
         readStylesToMap(-1);
+        Cu.reportError("Error occurred while trying to read the style file for" +
+                       " index " + index + " : " + status);
         return;
       }
       let data = "";

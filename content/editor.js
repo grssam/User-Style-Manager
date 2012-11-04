@@ -1103,9 +1103,8 @@ StyleEditor.prototype = {
       if (this.styleName.length == 0) {
         styleSheetList[this.index][1] = escape(this.doc.getElementById("USMFileNameBox").value);
       }
-      styleSheetList[this.index][2] = escape(this.doc.getElementById("USMFileNameBox")
-                                                 .value.replace(/[\\\/:*?\"<>|]+/gi, "") +
-                                                 ".css");
+      let fileName = this.doc.getElementById("USMFileNameBox").value.replace(/[\\\/:*?\"<>|]+/gi, "")
+      styleSheetList[this.index][2] = escape(fileName + ".css");
       if (unescape(styleSheetList[this.index][2]) == ".css") {
         styleSheetList[this.index][2] = escape("User Created Style Sheet " + this.index + ".css");
       }
@@ -1115,6 +1114,18 @@ StyleEditor.prototype = {
         try {
           this.styleSheetFile.create(0, parseInt('0666', 8));
         } catch (ex) { return; }
+      }
+      // File with sam name exists, so renaming it to original name (1) format
+      else {
+        let i = 1;
+        while (this.styleSheetFile.exists()) {
+          styleSheetList[this.index][2] = escape(unescape(styleSheetList[this.index][2])
+                                            .replace(/[^\\\/]{0,}\.css$/,
+                                                     fileName + " (" + i++ + ").css"));
+          this.styleSheetFile = getFileURI(unescape(styleSheetList[this.index][2]))
+                                  .QueryInterface(Ci.nsIFileURL).file;
+        }
+        this.styleSheetFile.create(0, parseInt('0666', 8));
       }
     }
     else {
@@ -1264,7 +1275,8 @@ StyleEditor.prototype = {
    **         // or when createNew, the initialText to be displayed in the editor window
    **   callback, // bool to tell whther to callback to open options window or not
    **   styleName, // New in version 0.9, name of style
-   **   updateURL  // New in version 0.9 , the update url of the style
+   **   updateURL, // New in version 0.9 , the update url of the style
+   **   options  // Options of the style sheet associated with its userstyles page
    ** ]
    **/
   onLoad: function SE_onLoad(aEvent) {
