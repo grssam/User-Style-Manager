@@ -118,7 +118,9 @@ UserStylesStore.prototype = {
         delete mappedIndexForGUIDs[record.id];
         styleSheetList[index][9] = Utils.makeGUID();
         mappedIndexForGUIDs[styleSheetList[index][9]] = index;
-        writeJSONPref();
+        writeJSONPref(function() {
+          trackerInstance._add(styleSheetList[index][9]);
+        });
         return;
       }
       deleteStylesFromUSM([index]);
