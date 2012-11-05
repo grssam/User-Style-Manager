@@ -779,7 +779,7 @@ function showNotification(aText, aTitle, aButtons, aCallback, aTimeout) {
     let navigationBox = window.document.getElementById("navigator-toolbox");
     navigationBox.parentNode.insertBefore(notificationBox, navigationBox.nextSibling);
     unload(function() {
-      notificationBox.removeAllNotifications(true);
+      notificationBox.removeAllNotifications();
       notificationBox.parentNode.removeChild(notificationBox);
       notificationBox = null;
     }, window);
@@ -800,14 +800,14 @@ function showNotification(aText, aTitle, aButtons, aCallback, aTimeout) {
         try {
           timeoutChecker.cancel();
           timeoutChecker = null;
-          notificationBox.removeAllNotifications(true);
+          notificationBox.removeAllNotifications();
           notificationBox.blur();
         } catch (ex) {}
         aCallback(index);
       }
     });
   }
-  notificationBox.removeAllNotifications(true);
+  notificationBox.removeAllNotifications();
   notificationBox.appendNotification(aText, "", null,
                                      notificationBox.PRIORITY_INFO_MEDIUM,
                                      buttons, null);
@@ -815,7 +815,7 @@ function showNotification(aText, aTitle, aButtons, aCallback, aTimeout) {
     notify: function () {
       if (!choiceSelected) {
         choiceSelected = true;
-        notificationBox.removeAllNotifications(true);
+        notificationBox.removeAllNotifications();
         notificationBox.blur();
         aCallback(-1);
         try {
