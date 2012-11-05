@@ -68,7 +68,7 @@ pref.defaults = {
   lastUpdatedOn: "0",
   updateTimeoutActive: false,
   syncStyles: true,
-  keepDeletedOnSync: true,
+  keepDeletedOnSync: false,
   defaultNamespace: "",
   syncImmediately: false,
   editingOptions: '{"codeBlockStyle":{}}',
