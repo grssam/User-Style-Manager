@@ -515,6 +515,10 @@ let optionsWindow = {
     if (pref("syncStyles")) {
       $("syncStyles").setAttribute("checked", true);
     }
+    else {
+      $("keepDeletedOnSync").setAttribute("disabled", true);
+      $("syncImmediately").setAttribute("disabled", true);
+    }
     if (pref("keepDeletedOnSync")) {
       $("keepDeletedOnSync").setAttribute("checked", true);
     }
