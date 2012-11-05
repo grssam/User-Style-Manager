@@ -1,6 +1,5 @@
 var EXPORTED_SYMBOLS = ["mappedIndexForGUIDs",
-                        "mappedCodeForIndex",
-                        "codeChangeForIndex"];
+                        "mappedCodeForIndex"];
 
 let mappedIndexForGUIDs = {};
 let mappedCodeForIndex = [];

@@ -51,6 +51,13 @@ function readJSONPref(callback) {
       let data = NetUtil.readInputStreamToString(inputStream,
                                                  inputStream.available());
       styleSheetList = JSON.parse(data);
+      mappedIndexForGUIDs = {};
+      for (let index = 0; index < styleSheetList.length; index++) {
+        if (styleSheetList[index][9] == null) {
+          styleSheetList[index][9] = Utils.makeGUID();
+        }
+        mappedIndexForGUIDs[styleSheetList[index][9]] = index;
+      }
       callback && callback();
     });
   }
@@ -67,6 +74,13 @@ function readJSONPref(callback) {
     converter.charset = "UTF-8";
     let istream = converter.convertToInputStream(JSON.stringify(styleSheetList));
     NetUtil.asyncCopy(istream, ostream, function(status) {
+      mappedIndexForGUIDs = {};
+      for (let index = 0; index < styleSheetList.length; index++) {
+        if (styleSheetList[index][9] == null) {
+          styleSheetList[index][9] = Utils.makeGUID();
+        }
+        mappedIndexForGUIDs[styleSheetList[index][9]] = index;
+      }
       callback && callback();
     });
   }
@@ -648,7 +662,7 @@ function updateStyleFromSync(index, newJSON, CSSText) {
     unloadStyleSheet(index);
   } catch(ex) {}
   styleSheetList[index] = JSON.parse(newJSON);
-  if ((!mappedCodeForIndex[index] || CSSText != mappedCodeForIndex[index]) &&
+  if ((mappedCodeForIndex[index] == undefined || CSSText != mappedCodeForIndex[index]) &&
       CSSText != "") {
     let file = getFileURI(unescape(styleSheetList[index][2]))
                  .QueryInterface(Ci.nsIFileURL).file;
@@ -739,7 +753,7 @@ function checkAndDisplayProperOption(contentWindow, url) {
   }
 }
 
-function deleteStylesFromUSM(aStyleSheetList) {
+function deleteStylesFromUSM(aStyleSheetList, fromSync) {
   aStyleSheetList = aStyleSheetList.sort(function (a,b) a*1 - b*1).reverse();
   let deletedGUIDs = [];
   for each (let index in aStyleSheetList) {
@@ -760,10 +774,13 @@ function deleteStylesFromUSM(aStyleSheetList) {
       }
     }
   }
-  // Notify the tracker that style has been deleted
-  Services.obs.notifyObservers(null, "USM:codeMappings:deleted",
-                               JSON.stringify(deletedGUIDs));
-  writeJSONPref();
+  writeJSONPref(function() {
+    if (!fromSync) {
+      // Notify the tracker that style has been deleted
+      Services.obs.notifyObservers(null, "USM:codeMappings:deleted",
+                                   JSON.stringify(deletedGUIDs));
+    }
+  });
 }
 
 function showNotification(aText, aTitle, aButtons, aCallback, aTimeout) {

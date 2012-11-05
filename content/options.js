@@ -28,6 +28,7 @@ let optionsWindow = {
   shortcutKey: pref("shortcutKey"),
   shortcutModifiers: pref("shortcutModifiers"),
   strings: null,
+  changedIndex: [],
 
   STR: function OW_STR(aString) {
     return optionsWindow.strings.GetStringFromName(aString);
@@ -130,6 +131,8 @@ let optionsWindow = {
         switch (column.id) {
           case "styleSheetNameCol" :
             this.origList[this.list[row][20]][1] = this.list[row][1] = escape(value);
+            optionsWindow.hasChanges = true;
+            optionsWindow.changedIndex.push(this.list[row][20]);
             optionsWindow.notifyChange();
             break;
           default:
@@ -141,7 +144,8 @@ let optionsWindow = {
           let index = this.list[row][20];
           toggleStyleSheet(index, this.list[row][0],
                            value == "true"? 'enabled': 'disabled');
-          Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
+          Services.obs.notifyObservers(null, "USM:codeMappings:updated",
+                                       JSON.stringify(index));
           this.origList[index][0] = this.list[row][0] =
             (value == "true"? 'enabled': 'disabled');
         }
@@ -300,9 +304,11 @@ let optionsWindow = {
     }
     writeJSONPref(function() {
       if (optionsWindow.hasChanges) {
-        for (let i = 0; i < styleSheetList.length; i++) {
-          Services.obs.notifyObservers(null, "USM:codeMappings:updated", i);
-        }
+        optionsWindow.changedIndex.forEach(function(i) {
+          Services.obs.notifyObservers(null, "USM:codeMappings:updated",
+                                       JSON.stringify(i));
+        });
+        optionsWindow.changedIndex = [];
       }
     });
   },
@@ -547,7 +553,6 @@ let optionsWindow = {
         optionsWindow.shortcutChanged = true;
       }
     }
-    optionsWindow.hasChanges = true;
     let nb = document.getElementById("changeNotificationBox");
     nb.removeAllNotifications(true);
     nb.appendNotification(optionsWindow.STR("notif.text"),

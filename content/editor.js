@@ -1184,7 +1184,8 @@ StyleEditor.prototype = {
           changes = true;
         }
         if (changes) {
-          Services.obs.notifyObservers(null, "USM:codeMappings:updated", this.index);
+          Services.obs.notifyObservers(null, "USM:codeMappings:updated",
+                                       JSON.stringify(this.index));
         }
       }.bind(this));
       this.onTextSaved();

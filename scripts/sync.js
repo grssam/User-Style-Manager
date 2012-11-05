@@ -38,7 +38,7 @@ UserStylesStore.prototype = {
 
   createRecord: function(id, collection) {
     let record = new UserStyleRecord(collection, id);
-    let index;
+    let index = null;
     try {
       index = mappedIndexForGUIDs[id];
     }
@@ -123,7 +123,7 @@ UserStylesStore.prototype = {
         });
         return;
       }
-      deleteStylesFromUSM([index]);
+      deleteStylesFromUSM([index], true);
     }
   }
 };
@@ -225,7 +225,12 @@ UserStylesSyncEngine.prototype = {
   get trackerInstance() trackerInstance,
 
   _findDupe: function(record) {
-    let styleToCheck = JSON.parse(record.json);
+    let styleToCheck = null;
+    try {
+      styleToCheck = JSON.parse(record.json);
+    } catch(ex) {
+      return null;
+    }
     for each (let userStyle in styleSheetList) {
       if (styleToCheck[3] == userStyle[3] &&
           styleToCheck[9] != userStyle[9]) {

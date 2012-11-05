@@ -373,7 +373,8 @@ function populateMenuPopupList(window, id, event) {
                 }
                 styleSheetList[data[i]][0] = 'enabled';
                 loadStyleSheet(data[i]);
-                Services.obs.notifyObservers(null, "USM:codeMappings:updated", i);
+                Services.obs.notifyObservers(null, "USM:codeMappings:updated",
+                                             JSON.stringify(i));
               }
               writeJSONPref();
             });
@@ -390,7 +391,8 @@ function populateMenuPopupList(window, id, event) {
                 }
                 unloadStyleSheet(data[i]);
                 styleSheetList[data[i]][0] = 'disabled';
-                Services.obs.notifyObservers(null, "USM:codeMappings:updated", i);
+                Services.obs.notifyObservers(null, "USM:codeMappings:updated",
+                                             JSON.stringify(i));
               }
               writeJSONPref();
             });
@@ -428,7 +430,8 @@ function populateMenuPopupList(window, id, event) {
               event.stopPropagation();
               toggleStyleSheet(index, !item.hasAttribute("checked")?'disabled':'enabled',
                                !item.hasAttribute("checked")?'enabled':'disabled');
-              Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
+              Services.obs.notifyObservers(null, "USM:codeMappings:updated",
+                                           JSON.stringify(index));
               if (item.hasAttribute("checked") && item.getAttribute("checked")) {
                 item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
               }
@@ -502,7 +505,8 @@ function populateMenuPopupList(window, id, event) {
         event.stopPropagation();
         toggleStyleSheet(index, !item.hasAttribute("checked")?'disabled':'enabled',
                          !item.hasAttribute("checked")?'enabled':'disabled');
-        Services.obs.notifyObservers(null, "USM:codeMappings:updated", index);
+        Services.obs.notifyObservers(null, "USM:codeMappings:updated",
+                                     JSON.stringify(index));
         if (item.hasAttribute("checked") && item.getAttribute("checked")) {
           item.setAttribute("tooltiptext", l10n("styleSheet.disable.text"));
         }
