@@ -9,7 +9,11 @@
 let global = this;
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource:///modules/source-editor.jsm");
+try {
+  Cu.import("resource:///modules/source-editor.jsm");
+} catch (ex) {
+  Cu.import("resource:///modules/devtools/sourceeditor/source-editor.jsm");
+}
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/NetUtil.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
