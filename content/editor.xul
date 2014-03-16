@@ -13,7 +13,6 @@
 <?xml-stylesheet href="editor.css" type="text/css"?>
 <?xml-stylesheet href="colorPicker/styles.css" type="text/css"?>
 <?xul-overlay href="chrome://global/content/editMenuOverlay.xul"?>
-<?xul-overlay href="chrome://browser/content/source-editor-overlay.xul"?>
 <window id="USMEditor"
         style="min-height:600px;min-width:600px"
         width="800"
@@ -22,6 +21,14 @@
         persist="screenX screenY width height sizemode">
   <script src="chrome://global/content/globalOverlay.js"
           type="application/javascript"/>
+  <script type="application/javascript">
+    function goUpdateSourceEditorMenuItems() {
+      goUpdateGlobalEditMenuItems();
+
+      ['cmd_undo', 'cmd_redo', 'cmd_cut', 'cmd_paste',
+       'cmd_delete', 'cmd_find', 'cmd_findAgain'].forEach(goUpdateCommand);
+    }
+  </script>
   <script src="colorPicker/colorPicker.js"
           type="application/x-javascript"/>
   <script src="editor.js"
@@ -184,57 +191,6 @@
           </menupopup>
         </menu>
 
-        <menu id="se-edit-menu"
-              label="&editMenu.label;"
-              accesskey="&editMenu.accesskey;">
-          <menupopup id="se-menu_editpopup"
-                     onpopupshowing="goUpdateSourceEditorMenuItems()">
-            <menuitem id="se-menu-undo"
-                      key="key_undo"
-                      label="&undoCmd.label;"
-                      command="se-cmd-undo"
-                      accesskey="&undoCmd.accesskey;"/>
-            <menuitem id="se-menu-redo"
-                      key="key_redo"
-                      label="&redoCmd.label;"
-                      command="se-cmd-redo"
-                      accesskey="&redoCmd.accesskey;"/>
-            <menuseparator/>
-            <menuitem id="se-menu-cut"
-                      key="key_cut"
-                      label="&cutCmd.label;"
-                      command="cmd_cut"
-                      accesskey="&cutCmd.accesskey;"/>
-            <menuitem id="se-menu-copy"
-                      key="key_copy"
-                      label="&copyCmd.label;"
-                      command="cmd_copy"
-                      accesskey="&copyCmd.accesskey;"/>
-            <menuitem id="se-menu-paste"
-                      key="key_paste"
-                      label="&pasteCmd.label;"
-                      command="cmd_paste"
-                      accesskey="&pasteCmd.accesskey;"/>
-            <menuseparator/>
-            <menuitem id="se-menu-selectAll"
-                      key="key_selectAll"
-                      label="&selectAllCmd.label;"
-                      command="cmd_selectAll"
-                      accesskey="&selectAllCmd.accesskey;"/>
-            <menuitem id="se-menu-beautify"
-                      key="key_beautify"
-                      label="&beautifyCmd.label;"
-                      command="se-cmd-beautify"
-                      accesskey="&beautifyCmd.accesskey;"
-                      tooltiptext="&beautifyCmd.tooltip;"/>
-            <menuseparator/>
-            <menuitem id="se-menu-gotoLine"
-                      key="key_gotoLine"
-                      label="&gotoLineCmd.label;"
-                      command="cmd_gotoLine"
-                      accesskey="&gotoLineCmd.accesskey;"/>
-          </menupopup>
-        </menu>
         <menu id="se-tools-menu"
               label="&toolsMenu.label;"
               accesskey="&toolsMenu.accesskey;">
@@ -436,30 +392,28 @@
   </vbox>
   <popupset id="USMStyleEditorPopups">
     <menupopup id="USMStyleEditorContextMenu"
-               onpopupshowing="goUpdateSourceEditorMenuItems()">
-        <menuitem id="se-cMenu-cut"/>
-        <menuitem id="se-cMenu-copy"/>
-        <menuitem id="se-cMenu-paste"/>
-        <menuitem id="se-cMenu-delete"/>
-        <menuseparator/>
-        <menuitem id="se-cMenu-selectAll"/>
-        <menuitem id="menu_beautify"
-                  key="key_beautify"
-                  label="&beautifyCmd.label;"
-                  command="se-cmd-beautify"
-                  accesskey="&beautifyCmd.accesskey;"
-                  tooltiptext="&beautifyCmd.tooltip;"/>
-        <menuseparator/>
-        <menuitem id="se-menu_undo"
-                  key="key_undo"
-                  label="&undoCmd.label;"
-                  command="se-cmd-undo"
-                  accesskey="&undoCmd.accesskey;"/>
-        <menuitem id="se-menu_redo"
-                  key="key_redo"
-                  label="&redoCmd.label;"
-                  command="se-cmd-redo"
-                  accesskey="&redoCmd.accesskey;"/>
+                  onpopupshowing="goUpdateSourceEditorMenuItems()">
+      <menuitem id="cMenu_cut"/>
+      <menuitem id="cMenu_copy"/>
+      <menuitem id="cMenu_paste"/>
+      <menuitem id="cMenu_delete"/>
+      <menuseparator/>
+      <menuitem id="cMenu_selectAll"/>
+      <menuitem id="menu_beautify"
+                key="key_beautify"
+                label="&beautifyCmd.label;"
+                command="se-cmd-beautify"
+                accesskey="&beautifyCmd.accesskey;"
+                tooltiptext="&beautifyCmd.tooltip;"/>
+      <menuseparator/>
+      <menuitem id="cMenu_undo"/>
+      <menuitem id="cMenu_redo"/>
+      <menuseparator/>
+      <menuitem id="se-menu-gotoLine"
+                key="key_gotoLine"
+                label="&gotoLineCmd.label;"
+                command="cmd_gotoLine"
+                accesskey="&gotoLineCmd.accesskey;"/>
     </menupopup>
   </popupset>
   <panel id="USMAutocompletePanel"
@@ -477,7 +431,8 @@
   <panel id="USMPreviewPanel"
          fade="fast"
          class="checkerboard"
-         noautofocus="true">
+         noautofocus="true"
+         consumeoutsideclicks="false">
     <image id="USMPreviewPanelImage" />
   </panel>
 </window>

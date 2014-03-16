@@ -8,12 +8,9 @@
 "use strict";
 let global = this;
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
+const {require} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools;
+const Editor  = require("devtools/sourceeditor/editor");
 Cu.import("resource://gre/modules/Services.jsm");
-try {
-  Cu.import("resource:///modules/source-editor.jsm");
-} catch (ex) {
-  Cu.import("resource:///modules/devtools/sourceeditor/source-editor.jsm");
-}
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/NetUtil.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
@@ -212,8 +209,6 @@ StyleEditor.prototype = {
   colorCaretOffset: -1,
   colorMatch: '',
   namespace: null,
-  sourceEditorEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "10.0") >= 0),
-  editorFindEnabled: (Services.vc.compare(Services.appinfo.platformVersion, "12.0") >= 0),
   get codeBlockStyle() {
     if (this._codeBlockStyle) {
       return this._codeBlockStyle;
@@ -236,42 +231,25 @@ StyleEditor.prototype = {
   },
 
   selectedText: function SE_selectedText() {
-    return this.editor.getSelectedText();
-  },
-
-  selectRange: function SE_selectRange(aStart, aEnd) {
-    if (this.sourceEditorEnabled) {
-      this.editor.setSelection(aStart, aEnd);
-    }
-    else {
-      this.editor.setSelectionRange(aStart, aEnd);
-    }
-  },
-
-  getSelectionRange: function SE_getSelection() {
     return this.editor.getSelection();
   },
 
+  selectRange: function SE_selectRange(aStart, aEnd) {
+    this.editor.setSelection(this.editor.getPosition(aStart),
+                             this.editor.getPosition(aEnd));
+  },
+
   getSelectionPoints: function SE_getSelectionPoints() {
-    return [this.getSelectionRange().start, this.getSelectionRange().end];
+    return [this.editor.getOffset(this.editor.getCursor("start")),
+            this.editor.getOffset(this.editor.getCursor("end"))];
   },
 
   getCaretLine: function SE_getCaretLine() {
-    if (this.sourceEditorEnabled) {
-      return this.editor.getCaretPosition().line;
-    }
-    else {
-      return null;
-    }
+    return this.editor.getCursor().line;
   },
 
-  getText: function SE_getText(aStart, aEnd) {
-    if (this.sourceEditorEnabled) {
-      return this.editor.getText(aStart, aEnd);
-    }
-    else {
-      return this.editor.value;
-    }
+  getText: function SE_getText() {
+    return this.editor.getText();
   },
 
   // Function to read the localized strings
@@ -286,13 +264,8 @@ StyleEditor.prototype = {
     if (aEnd == null) {
       aEnd = this.getText().length;
     }
-    if (this.sourceEditorEnabled) {
-      this.editor.setText(aText, aStart, aEnd);
-    }
-    else {
-      // separating out the text before and after astart and aend
-      this.editor.value = this.editor.value.slice(0, aStart) + aText + this.editor.value.slice(aEnd);
-    }
+    this.editor.replaceText(aText, this.editor.getPosition(aStart),
+                            this.editor.getPosition(aEnd));
   },
 
   setStyleName: function SE_setStyleName(aStyleName) {
@@ -305,48 +278,13 @@ StyleEditor.prototype = {
 
   // Function to convert mouse click coordinates (screenX, screenY) into offset
   getOffsetAtLocation: function SE_getOffsetAtLocation(aX, aY) {
-    aX -= (window.screenX + this.$("USMTextEditor").firstChild.boxObject.x +
-           7*Math.max(this.editor.getLineCount(), 10).toString().length + 20 -
-           this.editor._view._getScroll().x);
-    aY -= (window.screenY + this.$("USMTextEditor").firstChild.boxObject.y +
-           30 - this.editor._view._getScroll().y);
-    if (this.sourceEditorEnabled) {
-      if (this.editor.getOffsetAtLocation) {
-        return this.editor.getOffsetAtLocation(aX, aY);
-      }
-      else if (this.editor._view.getOffsetAtLocation) {
-        return this.editor._view.getOffsetAtLocation(aX, aY);
-      }
-      return 0;
-    }
-    return 0;
+    return this.editor.getOffset(this.editor.getPositionFromCoords({left: aX, top: aY}));
   },
 
   // Function to convert offset into X,Y coordinates
   getLocationAtOffset: function SE_getLocationAtOffset(aOffset) {
-    let lineHeight = this.editor._view.getLineHeight() || 17;
-    let x = 0, y = 0;
-    if (this.sourceEditorEnabled) {
-      if (this.editor._view._getOffsetToX) {
-        x = this.editor._view._getOffsetToX(aOffset) + window.screenX +
-            this.$("USMTextEditor").firstChild.boxObject.x;
-      }
-      else {
-        x = window.screenX + Math.min(this.$("USMTextEditor").firstChild.boxObject.x +
-            7*Math.max(this.editor.getLineCount(), 10).toString().length + 16 +
-            (this.caretPosCol)*8, window.innerWidth - (maxLen*8 + 30));
-      }
-      let line = 0;
-      if (this.editor._model.getLineAtOffset) {
-        line = this.editor._model.getLineAtOffset(aOffset);
-      }
-      else {
-        line = this.caretPosLine;
-      }
-      y = window.screenY + (line + 1 - this.editor.getTopIndex()) * lineHeight +
-          this.$("USMTextEditor").firstChild.boxObject.y + 30;
-    }
-    return {x: x, y: y};
+    let {top, left} = this.editor.getCoordsFromPosition(this.editor.getPosition(aOffset));
+    return {x: left, y: top};
   },
 
   resetVariables: function SE_resetVariables() {
@@ -374,7 +312,7 @@ StyleEditor.prototype = {
           this.editor.focus();
           event.stopPropagation();
           event.preventDefault();
-          this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
+          this.editor.setCursor({line: this.caretPosLine, ch: this.caretPosCol});
           let caretOffset = this.getCaretOffset();
           this.setText(value, caretOffset, caretOffset);
         }
@@ -433,22 +371,10 @@ StyleEditor.prototype = {
     }
   },
 
-  inputHelper: function SE_inputHelper(event) {
-    if (event.ctrlKey || event.altKey || event.metaKey) {
-      if (this.$("USMAutocompletePanel").state == "open") {
-        this.$("USMAutocompletePanel").hidePopup();
-      }
-      return;
-    }
-
-    switch (event.keyCode) {
-      case event.DOM_VK_DELETE:
-      case event.DOM_VK_BACK_SPACE:
-        if (this.$("USMAutocompletePanel").state == "open") {
-          this.$("USMAutocompletePanel").hidePopup();
-          return;
-        }
-      case event.DOM_VK_UP:
+  inputHelper: function SE_inputHelper(key) {
+    let pass = this.editor.container.contentWindow.wrappedJSObject.CodeMirror.Pass;
+    switch (key) {
+      case "up":
         if (this.$("USMAutocompletePanel").state == "open") {
           if (this.$("USMAutocompleteList").currentIndex == 0) {
             this.$("USMAutocompleteList").currentIndex =
@@ -459,10 +385,11 @@ StyleEditor.prototype = {
             this.$("USMAutocompleteList").currentIndex--;
             this.$("USMAutocompleteList").selectedIndex--;
           }
-          this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
+          this.editor.setCursor({line: this.caretPosLine, ch: this.caretPosCol});
+          return;
         }
-        return;
-      case event.DOM_VK_DOWN:
+        return pass;
+      case "down":
         if (this.$("USMAutocompletePanel").state == "open") {
           if (this.$("USMAutocompleteList").currentIndex ==
                 this.$("USMAutocompleteList").itemCount - 1) {
@@ -473,43 +400,38 @@ StyleEditor.prototype = {
             this.$("USMAutocompleteList").currentIndex++;
             this.$("USMAutocompleteList").selectedIndex++;
           }
-          this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
-        }
-        return;
-      case event.DOM_VK_LEFT:
-      case event.DOM_VK_RIGHT:
-      case event.DOM_VK_HOME:
-      case event.DOM_VK_END:
-      case event.DOM_VK_ESCAPE:
-        if (this.$("USMAutocompletePanel").state == "open") {
-          this.$("USMAutocompletePanel").hidePopup();
+          this.editor.setCursor({line: this.caretPosLine, ch: this.caretPosCol});
           return;
         }
-      case event.DOM_VK_TAB:
+        return pass;
+      case "other":
+        if (this.$("USMAutocompletePanel").state == "open") {
+          this.$("USMAutocompletePanel").hidePopup();
+        }
+        return pass;
+      case "tab":
         if (this.$("USMAutocompletePanel").state == "open") {
           if (this.$("USMAutocompleteList").selectedItem) {
             let value = this.$("USMAutocompleteList").selectedItem.lastChild.value + ": ";
             this.$("USMAutocompletePanel").hidePopup();
-            let tabSize = Services.prefs.getIntPref("devtools.editor.tabsize");
-            this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
             let currentPos = this.getCaretOffset();
-            this.setText(value, currentPos, currentPos + tabSize - (this.caretPosCol)%tabSize);
+            this.setText(value, currentPos, currentPos);
           }
+          return;
         }
-        return;
-      case event.DOM_VK_ENTER:
-      case event.DOM_VK_RETURN:
+        return pass;
+      case "enter":
         if (this.$("USMAutocompletePanel").state == "open") {
           if (this.$("USMAutocompleteList").selectedItem) {
-            this.editor.setCaretPosition(this.caretPosLine, this.caretPosCol);
+            this.editor.setCursor({line: this.caretPosLine, ch: this.caretPosCol});
             let currentPos = this.getCaretOffset();
-            this.editor.undo();
             this.setText(this.$("USMAutocompleteList").selectedItem.lastChild.value +
                           ": ", currentPos, currentPos);
             this.$("USMAutocompletePanel").hidePopup();
           }
+          return;
         }
-        return;
+        return pass;
     }
   },
 
@@ -601,22 +523,6 @@ StyleEditor.prototype = {
                      currentPos);
       }
     }
-    else if ("'" == lastWord) {
-      let textAfter = text.slice(currentPos).split("\n")[0];
-      let textBefore = text.slice(0, currentPos).split("\n").slice(-1)[0];
-      if (textAfter.trim() == "" && textBefore.split("'").length%2 == 0) {
-        this.setText("'", currentPos, currentPos);
-        this.setCaretOffset(currentPos);
-      }
-    }
-    else if ('"' == lastWord) {
-      let textAfter = text.slice(currentPos).split("\n")[0];
-      let textBefore = text.slice(0, currentPos).split("\n").slice(-1)[0];
-      if (textAfter.trim() == "" && textBefore.split('"').length%2 == 0) {
-        this.setText('"', currentPos, currentPos);
-        this.setCaretOffset(currentPos);
-      }
-    }
     else if (text.slice(0, currentPos).split("\n").slice(-1)[0].split("'").length%2 &&
              text.slice(0, currentPos).split("\n").slice(-1)[0].split('"').length%2) {
       if ("/*" == text.slice(currentPos - 2, currentPos)) {
@@ -629,15 +535,6 @@ StyleEditor.prototype = {
           this.setCaretOffset(currentPos);
         }
       }
-      else if ("{" == lastWord) {
-        let textAfter = text.slice(currentPos);
-        let textBefore = text.slice(0, currentPos);
-        if (textBefore.split("{").length - textBefore.split("}").length >
-            textAfter.split("}").length - textAfter.split("{").length) {
-          this.setText("}", currentPos, currentPos);
-          this.setCaretOffset(currentPos);
-        }
-      }
       // Case for color picker as you type
       else if (("(" == lastWord || "#" == lastWord) &&
                text.slice(0, currentPos).match(/(rgba?\s*\(|#)$/)) {
@@ -645,7 +542,7 @@ StyleEditor.prototype = {
         let panel = document.getElementById("USMColorPickerPanel");
         if (match && match[2] != "#") {
           let alpha = match[1].length > 4;
-          this.setText("150, 150, 150" + (alpha?", 1":"") + ")",
+          this.setText("150, 150, 150" + (alpha?", 1":""),
                        currentPos,
                        currentPos);
           color = [150,150,150];
@@ -675,10 +572,12 @@ StyleEditor.prototype = {
                     null, null, panel, this.onColorPickerSave.bind(this));
         let screen = this.getLocationAtOffset(currentPos - match[0].length);
         if (panel.state == "open") {
-          panel.moveTo(screen.x, screen.y + 15);
+          panel.moveTo(screen.x + this.editor.container.boxObject.screenX,
+                       screen.y + 15 + this.editor.container.boxObject.screenY);
         }
         else {
-          panel.openPopupAtScreen(screen.x, screen.y + 15, false);
+          panel.openPopupAtScreen(screen.x + this.editor.container.boxObject.screenX,
+                                  screen.y + 15 + this.editor.container.boxObject.screenY, false);
         }
         listen(window, panel, "popuphidden", function() {
           this.colorCaretOffset = -1;
@@ -687,24 +586,6 @@ StyleEditor.prototype = {
           this.editor.focus();
         }.bind(this));
       }
-      else if ("(" == lastWord) {
-        let textAfter = text.slice(currentPos);
-        let textBefore = text.slice(0, currentPos);
-        if (textBefore.split("(").length - textBefore.split(")").length >
-            textAfter.split(")").length - textAfter.split("(").length) {
-          this.setText(")", currentPos, currentPos);
-          this.setCaretOffset(currentPos);
-        }
-      }
-      else if ("[" == lastWord) {
-        let textAfter = text.slice(currentPos);
-        let textBefore = text.slice(0, currentPos);
-        if (textBefore.split("[").length - textBefore.split("]").length >
-            textAfter.split("]").length - textAfter.split("[").length) {
-          this.setText("]", currentPos, currentPos);
-          this.setCaretOffset(currentPos);
-        }
-      }
       else {
         let richlist = this.$("USMAutocompleteList");
         try {
@@ -712,15 +593,12 @@ StyleEditor.prototype = {
             richlist.removeChild(richlist.firstChild);
           }
         } catch (ex) {}
-        if (!this.sourceEditorEnabled) {
-          return;
-        }
         // Checking for autocompleting
         let textBefore = text.slice(0, currentPos);
         let word = textBefore.match(/([0-9a-zA-Z_\-]+)$/);
-        let colNum = this.editor.getCaretPosition().col;
+        let colNum = this.editor.getCursor().ch;
         this.caretPosCol = colNum;
-        let lineNum = this.editor.getCaretPosition().line;
+        let lineNum = this.editor.getCursor().line;
         this.caretPosLine = lineNum;
         if (!word) {
           try {
@@ -763,8 +641,10 @@ StyleEditor.prototype = {
           richlist.appendChild(item);
         }
         // Convert the caret position into x,y coordinates.
-        let lineHeight = this.editor._view.getLineHeight() || 17;
+        let lineHeight = 17;
         let {x, y} = this.getLocationAtOffset(currentPos - word.length);
+        x += this.editor.container.boxObject.screenX;
+        y += this.editor.container.boxObject.screenY + lineHeight;
         this.$("USMAutocompleteList").setAttribute("height",
                                                    Math.min(matchedList.length*20 + 15, 250));
         this.$("USMAutocompleteList").setAttribute("width", (maxLen*8 + 30));
@@ -794,7 +674,7 @@ StyleEditor.prototype = {
       panel.hidePopup();
       return;
     }
-    let offset = this.getOffsetAtLocation(event.screenX, event.screenY), startIndex;
+    let offset = this.getOffsetAtLocation(event.pageX, event.pageY), startIndex;
     let text = this.getText();
     let match = Math.max(text.slice(0, offset).lastIndexOf('url('), text.slice(0, offset).lastIndexOf('url ('));
     if (match == -1) {
@@ -831,13 +711,13 @@ StyleEditor.prototype = {
     }
   },
 
-  onMouseMove: function SE_onMouseMove({event}) {
+  onMouseMove: function SE_onMouseMove(event) {
     let panel = this.$("USMPreviewPanel");
     if (this.$("USMColorPickerPanel").state == "open") {
       panel.hidePopup();
       return;
     }
-    let offset = this.getOffsetAtLocation(event.screenX, event.screenY);
+    let offset = this.getOffsetAtLocation(event.pageX, event.pageY);
     let text = this.getText();
     if (text.length < 4) {
       return;
@@ -876,10 +756,10 @@ StyleEditor.prototype = {
     // this.caretPosCol = text.slice(0, startIndex).match(/\n?.{0,}$/).length;
     // this.caretPosLine = text.slice(0, startIndex).split("\n").length - 1;
     let screen = this.getLocationAtOffset(startIndex);
-    if ((screen.x - event.screenX) > 20 ||
-        (screen.x - event.screenX) < -8*match[0].length ||
-        (screen.y - event.screenY) > 20 ||
-        (screen.y - event.screenY) < -5) {
+    if ((screen.x - event.pageX) > 20 ||
+        (screen.x - event.pageX) < -8*match[0].length ||
+        (screen.y - event.pageY) > 25 ||
+        (screen.y - event.pageY) < -15) {
       panel.hidePopup();
       return;
     }
@@ -911,10 +791,10 @@ StyleEditor.prototype = {
     }
     this.setPreviewImage(this.regexp2RGB(match, color, color, color));
     if (panel.state == "closed") {
-      panel.openPopupAtScreen(screen.x, screen.y, false);
+      panel.openPopupAtScreen(event.screenX + 10, event.screenY + 10, false);
     }
     else {
-      panel.moveTo(screen.x, screen.y);
+      panel.moveTo(event.screenX + 10, event.screenY + 10);
     }
   },
 
@@ -934,9 +814,9 @@ StyleEditor.prototype = {
     if (this.$("USMPreviewPanel").state == "open") {
       this.$("USMPreviewPanel").hidePopup();
     }
-    let offset = this.getOffsetAtLocation(event.screenX, event.screenY);
-    this.caretPosCol= this.editor.getCaretPosition().col;
-    this.caretPosLine = this.editor.getCaretPosition().line;
+    let offset = this.getOffsetAtLocation(event.pageX, event.pageY);
+    this.caretPosCol= this.editor.getCursor().ch;
+    this.caretPosLine = this.editor.getCursor().line;
     let panel = document.getElementById("USMColorPickerPanel");
     let text = this.getText();
     let rgbhslaMatch = false, color;
@@ -964,10 +844,10 @@ StyleEditor.prototype = {
                     ? text.slice(startIndex).search(new RegExp(RGB_HSLA_MATCH, 'i'))
                     : text.slice(startIndex).search(new RegExp(HEX_MATCH, 'i'));
     let screen = this.getLocationAtOffset(startIndex);
-    if ((screen.x - event.screenX) > 20 ||
-        (screen.x - event.screenX) < -10*(match[0].length + (rgbhslaMatch?0:6)) ||
-        (screen.y - event.screenY) > 20 ||
-        (screen.y - event.screenY) < -5) {
+    if ((screen.x - event.pageX) > 20 ||
+        (screen.x - event.pageX) < -10*(match[0].length + (rgbhslaMatch?0:6)) ||
+        (screen.y - event.pageY) > 25 ||
+        (screen.y - event.pageY) < -15) {
       return;
     }
 
@@ -1270,7 +1150,7 @@ StyleEditor.prototype = {
     }.bind(this));
   },
 
-  /** Pass various options in the following format 
+  /** Pass various options in the following format
    ** as the fourth argument while opening editor
    ** [
    **   openNew, // bool , true if opening a new file
@@ -1286,34 +1166,26 @@ StyleEditor.prototype = {
    **/
   onLoad: function SE_onLoad(aEvent) {
 
-    let startEditor = function() {
-      if (this.sourceEditorEnabled) {
-        this.editor.init(editorPlaceholder, config, this.onEditorLoad.bind(this));
-      }
-      else {
-        editorPlaceholder.appendChild(this.editor);
-        this.setText(config.placeholderText);
-        this.editor.setSelectionRange(this.editor.value.length, this.editor.value.length);
-      }
+    let startEditor = (text = "") => {
+      this.editor.setText(text);
+      this.editor.clearHistory();
       this.origPath = styleSheetList[this.index][2];
       this.origEnabled = styleSheetList[this.index][0];
       this.styleName = styleSheetList[this.index][1];
-      if (!this.sourceEditorEnabled) {
-        this.onEditorLoad();
-      }
-    }.bind(this);
+      this.onEditorLoad();
+    };
 
-    let readFileData = function() {
+    let readFileData = () => {
       if (mappedCodeForIndex[this.index] &&
           mappedCodeForIndex[this.index].length > 0) {
+        let data = "";
         try {
-          config.placeholderText = mappedCodeForIndex[this.index];
-          config.initialText = mappedCodeForIndex[this.index];
+          data = mappedCodeForIndex[this.index];
         } catch (ex) {}
-        startEditor();
+        startEditor(data);
       }
       else {
-        NetUtil.asyncFetch(this.styleSheetFile, function(inputStream, status) {
+        NetUtil.asyncFetch(this.styleSheetFile, (inputStream, status) => {
           if (!Components.isSuccessCode(status)) {
             this.resetVariables();
             this.win.close();
@@ -1323,14 +1195,10 @@ StyleEditor.prototype = {
           try {
             data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
           } catch (ex) {}
-          try {
-            config.placeholderText = data;
-            config.initialText = data;
-          } catch (ex) {}
-          startEditor();
-        }.bind(this));
+          startEditor(data);
+        });
       }
-    }.bind(this);
+    };
 
     if (aEvent.target != this.doc) {
       return;
@@ -1376,21 +1244,7 @@ StyleEditor.prototype = {
       }
     }
 
-    if (this.sourceEditorEnabled) {
-      this.editor = new SourceEditor();
-    }
-    else {
-      this.editor = this.doc.createElementNS(XUL, "textbox");
-      this.editor.setAttribute("multiline", true);
-      this.editor.setAttribute("flex", "1");
-    }
 
-    // checking if gotoline is available or not
-    if (!this.editorFindEnabled) {
-      this.doc.getElementById("se-menu-gotoLine").disabled = true;
-      let fna = this.STR("featureNotAvailable");
-      this.doc.getElementById("se-menu-gotoLine").setAttribute("tooltiptext", fna);
-    }
     // Checking if clear default namespace needs to be disabled
     this.doc.getElementById("se-cmd-clearDefaultNamespace")
         .setAttribute("disabled", pref("defaultNamespace").match(/(xhtml|xul|none)/) == null);
@@ -1398,64 +1252,89 @@ StyleEditor.prototype = {
     if (this.initialText.length == 0) {
       this.initialText = this.STR("placeholder.text");
     }
-    let config = {
-      mode: this.sourceEditorEnabled? SourceEditor.MODES.CSS: null,
-      showLineNumbers: true,
-      placeholderText: this.initialText,
-      initialText: this.initialText,
-      contextMenu: "USMStyleEditorContextMenu",
+    let keyMap = {
+      "Tab": this.inputHelper.bind(this, "tab"), // This does not work for now
+      "Down": this.inputHelper.bind(this, "down"),
+      "Up": this.inputHelper.bind(this, "up"),
+      "Enter": this.inputHelper.bind(this, "enter"),
+      "Delete": this.inputHelper.bind(this, "other"),
+      "Backspace": this.inputHelper.bind(this, "other"),
+      "Left": this.inputHelper.bind(this, "other"),
+      "Right": this.inputHelper.bind(this, "other"),
+      "Home": this.inputHelper.bind(this, "other"),
+      "End": this.inputHelper.bind(this, "other"),
     };
+    let config = {
+      value: this.initialText,
+      lineNumbers: true,
+      mode: Editor.modes.css,
+      readOnly: false,
+      autoCloseBrackets: "{}()[]''\"\"",
+      contextMenu: "USMStyleEditorContextMenu",
+      extraKeys: keyMap
+    };
+    this.editor = new Editor(config);debugger;
     let editorPlaceholder = this.doc.getElementById("USMTextEditor");
     this.previewShown = false;
     this.saved = !this.createNew && !this.openNew;
 
-    readJSONPref(function() {
-      if (this.createNew) {
-        this.index = styleSheetList.length;
-        styleSheetList.push(['enabled', "", 
-                             (this.styleName.length > 0
-                              ? this.styleName + ".css"
-                              : escape("User Created Style Sheet " + this.index + ".css")),
-                             this.updateURL,
-                             "",
-                             JSON.stringify(new Date()), ""]);
-      }
-      else if (this.openNew) {
-        this.index = styleSheetList.length;
-        styleSheetList.push(['enabled', this.styleName, escape(this.stylePath),
-                             "", "", JSON.stringify(new Date()), ""]);
-      }
+    this.editor.appendTo(editorPlaceholder).then(() => {
+      // Hack for Tab key to work.
+      this.editor.extend({
+        overrideTab: ({cm}) => {
+          cm.addKeyMap({
+            "Tab": this.inputHelper.bind(this, "tab")
+          });
+        }
+      });
+      this.editor.overrideTab();
+      readJSONPref(() => {
+        if (this.createNew) {
+          this.index = styleSheetList.length;
+          styleSheetList.push([
+            'enabled', "",
+            (this.styleName.length > 0
+             ? this.styleName + ".css"
+             : escape("User Created Style Sheet " + this.index + ".css")),
+            this.updateURL, "", JSON.stringify(new Date()), ""
+          ]);
+        }
+        else if (this.openNew) {
+          this.index = styleSheetList.length;
+          styleSheetList.push(['enabled', this.styleName, escape(this.stylePath),
+                               "", "", JSON.stringify(new Date()), ""]);
+        }
 
-      if (this.createNew) {
-        try {
-          startEditor();
+        if (this.createNew) {
+          try {
+            startEditor();
+          }
+          catch (ex) {
+            this.styleSheetList.splice(this.index, 1);
+            this.resetVariables();
+            this.win.close();
+          }
         }
-        catch (ex) {
-          this.styleSheetList.splice(this.index, 1);
-          this.resetVariables();
-          this.win.close();
-        }
-      }
-      // Read the file and put the content in textBox
-      else {
-        let fileURI = getFileURI(unescape(styleSheetList[this.index][2]));
-        this.styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
-        if (!this.styleSheetFile.exists()) {
-          doRestore(this.index, readFileData);
-        }
+        // Read the file and put the content in textBox
         else {
-          readFileData();
+          let fileURI = getFileURI(unescape(styleSheetList[this.index][2]));
+          this.styleSheetFile = fileURI.QueryInterface(Ci.nsIFileURL).file;
+          if (!this.styleSheetFile.exists()) {
+            doRestore(this.index, readFileData);
+          }
+          else {
+            readFileData();
+          }
         }
-      }
-    }.bind(this));
+      });
+    });
   },
 
   onEditorLoad: function SE_onEditorLoad() {
     this.editor.focus();
     this.initialized = true;
-    this.$("USMTextEditor").firstChild.addEventListener("keypress", this.inputHelper, true);
-    this.$("USMTextEditor").firstChild.addEventListener("keyup", this.postInputHelper, true);
-    this.$("USMTextEditor").firstChild.addEventListener("keydown", this.preInputHelper, true);
+    this.editor.container.addEventListener("keyup", this.postInputHelper, true);
+    this.editor.container.addEventListener("keydown", this.preInputHelper, true);
 
     if (!this.createNew) {
       if (this.styleName && !this.saved) {
@@ -1488,11 +1367,9 @@ StyleEditor.prototype = {
     this.$("USMButtonPreview").onclick = this.previewButtonClick;
     this.$("USMButtonExit").onclick = this.exitButtonClick;
     // Assigning the mouse move and mouse click handler
-    if (this.sourceEditorEnabled) {
-      this.editor.addEventListener(SourceEditor.EVENTS.MOUSE_MOVE, this.onMouseMove);
-      this.$("USMTextEditor").firstChild.addEventListener("click", this.onMouseClick);
-      this.$("USMTextEditor").firstChild.addEventListener("dblclick", this.onDblClick);
-    }
+    this.editor.container.addEventListener("mousemove", this.onMouseMove);
+    this.editor.container.addEventListener("click", this.onMouseClick, true);
+    this.editor.container.addEventListener("dblclick", this.onDblClick, true);
     if (this.getText() == this.STR("placeholder.text")) {
       this.selectRange(0, this.getText().length);
     }
@@ -1508,19 +1385,11 @@ StyleEditor.prototype = {
   },
 
   getCaretOffset: function SE_getCaretOffset() {
-    if (this.sourceEditorEnabled) {
-      return this.editor.getCaretOffset();
-    }
-    return this.editor.selectionStart;
+    return this.editor.getOffset(this.editor.getCursor());
   },
 
   setCaretOffset: function SE_setCaretOffset(aOffset) {
-    if (this.sourceEditorEnabled) {
-      this.editor.setCaretOffset(aOffset);
-    }
-    else {
-      this.editor.setSelectionRange(aOffset, aOffset);
-    }
+    this.editor.setCursor(this.editor.getPosition(aOffset));
   },
 
   onToolsMenuShowing: function SE_onToolsMenuShowing() {
@@ -1859,7 +1728,7 @@ StyleEditor.prototype = {
       this.setText("@-moz-document url('') {\n}", pos, pos);
     }
     else {
-      this.setText("@-moz-document url('') {\n" + this.getText(start, end) + "\n}",
+      this.setText("@-moz-document url('') {\n" + this.selectedText() + "\n}",
                    start, end);
     }
     this.setCaretOffset(pos + 20);
@@ -1872,7 +1741,7 @@ StyleEditor.prototype = {
       this.setText("@-moz-document url-prefix('') {\n}", pos, pos);
     }
     else {
-      this.setText("@-moz-document url-prefix('') {\n" + this.getText(start, end) + "\n}",
+      this.setText("@-moz-document url-prefix('') {\n" + this.selectedText() + "\n}",
                    start, end);
     }
     this.setCaretOffset(pos + 27);
@@ -1939,7 +1808,6 @@ StyleEditor.prototype = {
     // This is a syntax validator as of now.
     let text = this.getText();
     let origCaretPos = this.getCaretOffset();
-    let origTopIndex = this.editor._view.getTopIndex();
     let error = false;
     let errorList = [];
     let warningList = [];
@@ -2343,7 +2211,7 @@ StyleEditor.prototype = {
       }
       this.setText(text);
       this.win.setTimeout(function() {
-        this.editor.setCaretPosition(origTopIndex, 1);
+        this.editor.setCursor({line: 0, ch: 0});
         this.setCaretOffset(origCaretPos);
       }.bind(this), text.length < 1000 ? 50: (text.length < 2500 ? 150: 350));
     }
@@ -2380,23 +2248,12 @@ StyleEditor.prototype = {
     this.doc.title = this.doc.title.replace(/^\*/, "");
     this.saved = true;
     this.savedOnce = true;
-    if (this.sourceEditorEnabled) {
-      this.editor.addEventListener(SourceEditor.EVENTS.TEXT_CHANGED, this.onTextChanged);
-    }
-    else {
-      this.editor.addEventListener("input", this.onTextChanged);
-    }
+    this.editor.once("change", this.onTextChanged);
   },
 
   onTextChanged: function SE_onTextChanged() {
     this.doc.title = "*" + this.doc.title;
     this.saved = false;
-    if (this.sourceEditorEnabled) {
-      this.editor.removeEventListener(SourceEditor.EVENTS.TEXT_CHANGED, this.onTextChanged);
-    }
-    else {
-      this.editor.removeEventListener("input" , this.onTextChanged);
-    }
   },
 
   onUnload: function SE_onUnload(aEvent) {
@@ -2405,17 +2262,14 @@ StyleEditor.prototype = {
     }
 
     this.resetVariables();
-    if (this.sourceEditorEnabled) {
-      this.editor.removeEventListener(SourceEditor.EVENTS.MOUSE_MOVE,
-                                      this.onMouseMove);
-    }
+    this.editor.container.removeEventListener("mousemove", this.onMouseMove);
     this.editor.destroy();
     this.editor = null;
     this.initialized = false;
   },
 
   promptCodeBlockStyles: function SE_promptCodeBlockStyles() {
-    
+
   },
 
   // return 0 : Save, 1 : Cancel , 2 : Don't Save
