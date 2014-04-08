@@ -80,6 +80,10 @@
 <!ENTITY keepDeletedOnSync.accesskey   "D">
 <!ENTITY keepDeletedOnSync.tooltip     "保留您在其他设备上删除掉的样式。\n这么做会将样式重新同步回您的其他设备">
 
+<!ENTITY syncImmediately.label        "立即同步">
+<!ENTITY syncImmediately.accesskey    "I">
+<!ENTITY syncImmediately.tooltip      "一旦您对样式作出任何修改，立即通过 Firefox 同步功能同步到服务器。\n否则 Firefox 会在自身设定的下次同步时间来同步样式。">
+
 <!ENTITY hotkey.tooltip               "创建一个自定义快捷键用以打开选项窗口">
 <!ENTITY hotkey.label                 "创建键盘快捷键">
 <!ENTITY hotkey.accesskey             "S">
