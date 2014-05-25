@@ -45,6 +45,7 @@ function pref(key, val) {
 pref.root = "extensions.UserStyleManager.";
 pref.defaults = {
   userStyleList: "[]",
+  colorPickerEnabled: true,
   maintainBackup: true,
   fallBack: true,
   firstRun: true,

@@ -16,6 +16,8 @@ Cu.import("resource://gre/modules/NetUtil.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
 Cu.import("chrome://userstylemanager-scripts/content/shared.jsm");
 
+var prefs = Services.prefs.getBranch("extensions.UserStyleManager.");
+
 function getFileURI(path) {
   return path.indexOf("file") == 0
            ? ios.newURI(path, null, null)
@@ -537,7 +539,8 @@ StyleEditor.prototype = {
       }
       // Case for color picker as you type
       else if (("(" == lastWord || "#" == lastWord) &&
-               text.slice(0, currentPos).match(/(rgba?\s*\(|#)$/)) {
+               text.slice(0, currentPos).match(/(rgba?\s*\(|#)$/) &&
+               prefs.getBoolPref("colorPickerEnabled")) {
         let match = text.slice(0, currentPos).match(/(rgba?\s*\()|(#)$/), color;
         let panel = document.getElementById("USMColorPickerPanel");
         if (match && match[2] != "#") {
