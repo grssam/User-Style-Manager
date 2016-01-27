@@ -8,6 +8,7 @@
 "use strict";
 
 Cu.import("chrome://userstylemanager-scripts/content/shared.jsm");
+Cu.import("resource://services-sync/util.js");
 
 // Global Variable to store the style sheet data
 // Format : [status, name, path, url, applies on, date added, date modified, style options, local changes ?]

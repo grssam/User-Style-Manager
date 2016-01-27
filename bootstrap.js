@@ -198,7 +198,8 @@ function addContextMenuEntry(window) {
         $(contextMenuEntryID + "Seperator").hidden = $(contextMenuEntryID).hidden = true;
       }
     };
-    let (contextEntry = window.document.createElementNS(XUL, "menuitem")) {
+    {
+      let contextEntry = window.document.createElementNS(XUL, "menuitem");
       contextEntry.setAttribute("id", contextMenuEntryID);
       contextEntry.setAttribute("class", "menuitem-iconic");
       contextEntry.setAttribute("image", LOGO);
@@ -270,7 +271,8 @@ function populateMenuPopupList(window, id, event) {
       child = child.nextSibling;
       menupop.removeChild(item);
     }
-    let (itemManage = window.document.createElementNS(XUL, "menuitem")) {
+    {
+      let itemManage = window.document.createElementNS(XUL, "menuitem");
       itemManage.setAttribute("label", l10n("manage.label"));
       itemManage.setAttribute("accesskey", l10n("manage.accesskey"));
       itemManage.setAttribute("tooltiptext", l10n("manage.tooltip"));
@@ -278,34 +280,40 @@ function populateMenuPopupList(window, id, event) {
       menupop.appendChild(itemManage);
     }
     // Adding menu to create new styles based on current domain/url/blank/Fx Chrome
-    let (createMenu = window.document.createElementNS(XUL, "menu")) {
+    {
+      let createMenu = window.document.createElementNS(XUL, "menu");
       createMenu.setAttribute("label", l10n("create.label"));
       createMenu.setAttribute("accesskey", l10n("create.accesskey"));
       createMenu.setAttribute("tooltiptext", l10n("create.tooltip"));
-      let (createMenupop = window.document.createElementNS(XUL, "menupopup")) {
+      {
+        let createMenupop = window.document.createElementNS(XUL, "menupopup");
         createMenupop.setAttribute("class", "popup-internal-box");
-        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+        {
+          let createItem = window.document.createElementNS(XUL, "menuitem");
           createItem.setAttribute("label", l10n("create.blank.label"));
           createItem.setAttribute("accesskey", l10n("create.blank.accesskey"));
           createItem.setAttribute("tooltiptext", l10n("create.blank.tooltip"));
           listen(window, createItem, "command", function() createNew(window, 'blank'));
           createMenupop.appendChild(createItem);
         }
-        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+        {
+          let createItem = window.document.createElementNS(XUL, "menuitem");
           createItem.setAttribute("label", l10n("create.domain.label"));
           createItem.setAttribute("accesskey", l10n("create.domain.accesskey"));
           createItem.setAttribute("tooltiptext", l10n("create.domain.tooltip") + " " + getDomain(window));
           listen(window, createItem, "command", function() createNew(window, 'domain'));
           createMenupop.appendChild(createItem);
         }
-        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+        {
+          let createItem = window.document.createElementNS(XUL, "menuitem");
           createItem.setAttribute("label", l10n("create.url.label"));
           createItem.setAttribute("accesskey", l10n("create.url.accesskey"));
           createItem.setAttribute("tooltiptext", l10n("create.url.tooltip") + " " + getURL(window));
           listen(window, createItem, "command", function() createNew(window, 'url'));
           createMenupop.appendChild(createItem);
         }
-        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+        {
+          let createItem = window.document.createElementNS(XUL, "menuitem");
           createItem.setAttribute("label", l10n("create.fx.label"));
           createItem.setAttribute("accesskey", l10n("create.fx.accesskey"));
           createItem.setAttribute("tooltiptext", l10n("create.fx.tooltip"));
@@ -317,13 +325,16 @@ function populateMenuPopupList(window, id, event) {
       menupop.appendChild(createMenu);
     }
     // Adding menu to search for styles related to current page/domain or even blank
-    let (createMenu = window.document.createElementNS(XUL, "menu")) {
+    {
+      let createMenu = window.document.createElementNS(XUL, "menu");
       createMenu.setAttribute("label", l10n("find.label"));
       createMenu.setAttribute("accesskey", l10n("find.accesskey"));
       createMenu.setAttribute("tooltiptext", l10n("find.tooltip"));
-      let (createMenupop = window.document.createElementNS(XUL, "menupopup")) {
+      {
+        let createMenupop = window.document.createElementNS(XUL, "menupopup");
         createMenupop.setAttribute("class", "popup-internal-box");
-        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+        {
+          let createItem = window.document.createElementNS(XUL, "menuitem");
           createItem.setAttribute("label", l10n("find.url.label"));
           createItem.setAttribute("accesskey", l10n("find.url.accesskey"));
           createItem.setAttribute("tooltiptext", l10n("find.url.tooltip") + " " + getURL(window));
@@ -337,7 +348,8 @@ function populateMenuPopupList(window, id, event) {
           });
           createMenupop.appendChild(createItem);
         }
-        let (createItem = window.document.createElementNS(XUL, "menuitem")) {
+        {
+          let createItem = window.document.createElementNS(XUL, "menuitem");
           createItem.setAttribute("label", l10n("find.fx.label"));
           createItem.setAttribute("accesskey", l10n("find.fx.accesskey"));
           createItem.setAttribute("tooltiptext", l10n("find.fx.tooltip"));
@@ -351,10 +363,12 @@ function populateMenuPopupList(window, id, event) {
       menupop.appendChild(createMenu);
     }
     // Adding the menu containing sorted stylesheets
-    let (sortedMenu = window.document.createElementNS(XUL, "menu")) {
+    {
+      let sortedMenu = window.document.createElementNS(XUL, "menu");
       sortedMenu.setAttribute("label", l10n("sortedMenu.label"));
       sortedMenu.setAttribute("accesskey", l10n("sortedMenu.accesskey"));
-      let (sortedMenupop = window.document.createElementNS(XUL, "menupopup")) {
+      {
+        let sortedMenupop = window.document.createElementNS(XUL, "menupopup");
         sortedMenupop.setAttribute("class", "popup-internal-box");
         sortedStyleSheet.forEach(function(data) {
           let sortedItem = window.document.createElementNS(XUL, "menu");
@@ -362,7 +376,8 @@ function populateMenuPopupList(window, id, event) {
           sortedItem.setAttribute("class", "menu-iconic");
           let sortedItemMenupop = window.document.createElementNS(XUL, "menupopup");
           sortedItemMenupop.setAttribute("class", "popup-internal-box");
-          let (enableAll = window.document.createElementNS(XUL, "menuitem")) {
+          {
+            let enableAll = window.document.createElementNS(XUL, "menuitem");
             enableAll.setAttribute("label", l10n("enableAll.label"));
             enableAll.setAttribute("accesskey", l10n("enableAll.accesskey"));
             enableAll.setAttribute("tooltiptext", l10n("enableAll.tooltip"));
@@ -380,7 +395,8 @@ function populateMenuPopupList(window, id, event) {
             });
             sortedItemMenupop.appendChild(enableAll);
           }
-          let (disableAll = window.document.createElementNS(XUL, "menuitem")) {
+          {
+            let disableAll = window.document.createElementNS(XUL, "menuitem");
             disableAll.setAttribute("label", l10n("disableAll.label"));
             disableAll.setAttribute("accesskey", l10n("disableAll.accesskey"));
             disableAll.setAttribute("tooltiptext", l10n("disableAll.tooltip"));
@@ -398,7 +414,8 @@ function populateMenuPopupList(window, id, event) {
             });
             sortedItemMenupop.appendChild(disableAll);
           }
-          let (sep = window.document.createElementNS(XUL, "menuseparator")) {
+          {
+            let sep = window.document.createElementNS(XUL, "menuseparator");
             sortedItemMenupop.appendChild(sep);
           }
           for (let i = 1; i < data.length; i++) {
@@ -448,10 +465,12 @@ function populateMenuPopupList(window, id, event) {
       }
       menupop.appendChild(sortedMenu);
     }
-    let (sep = window.document.createElementNS(XUL, "menuseparator")) {
+    {
+      let sep = window.document.createElementNS(XUL, "menuseparator");
       menupop.appendChild(sep);
     }
-    let (enabled = window.document.createElementNS(XUL, "menuitem")) {
+    {
+      let enabled = window.document.createElementNS(XUL, "menuitem");
       enabled.setAttribute("label", l10n("enabled.label"));
       enabled.setAttribute("accesskey", l10n("enabled.accesskey"));
       enabled.setAttribute("tooltiptext", l10n("enabled.tooltip"));
@@ -463,7 +482,8 @@ function populateMenuPopupList(window, id, event) {
       });
       menupop.appendChild(enabled);
     }
-    let (disabled = window.document.createElementNS(XUL, "menuitem")) {
+    {
+      let disabled = window.document.createElementNS(XUL, "menuitem");
       disabled.setAttribute("label", l10n("disabled.label"));
       disabled.setAttribute("accesskey", l10n("disabled.accesskey"));
       disabled.setAttribute("tooltiptext", l10n("disabled.tooltip"));
@@ -476,7 +496,8 @@ function populateMenuPopupList(window, id, event) {
       });
       menupop.appendChild(disabled);
     }
-    let (sep = window.document.createElementNS(XUL, "menuseparator")) {
+    {
+      let sep = window.document.createElementNS(XUL, "menuseparator");
       menupop.appendChild(sep);
     }
     styleSheetList.forEach(function(style, index) {
@@ -521,7 +542,7 @@ function populateMenuPopupList(window, id, event) {
 
 function addMenuItem(window) {
   function $(id) window.document.getElementById(id);
- 
+
   function removeMenuItem() {
     let menuitem = $(toolsMenuitemID);
     menuitem && menuitem.parentNode.removeChild(menuitem);
@@ -531,7 +552,8 @@ function addMenuItem(window) {
   removeMenuItem();
   if (pref("createToolsMenuButton")) {
     // add the new menuitem to File menu
-    let (menu = window.document.createElementNS(XUL, "menu")) {
+    {
+      let menu = window.document.createElementNS(XUL, "menu");
       menu.setAttribute("id", toolsMenuitemID);
       menu.setAttribute("class", "menu-iconic");
       if (pref("createHotKey")) {
@@ -555,7 +577,8 @@ function addMenuItem(window) {
       return;
     let appMenu = $("appmenuPrimaryPane");
     if (appMenu) {
-      let (appMenuItem = window.document.createElementNS(XUL, "menu")) {
+      {
+        let appMenuItem = window.document.createElementNS(XUL, "menu");
         appMenuItem.setAttribute("id", appMenuitemID);
         appMenuItem.setAttribute("class", "menu-iconic");
         appMenuItem.setAttribute("image", LOGO);
@@ -670,7 +693,8 @@ function createHotKey(window) {
     let USMKeyset = window.document.createElementNS(XUL, "keyset");
     USMKeyset.setAttribute("id", keysetID);
     // add hotkey
-    let (optionsKey = window.document.createElementNS(XUL, "key")) {
+    {
+      let optionsKey = window.document.createElementNS(XUL, "key");
       optionsKey.setAttribute("id", keyID);
       optionsKey.setAttribute("key", pref("shortcutKey"));
       optionsKey.setAttribute("modifiers", pref("shortcutModifiers"));
@@ -721,14 +745,16 @@ function addUserStyleHandler(window) {
     for (let i = 0; i < links.length; i++) {
       switch (links[i].rel) {
         case "stylish-code":
-          let (id = links[i].getAttribute("href").replace("#", "")) {
+          {
+            let id = links[i].getAttribute("href").replace("#", "");
             let element = document.getElementById(id);
             if (element)
               code = element.textContent;
           }
           break;
         case "stylish-description":
-          let (id = links[i].getAttribute("href").replace("#", "")) {
+          {
+            let id = links[i].getAttribute("href").replace("#", "");
             let element = document.getElementById(id);
             if (element)
               name = element.textContent;
@@ -757,14 +783,16 @@ function addUserStyleHandler(window) {
     for (let i = 0; i < links.length; i++) {
       switch (links[i].rel) {
         case "stylish-code":
-          let (id = links[i].getAttribute("href").replace("#", "")) {
+          {
+            let id = links[i].getAttribute("href").replace("#", "");
             let element = document.getElementById(id);
             if (element)
               code = element.textContent;
           }
           break;
         case "stylish-description":
-          let (id = links[i].getAttribute("href").replace("#", "")) {
+          {
+            let id = links[i].getAttribute("href").replace("#", "");
             let element = document.getElementById(id);
             if (element)
               name = element.textContent;
