@@ -5,7 +5,7 @@
     <creator>Girish Sharma</creator>
     <id>UserStyleManager@girishsharma</id>
     <name>User Style Manager</name>
-    <version>1.1</version>
+    <version>1.2</version>
     <bootstrap>true</bootstrap>
     <type>2</type>
     <homepageURL>https://addons.mozilla.org/en-US/firefox/addon/user-style-manager/</homepageURL>
@@ -17,7 +17,8 @@
     <translator>Fang5566 (zh-CN)</translator>
     <contributor>Drugoy (extreme testing, feedback and bug reporting)</contributor>
     <contributor>Alopepeo (testing, feedback and bug reporting)</contributor>
-    <strictCompatibility>true</strictCompatibility>
+    <contributor>doctorcolossus (Firefox 44+ compat)</contributor>
+    <strictCompatibility>false</strictCompatibility>
 
     <localized>
       <Description>
@@ -42,8 +43,8 @@
     <targetApplication>
       <r:Description>
         <id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</id>
-        <minVersion>28.0</minVersion>
-        <maxVersion>31.0a1</maxVersion>
+        <minVersion>40.0</minVersion>
+        <maxVersion>47.0a1</maxVersion>
       </r:Description>
     </targetApplication>
   </r:Description>
