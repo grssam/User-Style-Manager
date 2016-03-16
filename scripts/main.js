@@ -22,6 +22,8 @@ let sss = Cc["@mozilla.org/content/style-sheet-service;1"]
             .getService(Ci.nsIStyleSheetService);
 // Global I/O service
 let ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+// To read & write content to file
+const {TextDecoder, TextEncoder, OS} = Cu.import("resource://gre/modules/osfile.jsm", {});
 // Global prompt service
 let promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
                       .getService(Ci.nsIPromptService);
@@ -39,18 +41,14 @@ let openEditors = {};
 
 // Function to read the preferences
 function readJSONPref(callback) {
-  let JSONFile = getURIForFileInUserStyles("Preferences/usm.pref")
-                   .QueryInterface(Ci.nsIFileURL).file;
-  if (JSONFile.exists()) {
-    let channel = NetUtil.newChannel(JSONFile);
-    channel.contentType = "application/json";
-    NetUtil.asyncFetch(channel, function(inputStream, status) {
-      if (!Components.isSuccessCode(status)) {
-        styleSheetList = JSON.parse(pref("userStyleList"));
-        return;
-      }
-      let data = NetUtil.readInputStreamToString(inputStream,
-                                                 inputStream.available());
+  let JSONFile = OS.Path.join(OS.Constants.Path.profileDir,
+                              "User Styles", "Preferences", "usm.pref");
+  let decoder = new TextDecoder();
+  let promise = OS.File.read(JSONFile);
+  promise = promise.then(
+    function onSuccess(data) {
+      data = decoder.decode(data);
+      //console.log(data);
       styleSheetList = JSON.parse(data);
       mappedIndexForGUIDs = {};
       for (let index = 0; index < styleSheetList.length; index++) {
@@ -59,22 +57,19 @@ function readJSONPref(callback) {
         }
         mappedIndexForGUIDs[styleSheetList[index][9]] = index;
       }
-      callback && callback();
-    });
-  }
-  else {
-    let prefDirectory = getURIForFileInUserStyles("Preferences/")
-                          .QueryInterface(Ci.nsIFileURL).file;
-    if (!prefDirectory.exists()) {
-      prefDirectory.create(1, parseInt('0777', 8));
-    }
-    JSONFile.create(0, parseInt('0666', 8));
-    let ostream = FileUtils.openSafeFileOutputStream(JSONFile);
-    let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-                      .createInstance(Ci.nsIScriptableUnicodeConverter);
-    converter.charset = "UTF-8";
-    let istream = converter.convertToInputStream(JSON.stringify(styleSheetList));
-    NetUtil.asyncCopy(istream, ostream, function(status) {
+      return callback && callback();
+    },
+    function onFailure(reason) {
+      console.log(reason);
+      styleSheetList = JSON.parse(pref("userStyleList"));
+
+      let prefDir = OS.Path.join(OS.Constants.Path.profileDir, "User Styles", "Preferences");
+      OS.File.makeDir(prefDir);
+
+      let encoder = new TextEncoder();
+      let array = encoder.encode(JSON.stringify(styleSheetList));
+      OS.File.writeAtomic(JSONFile, array, {tmpPath: JSONFile + ".tmp"});
+
       mappedIndexForGUIDs = {};
       for (let index = 0; index < styleSheetList.length; index++) {
         if (styleSheetList[index][9] == null) {
@@ -82,24 +77,21 @@ function readJSONPref(callback) {
         }
         mappedIndexForGUIDs[styleSheetList[index][9]] = index;
       }
-      callback && callback();
-    });
-  }
+      return callback && callback();
+    }
+  );
 }
 
 // Function to write the preferences
 function writeJSONPref(callback) {
   pref("userStyleList", JSON.stringify(styleSheetList));
-  let JSONFile = getURIForFileInUserStyles("Preferences/usm.pref")
-                   .QueryInterface(Ci.nsIFileURL).file;
-  let ostream = FileUtils.openSafeFileOutputStream(JSONFile);
-  let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-                    .createInstance(Ci.nsIScriptableUnicodeConverter);
-  converter.charset = "UTF-8";
-  let istream = converter.convertToInputStream(JSON.stringify(styleSheetList));
-  NetUtil.asyncCopy(istream, ostream, function(status) {
-    callback && callback();
-  });
+  let JSONFile = OS.Path.join(OS.Constants.Path.profileDir,
+                              "User Styles", "Preferences", "usm.pref");
+  let encoder = new TextEncoder();
+  let array = encoder.encode(JSON.stringify(styleSheetList));
+  let promise = OS.File.writeAtomic(JSONFile, array, {tmpPath: JSONFile + ".tmp"});
+
+  callback && callback();
 }
 
 function readStylesToMap(index) {
@@ -114,20 +106,22 @@ function readStylesToMap(index) {
   else {
     let file = getFileURI(unescape(styleSheetList[index][2]))
                  .QueryInterface(Ci.nsIFileURL).file;
-    NetUtil.asyncFetch(file, function(inputStream, status) {
-      if (!Components.isSuccessCode(status)) {
+    let decoder = new TextDecoder();
+    let promise = OS.File.read(file.path);
+    promise = promise.then(
+      function onSuccess(data) {     
+        data = decoder.decode(data);
+        mappedCodeForIndex[index] = data;
+        return readStylesToMap(++index);
+      },
+      function onFailure(reason) {
         readStylesToMap(-1);
         Cu.reportError("Error occurred while trying to read the style file for" +
                        " index " + index + " : " + status);
+        console.error(reason);
         return;
       }
-      let data = "";
-      try {
-        data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-      } catch (ex) {}
-      mappedCodeForIndex[index] = data;
-      readStylesToMap(++index);
-    });
+    );
   }
 }
 

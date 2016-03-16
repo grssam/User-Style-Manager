@@ -140,7 +140,11 @@ UserStylesTracker.prototype = {
 
   _enabled: true,
   observe: function observe(subject, topic, data) {
-    data = JSON.parse(data);
+    try {
+      data = JSON.parse(data);
+    } catch (ex) {
+      console.error(ex);
+    }
     switch (topic) {
 
       case "USM:codeMappings:deleted":

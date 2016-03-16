@@ -1185,18 +1185,19 @@ StyleEditor.prototype = {
         startEditor(data);
       }
       else {
-        NetUtil.asyncFetch(this.styleSheetFile, (inputStream, status) => {
-          if (!Components.isSuccessCode(status)) {
+        let decoder = new TextDecoder();
+        let promise = OS.File.read(this.styleSheetFile.path);
+        promise = promise.then(
+          function onSuccess(data) {
+            data = decoder.decode(data);
+            return startEditor(data);
+          },
+          function onFailure(reason) {
             this.resetVariables();
             this.win.close();
             return;
           }
-          let data = "";
-          try {
-            data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-          } catch (ex) {}
-          startEditor(data);
-        });
+        );
       }
     };
 
