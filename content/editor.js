@@ -9,7 +9,13 @@
 let global = this;
 const {classes: Cc, interfaces: Ci, utils: Cu} = Components;
 const {require} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {}).devtools;
-const Editor  = require("devtools/sourceeditor/editor");
+var Editor;
+try {
+  // Firefox 44+
+  Editor = require("devtools/client/sourceeditor/editor");
+} catch (ex) {
+  Editor = require("devtools/sourceeditor/editor");
+}
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/NetUtil.jsm");
@@ -1185,18 +1191,19 @@ StyleEditor.prototype = {
         startEditor(data);
       }
       else {
-        NetUtil.asyncFetch(this.styleSheetFile, (inputStream, status) => {
-          if (!Components.isSuccessCode(status)) {
+        let decoder = new TextDecoder();
+        let promise = OS.File.read(this.styleSheetFile.path);
+        promise = promise.then(
+          function onSuccess(data) {
+            data = decoder.decode(data);
+            return startEditor(data);
+          },
+          function onFailure(reason) {
             this.resetVariables();
             this.win.close();
             return;
           }
-          let data = "";
-          try {
-            data = NetUtil.readInputStreamToString(inputStream, inputStream.available());
-          } catch (ex) {}
-          startEditor(data);
-        });
+        );
       }
     };
 
@@ -1764,19 +1771,19 @@ StyleEditor.prototype = {
   },
 
   closeErrorPanel: function SE_closeErrorPanel() {
-    let (errorPanel = this.$("USMErrorPanel")) {
-      this.$("USMErrorLabel").style.opacity = 0;
-      this.$("USMErrorLabel").style.margin = "30px 0px -60px 0px";
-      errorPanel.style.opacity = 0;
-      errorPanel.style.margin = "100px 0px -100px 0px;";
-      while (errorPanel.firstChild) {
-        errorPanel.removeChild(errorPanel.firstChild);
-      }
+    let errorPanel = this.$("USMErrorPanel");
+    this.$("USMErrorLabel").style.opacity = 0;
+    this.$("USMErrorLabel").style.margin = "30px 0px -60px 0px";
+    errorPanel.style.opacity = 0;
+    errorPanel.style.margin = "100px 0px -100px 0px;";
+    while (errorPanel.firstChild) {
+      errorPanel.removeChild(errorPanel.firstChild);
     }
   },
 
   validateCSS: function SE_validateCSS(previewing) {
-    let (errorPanel = this.$("USMErrorPanel")) {
+    {
+      let errorPanel = this.$("USMErrorPanel");
       while (errorPanel.firstChild) {
         errorPanel.removeChild(errorPanel.firstChild);
       }
@@ -2120,7 +2127,8 @@ StyleEditor.prototype = {
                     : promptService.confirm(null, this.STR("validate.error"),
                                             this.STR("validate.notCSS"));
       if (!answer) {
-        let (errorPanel = this.$("USMErrorPanel")) {
+        {
+          let errorPanel = this.$("USMErrorPanel");
           while (errorPanel.firstChild) {
             errorPanel.removeChild(errorPanel.firstChild);
           }
